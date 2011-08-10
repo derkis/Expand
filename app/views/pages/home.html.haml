@@ -3,8 +3,8 @@
   .nav
     .button
       %form{ :method => 'link', :action => '/login' }
-      %input{ :type => 'submit', :value => 'Login' }
-    .links
+        %input{ :type => 'submit', :value => 'Login' }
+    %nav
       %ul
         %li= link_to 'Play Now', '/portal'
         %li= link_to 'Register', '/register'
