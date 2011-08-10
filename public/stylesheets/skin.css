@@ -1,37 +1,50 @@
-body {
+html, body {
+	height: 100;
+
 	margin: 0;
 	padding: 0;
-	background: #FFF;
-	
 }
 
 .container {
+	background: #FFF;
+	min-height: 100%;
 	width: 100%;
+	
 }
 
 header {
 	padding: 1em;
+	height: 50px;
 }
 
 header img {
 	
 }
 
-section {
-	margin-top: 1em;
-	padding: 0.3em;
-	padding-bottom: 1em;
+.content {
+	min-height: 100%;
+	height: auto !important;
+	height: 100%;
+	margin: 0 auto -1em;
+	vertical-align: bottom;
 }
 
-section h1 {
-  font-size: 200%;
+.content h1 {
+	font-size: 200%;
 }
 
-footer {
-	position: absolute;
-	bottom: 0;
-	width: 100%;
+footer, .push {
 	height: 1em;
+	padding: 1em;
+	clear: both;
+}
+
+footer #footer_left {
+	float: left;
+}
+
+footer #footer_right {
+	float: right;
 }
 
 /* Links */
@@ -87,34 +100,35 @@ nav ul li a:hover {
 
 /* home */
 
-.mainbar {
+#mainbar {
 	position: relative;
-	top: 13em;
+	top: 15em;
 	height: 13em;
-	margin-left: -1.1em;
-	margin-right: -1.1em;
 	background: #365656;
-	border-style: solid;
+	border-top-style: solid;
+	border-bottom-style: solid;
 	border-width: 0.4em;
 	border-color: #568A8A;
+	clear: both;
 }
 
-.mainbar img {
-	padding-left: 2em;
-}
-
-.mainbar .nav {
-	float: right;
-	width: 10em;
-	padding-right: 5em;
-}
-
-.mainbar .nav .button {
+#mainbar img {
 	float: left;
-	vertical-align: middle;
 }
 
-.mainbar .nav .links {
-	float: right;
+#mainbar .nav {
+	float: left;
+	height: inherit;
+}
+
+#mainbar .nav .button {
+	float: left;
+	clear: right;
+	vertical-align: center;
+	width: 5em;
+}
+
+#mainbar .nav .links {
+	float: left;
 }
 

@@ -1,6 +1,6 @@
 Acquire::Application.routes.draw do
-  match '/contact', :to => 'pages#contact'
-  match '/about', :to => 'pages#about'
+  match '/contact', :to => 'pages#contact', :as => :contact
+  match '/about', :to => 'pages#about', :as => :about
   
   root :to => "pages#home"
 
