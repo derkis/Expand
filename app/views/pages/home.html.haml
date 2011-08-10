@@ -1,6 +1,11 @@
-#main_bar
-  %img.title{ :src => 'title.png', :alt => 'Expand' }
-  %ul#header_links
-    %li.list_item= link_to 'Login', '/login'
-    %li.list_item= link_to 'Register', '/register'
-    %li.list_item= link_to 'Play Now', '/portal'
+.mainbar
+  = image_tag("title.png", :alt => "Expand")
+  .nav
+    .button
+      %form{ :method => 'link', :action => '/login' }
+      %input{ :type => 'submit', :value => 'Login' }
+    .links
+      %ul
+        %li= link_to 'Play Now', '/portal'
+        %li= link_to 'Register', '/register'
+      
