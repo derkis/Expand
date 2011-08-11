@@ -114,23 +114,23 @@ nav ul li a:hover {
 	padding-left: 6em;
 }
 
-#mainbar .nav {
+#mainbar .login_links {
 	overflow: hidden;
 	height: inherit;
 }
 
-#mainbar .nav .button {
+#mainbar .login_links .button {
 	height: 5em;
 	width: 10em;
 }
 
-#mainbar .nav nav {
+#mainbar .login_links nav {
 	float: none;
 	height: 4em;
 	width: 5em;
 }
 
-#mainbar .nav nav ul li {
+#mainbar .login_links nav ul li {
 	display: block;
 }
 

@@ -1,6 +1,10 @@
 Acquire::Application.routes.draw do
+  resources :users
+
   match '/contact', :to => 'pages#contact', :as => :contact
   match '/about', :to => 'pages#about', :as => :about
+  
+  match '/register', :to => 'users#new', :as => :register
   
   root :to => "pages#home"
 
