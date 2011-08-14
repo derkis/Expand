@@ -2,7 +2,7 @@ class UsersController < ApplicationController
     
   def new
     @user = User.new
-    @title = 'Register!'
+    @title = 'Register'
   end
   
   def show
@@ -15,7 +15,7 @@ class UsersController < ApplicationController
     if @user.save
       redirect_to "" # TODO redirect to lobby
     else
-      @title = "Register!"
+      @title = "Register"
       render 'new'
     end
   end
