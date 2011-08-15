@@ -1,10 +1,13 @@
 Acquire::Application.routes.draw do
   resources :users
+  resources :sessions, :only => [:new, :create, :destroy]
 
   match '/contact', :to => 'pages#contact', :as => :contact
   match '/about', :to => 'pages#about', :as => :about
   
   match '/register', :to => 'users#new', :as => :register
+  match '/login', :to => 'sessions#new', :as => :login
+  match '/signout', :to => 'sessions#destroy', :as => :logout
   
   root :to => "pages#home"
 

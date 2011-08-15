@@ -13,6 +13,8 @@ class UsersController < ApplicationController
   def create
     @user = User.new(params[:user])
     if @user.save
+      sign_in @user
+      flash[:success] = "Welcome"
       redirect_to "" # TODO redirect to lobby
     else
       @title = "Register"
