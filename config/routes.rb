@@ -9,6 +9,8 @@ Acquire::Application.routes.draw do
   match '/login', :to => 'sessions#new', :as => :login
   match '/signout', :to => 'sessions#destroy', :as => :logout
   
+  match '/lobby', :to => 'lobby#lobby', :as => :lobby
+  
   root :to => "pages#home"
 
   # The priority is based upon order of creation:

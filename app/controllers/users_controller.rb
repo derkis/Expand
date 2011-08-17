@@ -10,13 +10,15 @@ class UsersController < ApplicationController
   end
   
   def create
+    params[:user][:is_online] = false
     @user = User.new(params[:user])
     if @user.save
       sign_in @user
-      flash[:success] = "Welcome"
-      redirect_to "" # TODO redirect to lobby
+      flash[:success] = "Registered successfully, you may now begin playing!"
+      redirect_to :lobby
     else
       @title = "Register"
+      flash.now[:failure] = "Didn't work bro."
       render 'new'
     end
   end

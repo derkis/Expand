@@ -5,7 +5,6 @@ describe "Users" do
   describe "registration" do
 
     descirbe "failure" do
-
       it "should not make a new user" do
         lambda do
           visit signup_path

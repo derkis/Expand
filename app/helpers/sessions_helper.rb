@@ -3,6 +3,7 @@ module SessionsHelper
   def sign_in(user)
     cookies.permanent.signed[:remember_token] = [user.id, user.salt]
     current_user = user
+    toggle_status(user)
   end
   
   def current_user
@@ -25,5 +26,10 @@ module SessionsHelper
     
     def remember_token
       cookies.signed[:remember_token] || [nil, nil]
+    end
+    
+    def toggle_status(user)
+      user.is_online = !user.is_online
+      user.save
     end
 end
