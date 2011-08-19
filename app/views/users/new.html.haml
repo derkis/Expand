@@ -1,16 +1,5 @@
 = form_for(@user) do |f|
-  = render 'shared/error_messages'
-  .input
-    = f.label :name
-    = f.text_field :name
-  .input
-    = f.label :email
-    = f.text_field :email
-  .input
-    = f.label :password
-    = f.password_field :password
-  .input
-    = f.label :password_confirmation, 'Confirm Password'
-    = f.password_field :password_confirmation
+  = render 'shared/error_messages', :object => f.object
+  = render 'fields', :f => f
   .action
     = f.submit 'Submit'

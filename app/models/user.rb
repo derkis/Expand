@@ -14,7 +14,7 @@
 
 class User < ActiveRecord::Base
   attr_accessor :password, :is_online
-  attr_accessible :name, :email, :password, :password_confirmation 
+  attr_accessible :name, :email, :password, :password_confirmation
 
   email_regex = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
     
@@ -28,19 +28,21 @@ class User < ActiveRecord::Base
                        :length       => { :within => 6..40 }
                        
   before_save :encrypt_password
+   
+  class << self
+    def authenticate(email, submitted_password)
+      user = find_by_email(email)
+      user if user and user.has_password?(submitted_password)
+    end
+  
+    def authenticate_with_salt(id, cookie_salt)
+      user = find_by_id(id)
+      user if user and user.salt == cookie_salt
+    end
+  end
   
   def has_password?(submitted_password)
     encrypted_password == encrypt(submitted_password)
-  end
-  
-  def self.authenticate(email, submitted_password)
-    user = find_by_email(email)
-    return user if user.has_password?(submitted_password) unless user.nil?
-  end
-  
-  def self.authenticate_with_salt(id, cookie_salt)
-    user = find_by_id(id)
-    (user && user.salt == cookie_salt) ? user : nil
   end
   
   private

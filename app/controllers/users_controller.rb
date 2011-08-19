@@ -10,7 +10,6 @@ class UsersController < ApplicationController
   end
   
   def create
-    params[:user][:is_online] = false
     @user = User.new(params[:user])
     if @user.save
       sign_in @user
@@ -21,5 +20,10 @@ class UsersController < ApplicationController
       flash.now[:failure] = "Didn't work bro."
       render 'new'
     end
+  end
+  
+  def edit
+    @user = User.find(params[:id])
+    @title = "Edit Profile"
   end
 end

@@ -12,17 +12,16 @@ html, body {
 }
 
 header {
-	padding: 1em;
-	height: 50px;
-}
-
-header img {
-	
+	background: #F0F5EB;
+	margin: -1em -1em 2em;
+	height: 20px;
+	padding-bottom: 0.5em;
 }
 
 .content {
 	min-height: inherit;
 	height: inherit;
+	padding: 1em 1em 0;
 	margin: 0 auto -4em;
 	vertical-align: bottom;
 }
@@ -35,6 +34,10 @@ footer, .push {
 	height: 1em;
 	padding: 1em;
 	clear: both;
+}
+
+footer {
+	background: #F0F5EB;
 }
 
 footer #footer_left {
@@ -100,8 +103,9 @@ nav ul li a:hover {
 
 #mainbar {
 	position: relative;
-	top: 15em;
+	top: 23em;
 	height: 13em;
+	margin: 0 -1em 0;
 	background: #365656;
 	border-style: solid none solid;
 	border-width: 0.4em;
