@@ -1,6 +1,0 @@
-#online_users
-  = form_for @game do |f|
-    - @online_users.each_with_inxex do |usr, i|
-      .checkbox
-        = check_box_tag "game_users[#{i}]"
-        = label.tag usr.email
