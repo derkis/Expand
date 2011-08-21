@@ -1,6 +1,10 @@
 class PagesController < ApplicationController
   def home
-    @title = 'Home'
+    if signed_in?
+      redirect_to :lobby
+    else
+      @title = 'Home'
+    end
   end
 
   def contact

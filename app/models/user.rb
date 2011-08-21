@@ -27,7 +27,12 @@ class User < ActiveRecord::Base
                        :confirmation => true,
                        :length       => { :within => 6..40 }
                        
+  after_create :init_player
   before_save :encrypt_password
+  
+  def init_player
+    Player.create!(:user_id => id)
+  end
    
   class << self
     def authenticate(email, submitted_password)

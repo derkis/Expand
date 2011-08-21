@@ -24,6 +24,12 @@ module SessionsHelper
     self.current_user = nil
   end
   
+  def get_online_users
+    online_users = User.find_all_by_is_online(true).reject! do |user|
+      user.id == current_user.id
+    end
+  end
+  
   private
     def user_from_remember_token
       remember_token = cookies.signed[:remember_token] || [nil, nil]

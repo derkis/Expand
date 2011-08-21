@@ -1,16 +1,16 @@
 # == Schema Information
 #
-# Table name: players
+# Table name: hotels
 #
 #  id         :integer         not null, primary key
+#  stock      :integer
+#  size       :integer
 #  created_at :datetime
 #  updated_at :datetime
-#  cash       :string(255)
-#  stock      :string(255)
 #
 
 require 'spec_helper'
 
-describe Player do
+describe Hotel do
   pending "add some examples to (or delete) #{__FILE__}"
 end

@@ -1,13 +1,13 @@
 # == Schema Information
 #
-# Table name: players
+# Table name: games
 #
 #  id         :integer         not null, primary key
+#  board      :string(255)
 #  created_at :datetime
 #  updated_at :datetime
-#  cash       :string(255)
-#  stock      :string(255)
 #
 
-class Player < ActiveRecord::Base
+class Game < ActiveRecord::Base
+  attr_accessible :players
 end

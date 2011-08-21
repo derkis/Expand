@@ -1,13 +1,14 @@
 # == Schema Information
 #
-# Table name: players
+# Table name: hotels
 #
 #  id         :integer         not null, primary key
+#  stock      :integer
+#  size       :integer
 #  created_at :datetime
 #  updated_at :datetime
-#  cash       :string(255)
-#  stock      :string(255)
 #
 
-class Player < ActiveRecord::Base
+class Hotel < ActiveRecord::Base
+  belongs_to :game
 end

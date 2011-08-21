@@ -1,6 +1,7 @@
 Acquire::Application.routes.draw do
   resources :users
   resources :sessions, :only => [:new, :create, :destroy]
+  resources :games, :only => [:new, :create, :show, :destroy]
 
   match '/contact', :to => 'pages#contact', :as => :contact
   match '/about', :to => 'pages#about', :as => :about
@@ -9,8 +10,8 @@ Acquire::Application.routes.draw do
   match '/login', :to => 'sessions#new', :as => :login
   match '/signout', :to => 'sessions#destroy', :as => :logout
   
-  match '/lobby', :to => 'lobby#lobby', :as => :lobby
-  
+  match '/lobby', :to => 'games#new', :as => :lobby
+    
   root :to => "pages#home"
 
   # The priority is based upon order of creation:

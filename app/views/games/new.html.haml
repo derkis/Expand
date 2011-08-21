@@ -1,0 +1,8 @@
+#online_users
+  = form_for(@game) do |f|
+    - @online_users.each_with_index do |user, i|
+      .checkbox
+        = check_box_tag "player[]", user.id
+        = label_tag :player, user.name
+    .action
+      = f.submit 'Start Game'

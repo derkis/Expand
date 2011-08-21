@@ -1,16 +1,16 @@
 # == Schema Information
 #
-# Table name: players
+# Table name: moves
 #
 #  id         :integer         not null, primary key
+#  type       :string(255)
+#  contents   :string(255)
 #  created_at :datetime
 #  updated_at :datetime
-#  cash       :string(255)
-#  stock      :string(255)
 #
 
 require 'spec_helper'
 
-describe Player do
+describe Move do
   pending "add some examples to (or delete) #{__FILE__}"
 end
