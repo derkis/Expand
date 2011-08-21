@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110821044657) do
+ActiveRecord::Schema.define(:version => 20110821184046) do
 
   create_table "games", :force => true do |t|
     t.string   "board"
@@ -37,7 +37,13 @@ ActiveRecord::Schema.define(:version => 20110821044657) do
     t.datetime "updated_at"
     t.string   "cash"
     t.string   "stock"
+    t.integer  "user_id"
+    t.integer  "game_id"
   end
+
+  add_index "players", ["game_id"], :name => "index_players_on_game_id"
+  add_index "players", ["user_id", "game_id"], :name => "index_players_on_user_id_and_game_id", :unique => true
+  add_index "players", ["user_id"], :name => "index_players_on_user_id"
 
   create_table "users", :force => true do |t|
     t.string   "name"
