@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110821184046) do
+ActiveRecord::Schema.define(:version => 20110821190926) do
 
   create_table "games", :force => true do |t|
     t.string   "board"
@@ -23,14 +23,22 @@ ActiveRecord::Schema.define(:version => 20110821184046) do
     t.integer  "size"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "name"
+    t.string   "quality"
+    t.integer  "game_id"
   end
+
+  add_index "hotels", ["game_id"], :name => "index_hotels_on_game_id"
 
   create_table "moves", :force => true do |t|
     t.string   "type"
     t.string   "contents"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "game_id"
   end
+
+  add_index "moves", ["game_id"], :name => "index_moves_on_game_id"
 
   create_table "players", :force => true do |t|
     t.datetime "created_at"

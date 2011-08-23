@@ -7,6 +7,8 @@
 #  updated_at :datetime
 #  cash       :string(255)
 #  stock      :string(255)
+#  user_id    :integer
+#  game_id    :integer
 #
 
 require 'spec_helper'

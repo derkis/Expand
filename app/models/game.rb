@@ -9,5 +9,13 @@
 #
 
 class Game < ActiveRecord::Base
-  attr_accessible :players
+  attr_accessible :board, :hotels
+  
+  has_many :players
+  has_many :hotels
+  has_many :moves
+  has_many :users, :through => :players
+  
+  accepts_nested_attributes_for :players, :allow_destroy => true
+  
 end

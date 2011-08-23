@@ -15,6 +15,9 @@
 class User < ActiveRecord::Base
   attr_accessor :password, :is_online
   attr_accessible :name, :email, :password, :password_confirmation
+  
+  has_one :player
+  has_one :game, :through => :player
 
   email_regex = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
     
@@ -27,13 +30,8 @@ class User < ActiveRecord::Base
                        :confirmation => true,
                        :length       => { :within => 6..40 }
                        
-  after_create :init_player
   before_save :encrypt_password
-  
-  def init_player
-    Player.create!(:user_id => id)
-  end
-   
+
   class << self
     def authenticate(email, submitted_password)
       user = find_by_email(email)

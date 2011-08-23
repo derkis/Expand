@@ -7,6 +7,9 @@
 #  size       :integer
 #  created_at :datetime
 #  updated_at :datetime
+#  name       :string(255)
+#  quality    :string(255)
+#  game_id    :integer
 #
 
 require 'spec_helper'

@@ -8,7 +8,7 @@ class GamesController < ApplicationController
   def create
     logger.debug "  DEBUG: games params #{params[:game]}"
     @game = Game.new(params[:game])
-    logger.debug "  DEBUG: contents of game, #{@game}"
+    logger.debug "  DEBUG: players in game, #{@game.players}"
     @game.save
     redirect_to game_path(@game.id)
   end
