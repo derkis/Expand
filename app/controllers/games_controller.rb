@@ -3,13 +3,15 @@ class GamesController < ApplicationController
     @title = 'Lobby'
     @game = Game.new
     @online_users = get_online_users
+   
+    logger.debug "  DEBUG: online_users, #{@online_users}"
   end
   
   def create
     logger.debug "  DEBUG: games params #{params[:game]}"
     @game = Game.new(params[:game])
-    logger.debug "  DEBUG: players in game, #{@game.players}"
     @game.save
+    logger.debug "  DEBUG: players in game, #{@game.players}"
     redirect_to game_path(@game.id)
   end
   

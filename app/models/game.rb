@@ -9,11 +9,11 @@
 #
 
 class Game < ActiveRecord::Base
-  attr_accessible :board, :hotels
+  attr_accessible :board, :hotels, :players, :players_attributes
   
-  has_many :players
-  has_many :hotels
-  has_many :moves
+  has_many :players, :dependent => :destroy
+  has_many :hotels, :dependent => :destroy
+  has_many :moves, :dependent => :destroy
   has_many :users, :through => :players
   
   accepts_nested_attributes_for :players, :allow_destroy => true

@@ -12,13 +12,14 @@
 #
 
 class Player < ActiveRecord::Base
-  attr_accessible :user_id
+  attr_accessible :user_id, :cash, :stock
   serialize :stock
   
-  after_create :init_defaults
+  before_save :init_defaults
   
   def init_defaults
-    cash = 6000
-    stock = Array.new(7, 0)
+    logger.debug "  DEBUG: player::init_defaults"
+    self.cash = 6000 unless self.cash
+    self.stock = Array.new(7, 0) unless self.stock
   end
 end
