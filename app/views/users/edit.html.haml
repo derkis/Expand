@@ -1,8 +1,0 @@
-= form_for(@user) do |f|
-  = render 'shared/error_messages', :object => f.object
-  = render 'fields', :f => f
-  .action
-    = f.submit 'Update'
-.edit-image  
-  = gravatar_image_tag @user.email, :class => 'gravatar'
-  link_to "Change", "http://gravatar.com/emails"

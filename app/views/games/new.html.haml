@@ -1,9 +1,0 @@
-#online_users
-  = form_for(@game) do |game_f|
-    = game_f.fields_for :players_attributes do |player_f|
-      - @online_users.each_with_index do |user, i|
-        = check_box_tag("game[players_attributes[][user_id]]", user.id, checked = false, { :class => "pl_checkbox" })
-        = label_tag("game[players_attributes[][user_id]]", user.name)
-      = player_f.hidden_field "user_id", :value => current_user.id
-    .action
-      = game_f.submit 'Send Invites'
