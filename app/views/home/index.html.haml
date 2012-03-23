@@ -1,0 +1,13 @@
+#mainbar
+  = image_tag("title.png", :alt => "Expand")
+  .login_links
+    .button
+      %form
+        %input{ :type => 'submit', :value => 'Login', :class => 'login_link' }
+    %nav
+      %ul
+        %li= link_to 'Play Now', '/portal' 
+        %li= link_to 'Register', '/register', { :class => 'registration_link' }
+.transparency
+.registration_popup
+.login_popup
