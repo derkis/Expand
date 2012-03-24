@@ -1,0 +1,8 @@
+#header
+	- if user_signed_in?
+		%nav
+			= current_user.email
+			= link_to 'profile', :edit_user_registration
+			= link_to 'logout', :destroy_user_session, :method => :delete
+		
+			

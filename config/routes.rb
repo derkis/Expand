@@ -1,9 +1,9 @@
 Expand::Application.routes.draw do
   
+  root :to => 'home#index'
+    
   devise_for :users
-
-  root :to => "home#index"
-
+  
   # The priority is based upon order of creation:
   # first created -> highest priority.
 

@@ -1,13 +1,28 @@
 #mainbar
-  = image_tag("title.png", :alt => "Expand")
-  .login_links
-    .button
-      %form
-        %input{ :type => 'submit', :value => 'Login', :class => 'login_link' }
-    %nav
-      %ul
-        %li= link_to 'Play Now', '/portal' 
-        %li= link_to 'Register', '/register', { :class => 'registration_link' }
+= image_tag("title.png", :alt => "Expand")
+.login_links
+	.button
+		%form
+			%input{ :type => 'submit', :value => 'Login', :class => 'login_link' }
+			%nav
+				%ul
+					%li= link_to 'Play Now', '/portal' 
+					%li= link_to 'Register', :new_user_registration, { :class => 'registration_link' }
+
 .transparency
-.registration_popup
+
 .login_popup
+	%h2 Sign in
+	= form_for(@user, :url => :user_session) do |f|
+		%div
+			= f.label :email
+			%br/
+			= f.email_field :email
+		%div
+			= f.label :password
+			%br/
+			= f.password_field :password
+		%div= f.submit "Sign in"
+	= link_to "Sign up", :new_user_registration
+	%br/
+	= link_to "Forgot your password?", :new_user_password
