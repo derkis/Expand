@@ -2,8 +2,11 @@ Expand::Application.routes.draw do
   
   root :to => 'home#index'
     
-  devise_for :users
+  devise_for :users, :controllers => { :sessions => 'sessions' }
   
+  resources :games, :except => :index
+  match 'portal' => 'games#index', :as => :portal, :via => :get
+      
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
