@@ -1,2 +1,9 @@
-- @online_users.each do |user|
-	= user.email
+- form_for @game do |game_f|
+	- game_f.fields_for :players_attributes do |players_f|
+		- @online_users.each do |user|
+			= check_box_tag('game[players_attributes[][user_id]]', user.id, checked = false, { :class => "pl_checkbox"})
+			= label_tag('game[players_attributes[][user_id]]', user.email)
+			= players_f.hidden_field 'game_id', :value => @game.id
+		= players_f.hidden_field 'user_id', :value => current_user.id
+		= players_f.hidden_field 'game_id', :value => @game.id
+		= game_f.submit 'Send Invites'
