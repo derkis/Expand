@@ -1,13 +1,13 @@
 class GamesController < ApplicationController
   
   before_filter :authenticate_user!
-  before_filter :set_last_request_at
+  after_filter :set_last_request_at, :except => :user_delta
   
   def index
     @title = 'portal'
     @game = Game.new
     @game.players.build
-    @online_users = get_online_users()
+    @online_users = get_users_since(15.minutes.ago)
   end
   
   def create
@@ -17,21 +17,18 @@ class GamesController < ApplicationController
     logger.debug "  DEBUG: players in game, #{@game.players}"
   end
   
-  def online_users
-    @online_users = get_online_users()    
+  def users_online
+    user_delta = get_users_since(15.minutes.ago)    
     respond_to do |format| 
       format.html { redirect_to :portal }
-      format.json { render :json => @online_users.to_json(:only => [:id, :email]) }
+      format.json { render :json => user_delta.to_json(:only => [:id, :email]) }
     end
   end
   
   private
   
-  def get_online_users
-    User.where(
-      "last_request_at > :time AND NOT email = :email", 
-      { :time => 15.minutes.ago, :email => current_user.email }
-    ).all
+  def get_users_since(time)
+    User.find(:all, :conditions => [ "last_request_at > ? AND NOT email = ?", time, current_user.email ], :order => :id)
   end
   
   def set_last_request_at

@@ -1,11 +1,16 @@
 #new_game_form{ :last_update => 'this' }
 	= form_for @game do |game_f|
 		= game_f.fields_for :players, @game.players do |players_f|
-			- @online_users.each_with_index do |user, index|
-				= players_f.label :user_id, user.email
-				= check_box_tag("game[players_attributes][#{index+1}][user_id]", user.id)
-				= hidden_field_tag("game[players_attributes][#{index+1}][user_id]", @game.id)
+			%table
+				%tr
+					%td{ :align => 'left', :colspan => '2' }
+						Online Users
+				- @online_users.each_with_index do |user, index|
+					%tr
+						%td{ :class => "user_row", :user_id => "#{user.id}" }
+							= players_f.label :user_id, user.email
+							= check_box_tag("game[players_attributes][#{index+1}][user_id]", user.id, false, :class => :player_checkbox)
+							= hidden_field_tag("game[players_attributes][#{index+1}][game_id]", @game.id, :class => :player_hidden_field)
 			= players_f.hidden_field :user_id, :value => current_user.id
 			= players_f.hidden_field :game_id, :value => @game.id
-			%br
 			= game_f.submit 'Send Invites'
