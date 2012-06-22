@@ -32,18 +32,22 @@ function updateLobby() {
 			}
 		}
 		
-		for( ; disp_i < displayed_users.length ; disp_i++)
+		for( ; disp_i < displayed_users.length ; disp_i++) {
+			displayed_user = displayed_users[disp_i];
 			remove_user_tag(displayed_user);
+		}
 		
 		var last_displayed_user = displayed_users[displayed_users.length-1];	
-		for( ; online_i < data.length ; online_i++)
-			new_user_index = add_user_tag(online_user, last_displayed_user, new_user_index);
+		for( ; online_i < data.length ; online_i++) {
+			online_user = data[online_i];
+			new_user_index = add_user_tag(online_user, last_displayed_user, new_user_index);	
+		}
 	});
 	setTimeout(updateLobby, 10000);
 }
 
 function add_user_tag(online_user, displayed_user, new_user_index) {
-	$(displayed_user).parent().before(
+	var new_user_tag =
 		'<tr>' +
 		'	<td class="user_row" user_id="' + online_user.id + '">' +
 		'	<label for="game_players_attributes_0_user_id">' + online_user.email + '<\/label>' +
@@ -51,10 +55,15 @@ function add_user_tag(online_user, displayed_user, new_user_index) {
 		'	<input class="player_hidden_field" id="game_players_attributes_' + new_user_index + '_user_id" name="game[players_attributes][' + new_user_index + '][game_id]" type="hidden">' +
 		'	<\/td>' +
 		'<\/tr>'
-	);
+	if(displayed_user)
+		$(displayed_user).parent().before(new_user_tag);
+	else
+		$('.table_title').after(new_user_tag);
+
 	return ++new_user_index;
 }
 
 function remove_user_tag(displayed_user) {
+	console.log("removing user: " + displayed_user);
 	$(displayed_user).parent().remove();
 }

@@ -2,7 +2,7 @@
 	= form_for @game do |game_f|
 		= game_f.fields_for :players, @game.players do |players_f|
 			%table
-				%tr
+				%tr{ :class => 'table_title' }
 					%td{ :align => 'left', :colspan => '2' }
 						Online Users
 				- @online_users.each_with_index do |user, index|
