@@ -1,18 +1,40 @@
 $(document).ready(function() {
+	
+	$('.new_game').bind('ajax:before', function(){
+		console.log('before');
+	});
+	
+	$('.new_game').bind('ajax:loading', function(){
+		console.log('loading');
+	});
+	
+	$('.new_game').bind('ajax:success', function(){
+		console.log("Success!");
+	});
+	
+	$('.new_game').bind('ajax:failure', function(){
+		console.log('failure');
+	});
+	
+	$('.new_game').bind('ajax:complete', function(){
+		console.log('complete');
+	});
+	
+	$('.new_game').bind('ajax:after', function(){
+		console.log('after');
+	});
+	
 	setTimeout(updateLobby, 10000);
 });
 
 function updateLobby() {
-	console.log('updatelobby');
 	$.getJSON('users_online.json', function(data) {
 		var displayed_users = $('.user_row');
 		var new_user_index = displayed_users.length
 		var disp_i = 0, online_i = 0;
 		var displayed_user, online_user;
 		var displayed_uid, online_uid;
-		console.log(displayed_users);
-		console.log(data);
-		console.log('lengths: ' + displayed_users.length + ' ' + data.length);
+		console.log(displayed_users); console.log(data);
 		while(disp_i < displayed_users.length && online_i < data.length) {
 			displayed_user = displayed_users[disp_i];
 			online_user = data[online_i];

@@ -2,10 +2,11 @@ class GamesController < ApplicationController
   
   before_filter :authenticate_user!
   after_filter :set_last_request_at, :except => :user_delta
-  
+    
   def index
     @title = 'portal'
     @game = Game.new
+    logger.debug " DEBUG: INDEX -- #{@game.id}"
     @game.players.build
     @online_users = get_users_since(15.minutes.ago)
   end
@@ -13,8 +14,10 @@ class GamesController < ApplicationController
   def create
     logger.debug "  DEBUG: games params #{params[:game]}"
     @game = Game.new(params[:game])
-    @game.save
+    logger.debug "  DEBUG: game #{@game.id} players #{@game.players}"
+    @game.save    
     logger.debug "  DEBUG: players in game, #{@game.players}"
+    render :nothing => true
   end
   
   def users_online
