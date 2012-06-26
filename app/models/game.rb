@@ -4,5 +4,4 @@ class Game < ActiveRecord::Base
   
   attr_accessible :players, :players_attributes
   accepts_nested_attributes_for :players, :allow_destroy => true
-    
 end
