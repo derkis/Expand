@@ -1,33 +1,14 @@
 $(document).ready(function() {
-	
-	$('.new_game').bind('ajax:before', function(){
-		console.log('before');
-	});
-	
-	$('.new_game').bind('ajax:loading', function(){
-		console.log('loading');
-	});
-	
-	$('.new_game').bind('ajax:success', function(){
-		console.log("Success!");
-	});
-	
-	$('.new_game').bind('ajax:failure', function(){
-		console.log('failure');
-	});
-	
-	$('.new_game').bind('ajax:complete', function(){
-		console.log('complete');
-	});
-	
-	$('.new_game').bind('ajax:after', function(){
-		console.log('after');
-	});
-	
-	setTimeout(updateLobby, 10000);
+	setTimeout(polling_wrapper, 10000);
 });
 
-function updateLobby() {
+function polling_wrapper() {
+	check_users();
+	check_game_requests();
+	setTimeout(polling_wrapper, 10000);
+}
+
+function check_users() {
 	$.getJSON('users_online.json', function(data) {
 		var displayed_users = $('.user_row');
 		var new_user_index = displayed_users.length
@@ -65,7 +46,12 @@ function updateLobby() {
 			new_user_index = add_user_tag(online_user, last_displayed_user, new_user_index);	
 		}
 	});
-	setTimeout(updateLobby, 10000);
+}
+
+function check_game_requests() {
+	$.getJSON('proposed_games.json', function(data) {
+		console.log(data);
+	});
 }
 
 function add_user_tag(online_user, displayed_user, new_user_index) {

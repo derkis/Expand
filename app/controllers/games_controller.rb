@@ -28,10 +28,21 @@ class GamesController < ApplicationController
     end
   end
   
+  def proposed_games
+    proposed_games = get_proposed_games()
+    respond_to do |format|
+      format.json { render :json => proposed_games.to_json }
+    end
+  end
+  
   private
   
   def get_users_since(time)
     User.find(:all, :conditions => [ "last_request_at > ? AND NOT email = ?", time, current_user.email ], :order => :id)
+  end
+  
+  def get_proposed_games
+    Game.includes([:player]).where(['status = ? AND player.user_id = ?', Game.PROPOSED, current_user.id])
   end
   
   def set_last_request_at
