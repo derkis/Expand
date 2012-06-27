@@ -50,7 +50,10 @@ function check_users() {
 
 function check_game_requests() {
 	$.getJSON('proposed_games.json', function(data) {
-		console.log(data);
+		console.log(data)
+		for(var game in data) {
+			
+		}
 	});
 }
 

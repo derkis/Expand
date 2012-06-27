@@ -42,7 +42,7 @@ class GamesController < ApplicationController
   end
   
   def get_proposed_games
-    Game.includes([:player]).where(['status = ? AND player.user_id = ?', Game.PROPOSED, current_user.id])
+    Game.includes([:players]).where(['status = ? AND players.user_id = ?', Game::PROPOSED, current_user.id])
   end
   
   def set_last_request_at
