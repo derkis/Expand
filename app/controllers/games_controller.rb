@@ -42,6 +42,7 @@ class GamesController < ApplicationController
   
   def proposed_games
     proposed_games = get_proposed_games()
+    logger.debug "  DEBUG: game_players #{proposed_games}"
     respond_to do |format|
       format.json { render :json => proposed_games.to_json }
     end
@@ -54,7 +55,12 @@ class GamesController < ApplicationController
   end
   
   def get_proposed_games
-    Game.includes([:players]).where(['status = ? AND players.user_id = ?', Game::PROPOSED, current_user.id])
+    game_players = []
+    games = Game.includes([:players]).all(:select => [:id], :conditions => ['status = ? AND players.user_id = ?', Game::PROPOSED, current_user.id])
+    games.each_with_index do |game, index|
+      game_players[index] = Player.all(:select => [:id, :game_id, :accepted], :conditions => ['game_id = ? AND NOT user_id = ?', current_user.id, game.id])
+    end
+    return game_players
   end
   
   def set_last_request_at

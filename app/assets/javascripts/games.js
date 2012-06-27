@@ -52,9 +52,9 @@ function check_users() {
 
 function check_game_requests() {
 	$.getJSON('proposed_games.json', function(data) {
-		console.log(data)
-		for(var game in data) {
-			
+		console.log(data);
+		for(var players in data) {
+			add_game_invitation_tag(players);
 		}
 	});
 }
@@ -79,4 +79,8 @@ function add_user_tag(online_user, displayed_user, new_user_index) {
 function remove_user_tag(displayed_user) {
 	console.log("removing user: " + displayed_user);
 	$(displayed_user).parent().remove();
+}
+
+function add_game_invitation_tag(players) {
+	
 }
