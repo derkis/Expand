@@ -9,6 +9,8 @@
 #
 
 class Game < ActiveRecord::Base
+  after_initialize :init
+  
   PROPOSED = 0; STARTED = 1; FINISHED = 2
   
   has_many :players, :dependent => :destroy
@@ -18,5 +20,9 @@ class Game < ActiveRecord::Base
   accepts_nested_attributes_for :players, :allow_destroy => true
   
   validates :status, :numericality => :true, :inclusion => { :in => [ PROPOSED, STARTED, FINISHED ] }
-    
+ 
+  def init
+    self.status ||= PROPOSED
+  end
+
 end
