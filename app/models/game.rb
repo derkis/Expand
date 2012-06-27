@@ -23,6 +23,6 @@ class Game < ActiveRecord::Base
  
   def init
     self.status ||= PROPOSED
-  end
+  end  
 
 end
