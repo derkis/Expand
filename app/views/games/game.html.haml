@@ -1,2 +1,10 @@
-.yay
-  yay
+%table
+  %tbody
+    - i = 0
+    - @board.each do |column|
+      %tr
+        %td{:width => 50, :height => 50, :bgcolor => "#EEEEEE"}
+          = i = i + 1
+        - column.each do |row|
+          %td{:width => 50, :height => 50}
+            = row

@@ -6,6 +6,9 @@
 #  created_at :datetime        not null
 #  updated_at :datetime        not null
 #  status     :integer
+#  board      :string(255)
+#  width      :integer
+#  height     :integer
 #
 
 class Game < ActiveRecord::Base
@@ -23,6 +26,9 @@ class Game < ActiveRecord::Base
  
   def init
     self.status ||= PROPOSED
+    self.width = 12
+    self.height = 9
+    self.board ="111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
   end  
 
 end

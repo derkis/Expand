@@ -1,8 +1,12 @@
+require 'games_helper'
+
 class GamesController < ApplicationController
-  
+
+  include GamesHelper
+
   before_filter :authenticate_user!
   after_filter :set_last_request_at, :except => :user_delta
-    
+
   def index
     @title = 'portal'
     @game = Game.new
@@ -32,6 +36,7 @@ class GamesController < ApplicationController
     @title = 'playing game'
     #Create mock game just for initial display...
     @game = Game.new
+    @board = getBoardArrayFromGame(@game)
     render(:game)
   end
   
