@@ -27,15 +27,21 @@ class GamesController < ApplicationController
       format.json { render :json => user_delta.to_json(:only => [:id, :email]) }
     end
   end
-  
+
+  def play
+    @title = 'playing game'
+    #Create mock game just for initial display...
+    @game = Game.new
+    render(:game)
+  end
+
   private
   
   def get_users_since(time)
-    User.find(:all, :conditions => [ "last_request_at > ? AND NOT email = ?", time, current_user.email ], :order => :id)
+    User.all(:conditions => [ "last_request_at > ? AND NOT email = ?", time, current_user.email ], :order => :id)
   end
   
   def set_last_request_at
     current_user.update_attribute(:last_request_at, Time.now) if user_signed_in?
   end
-  
 end
