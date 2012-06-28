@@ -8,6 +8,8 @@ Expand::Application.routes.draw do
   match 'portal' => 'games#index', :as => :portal, :via => :get
   match 'play' => 'games#play', :as => :play, :via => :get
   
+  resources :players, :only => :update
+  
   # endpoints
   match 'users_online' => 'games#users_online', :as => :users_online, :via => :get
   match 'proposed_games' => 'games#proposed_games', :as => :proposed_games, :via => :get
