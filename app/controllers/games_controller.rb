@@ -43,12 +43,22 @@ class GamesController < ApplicationController
   end
   
   def get_proposed_games
-    game_players = []
-    games = Game.includes([:players]).all(:select => [:id], :conditions => ['status = ? AND players.user_id = ?', Game::PROPOSED, current_user.id])
-    games.each_with_index do |game, index|
-      game_players[index] = Player.all(:select => [:id, :game_id, :accepted], :conditions => ['game_id = ? AND NOT user_id = ?', current_user.id, game.id])
+    proposed_games = Game.includes([:players]).all(:conditions => ['status = ? AND players.user_id = ?', Game::PROPOSED, current_user.id])
+    games_string = proposed_games.inject(' AND ') { |string, game| string += "game_id = #{game.id} OR " }
+    players = Player.all(:conditions => ['user_id <> ?' + games_string[0..-5], current_user.id], :group => :game_id)
+    
+    (games_array = []).tap do |games_array|
+      next_game_index = get_index_of_next_game_in(players)
+      while(next_game_index)
+        games_array << players.slice!(0..next_game_index-1)
+        next_game_index = get_index_of_next_game_in(players)
+      end
+      games_array << players
     end
-    return game_players
+  end
+  
+  def get_index_of_next_game_in(players)
+     players.index { |player| player.game_id != players.first.game_id }
   end
   
   def set_last_request_at
