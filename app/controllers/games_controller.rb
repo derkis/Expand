@@ -57,7 +57,7 @@ class GamesController < ApplicationController
   def get_proposed_games
     proposed_games = Game.includes([:players]).all(:conditions => ['status = ? AND players.user_id = ?', Game::PROPOSED, current_user.id])
     games_string = proposed_games.inject(' AND ') { |string, game| string += "game_id = #{game.id} OR " }
-    players = Player.all(:conditions => ['user_id <> ?' + games_string[0..-5], current_user.id], :group => :game_id)
+    players = Player.all(:conditions => ['user_id <> ?' + games_string[0..-5], current_user.id], :group => :game_id) # this is matching current_user.id for some reason
     
     (games_array = []).tap do |games_array|
       next_game_index = get_index_of_next_game_in(players)
