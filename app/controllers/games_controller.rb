@@ -1,8 +1,12 @@
+require 'games_helper'
+
 class GamesController < ApplicationController
-  
+
+  include GamesHelper
+
   before_filter :authenticate_user!
   after_filter :set_last_request_at, :except => :user_delta
-    
+
   def index
     @title = 'portal'
     @game = Game.new
@@ -27,6 +31,14 @@ class GamesController < ApplicationController
       format.json { render :json => user_delta.to_json(:only => [:id, :email]) }
     end
   end
+
+  def play
+    @title = 'playing game'
+    #Create mock game just for initial display...
+    @game = Game.new
+    @board = getBoardArrayFromGame(@game)
+    render(:game)
+  end
   
   def proposed_games
     proposed_games = get_proposed_games()
@@ -35,7 +47,7 @@ class GamesController < ApplicationController
       format.json { render :json => proposed_games.to_json }
     end
   end
-  
+
   private
   
   def get_users_since(time)
@@ -64,5 +76,4 @@ class GamesController < ApplicationController
   def set_last_request_at
     current_user.update_attribute(:last_request_at, Time.now) if user_signed_in?
   end
-  
 end

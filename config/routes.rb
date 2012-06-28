@@ -7,6 +7,7 @@ Expand::Application.routes.draw do
   resources :games, :except => :index
   match 'portal' => 'games#index', :as => :portal, :via => :get
   match 'users_online' => 'games#users_online', :as => :users_online, :via => :get
+  match 'play' => 'games#play', :as => :play, :via => :get
   match 'proposed_games' => 'games#proposed_games', :as => :proposed_games, :via => :get
       
   # The priority is based upon order of creation:

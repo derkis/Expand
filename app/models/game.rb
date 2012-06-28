@@ -6,6 +6,9 @@
 #  created_at :datetime        not null
 #  updated_at :datetime        not null
 #  status     :integer
+#  board      :string(255)
+#  width      :integer
+#  height     :integer
 #
 
 class Game < ActiveRecord::Base
@@ -20,9 +23,12 @@ class Game < ActiveRecord::Base
   accepts_nested_attributes_for :players, :allow_destroy => true
   
   validates :status, :numericality => :true, :inclusion => { :in => [ PROPOSED, STARTED, FINISHED ] }
-  
+ 
   def init
     self.status ||= PROPOSED
+    self.width = 12
+    self.height = 9
+    self.board ="111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
   end  
 
 end

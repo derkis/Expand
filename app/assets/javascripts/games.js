@@ -15,7 +15,9 @@ function check_users() {
 		var disp_i = 0, online_i = 0;
 		var displayed_user, online_user;
 		var displayed_uid, online_uid;
-		console.log(displayed_users); console.log(data);
+
+        console.log(displayed_users); console.log(data);
+
 		while(disp_i < displayed_users.length && online_i < data.length) {
 			displayed_user = displayed_users[disp_i];
 			online_user = data[online_i];
