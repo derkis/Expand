@@ -12,7 +12,7 @@ class GamesController < ApplicationController
     @game = Game.new
     @game.players.build
     @online_users = get_users_since(15.minutes.ago)
-    # @player = Player.find(1)
+    @player = Player.find(1)
   end
   
   def create

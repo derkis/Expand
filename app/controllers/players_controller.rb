@@ -5,7 +5,9 @@ class PlayersController < ApplicationController
   
   def update
     @player = Player.find(params[:id])
+    logger.debug("  DEBUG: player before: #{@player.accepted}");
     @player.update_attributes(params[:player])
+    logger.debug("  DEBUG: player after: #{Player.find(params[:id]).accepted}");
     render :nothing => true
   end
   

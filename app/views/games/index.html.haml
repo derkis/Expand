@@ -1,4 +1,7 @@
 #game_invites
+	= form_for @player do |player_f|
+		= player_f.hidden_field :accepted, :value => true
+		= player_f.submit 'Update Accepted'
 #new_game_form
 	= form_for @game, :remote => true do |game_f|
 		= game_f.fields_for :players, @game.players do |players_f|

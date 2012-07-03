@@ -99,7 +99,7 @@ function add_game_invitation_tag(this_player, players) {
 	var game_invitation_tag =
 		'<div class="game_invite" player_id=' + this_player['player_id'] + ' game_id=' + this_player['game_id'] + '>' +
 			'Play a game with: ' + players_string + 
-			'<button type="button" onclick="accept_game_invitation()">' +
+			'<button type="button" onclick="accept_game_invitation(' + this_player['player_id'] + ')">' +
 				'Accept' +
 			'<\/button>' +
 		'<\/div>';
@@ -107,14 +107,17 @@ function add_game_invitation_tag(this_player, players) {
 }
 
 // POST player accept
-function accept_game_invitation() {
-	alert('Should send JSON post');
+function accept_game_invitation(player_id) {
+	console.log('POST for ' + player_id);
 	
-	// $.ajax({
-	//     type: 'POST',
-	//     url: url,
-	//     data: data,
-	//     success: success,
-	//     dataType: json
-	// });
+	$.ajax({
+		type: 'PUT',
+		url: 'players/' + player_id,
+		data: JSON.stringify({ 'player': { 'accepted': true } }),
+		contentType: 'application/json',
+		dataType: "json",
+		success: function(data) {
+			console.log('PUT player update');
+		}
+	});
 }
