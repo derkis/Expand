@@ -1,10 +1,20 @@
+= session[:id]
+= render "layouts/players"
 %table
   %tbody
-    - i = 0
-    - @board.each do |column|
+    - i = "A"
+    - l = 0
+    %tr
+      %td{:width => 50, :height => 50, :bgcolor => "#EEEEEE",:align=>"center"}
+        Expand
+      - @board[0].each do |col|
+        %td{:width => 50, :height => 50, :bgcolor => "#EEEEEE",:align=>"center"}
+          = l = l.succ
+    - @board.each do |row|
       %tr
-        %td{:width => 50, :height => 50, :bgcolor => "#EEEEEE"}
-          = i = i + 1
-        - column.each do |row|
-          %td{:width => 50, :height => 50}
-            = row
+        %td{:width => 50, :height => 50, :bgcolor => "#EEEEEE",:align=>"center"}
+          = i
+          - i = i.succ
+        - row.each do |column|
+          %td{:width => 50, :height => 50,:align=>"center",:class=>"cell"}
+            = column

@@ -1,5 +1,9 @@
 $(document).ready(function() {
 	setTimeout(polling_wrapper, 10000);
+
+    $("cell").click(function(event)
+        {$(this).backgroundColor = 0; alert("click fuckers")}
+    );
 });
 
 function polling_wrapper() {

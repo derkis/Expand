@@ -6,8 +6,9 @@ Expand::Application.routes.draw do
   
   resources :games, :except => :index
   match 'portal' => 'games#index', :as => :portal, :via => :get
-  match 'play' => 'games#play', :as => :play, :via => :get
-  
+  match 'test' => 'test_game#start', :as => :test, :via => :get 
+  match 'testContinue' => 'test_game#play', :as => :testContinue, :via => :get
+
   resources :players, :only => :update
   
   # endpoints
