@@ -12,6 +12,7 @@
 #
 
 class Game < ActiveRecord::Base
+  
   after_initialize :init
   
   PROPOSED = 0; STARTED = 1; FINISHED = 2
@@ -26,9 +27,9 @@ class Game < ActiveRecord::Base
  
   def init
     self.status ||= PROPOSED
-    self.width = 12
-    self.height = 9
-    self.board ="111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+    self.width ||= 12
+    self.height ||= 9
+    self.board ||= "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
   end  
 
 end

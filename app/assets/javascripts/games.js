@@ -118,6 +118,7 @@ function accept_game_invitation(player_id) {
 		dataType: "json",
 		success: function(data) {
 			console.log('PUT player update');
+			console.log(data);
 		}
 	});
 }

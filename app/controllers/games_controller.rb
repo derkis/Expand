@@ -65,9 +65,7 @@ class GamesController < ApplicationController
     players_array.size.times do |i|
       players_array[i] = players_array[i].delete_if { |key, value| key.kind_of? Integer } 
     end
-    players_array.group_by do |player|
-      player["game_id"]
-    end
+    players_array.group_by { |player| player["game_id"] }
    end
   
 end
