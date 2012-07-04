@@ -2,8 +2,6 @@ require 'games_helper'
 
 class GamesController < ApplicationController
 
-  include GamesHelper
-
   before_filter :authenticate_user!
   after_filter :set_last_request_at, :except => [:users_online, :proposed_games]
   
@@ -24,12 +22,7 @@ class GamesController < ApplicationController
   end
   
   def play
-     @title = 'playing game'
-     #Create mock game just for initial display...
-     @game = Game.new
-     @board = getBoardArrayFromGame(@game)
-     render(:game)
-  end
+       end
 
   # endpoints
   def users_online
@@ -68,12 +61,6 @@ class GamesController < ApplicationController
       end
       games_array << players
     end
-  end
-
-  def get_proposed_games2
-    proposed_game_players = Player.includes([:game]).all(:conditions => ['user_id = ? AND games.status = ?'], current_user.id, Game::PROPOSED)
-    games_string = proposed_game_players.inject(' AND ') { |string, player| string += "players.game_id = #{player.game_id} OR " }
-    # proposed_game_users = User.includes([:players]).all(:conditions => ['id <> ?' + games_string[0..-5], current_user.id], :group => :game_id)    
   end
 
   def get_index_of_next_game_in(players)
