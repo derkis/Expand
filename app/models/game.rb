@@ -11,6 +11,7 @@
 #
 
 class Game < ActiveRecord::Base
+  
   after_initialize :init
   
   PROPOSED = 0; STARTED = 1; FINISHED = 2

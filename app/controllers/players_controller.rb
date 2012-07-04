@@ -5,8 +5,14 @@ class PlayersController < ApplicationController
   
   def update
     @player = Player.find(params[:id])
+    logger.debug("  DEBUG: player before: #{@player}");
     @player.update_attributes(params[:player])
-    render :nothing => true
+    logger.debug("  DEBUG: player after: #{Player.find(params[:id])}");
+    
+    respond_to do |format|
+      format.json { render :json => @player.to_json }
+      format.all { not_found() }
+    end
   end
   
 end

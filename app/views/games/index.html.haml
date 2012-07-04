@@ -1,8 +1,4 @@
 #game_invites
-	-# form_for @player, :remote => true do |player_f|
-		-# player_f.label :accepted, 'Game invitation!'
-		-# player_f.hidden_field :accepted, :value => true
-		-# player_f.submit 'Accept'
 #new_game_form
 	= form_for @game, :remote => true do |game_f|
 		= game_f.fields_for :players, @game.players do |players_f|
@@ -15,7 +11,5 @@
 						%td{ :class => "user_row", :user_id => "#{user.id}" }
 							= players_f.label :user_id, user.email
 							= check_box_tag("game[players_attributes][#{user.id}][user_id]", user.id, false, :class => :player_checkbox)
-							= hidden_field_tag("game[players_attributes][#{user.id}][game_id]", @game.id, :class => :player_hidden_field)
 			= players_f.hidden_field :user_id, :value => current_user.id
-			= players_f.hidden_field :game_id, :value => @game.id
 			= game_f.submit 'Send Invites'

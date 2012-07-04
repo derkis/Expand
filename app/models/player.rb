@@ -11,6 +11,7 @@
 #
 
 class Player < ActiveRecord::Base
+  
   after_initialize :init
   
   belongs_to :user
@@ -19,7 +20,11 @@ class Player < ActiveRecord::Base
   attr_accessible :user_id, :game_id, :accepted
   
   def init
-    self.accepted = false
+    self.accepted ||= false
+  end
+  
+  def to_s
+    "#{self.id}, game_id: #{self.game_id}, user_id: #{self.user_id}, accepted: #{self.accepted}"
   end
   
 end

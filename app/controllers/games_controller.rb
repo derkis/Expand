@@ -10,7 +10,7 @@ class GamesController < ApplicationController
     @game = Game.new
     @game.players.build
     @online_users = get_users_since(15.minutes.ago)
-    # @player = Player.find(1)
+    @player = Player.find(1)
   end
   
   def create
@@ -47,19 +47,16 @@ class GamesController < ApplicationController
   def get_users_since(time)
     User.all(:conditions => [ "last_request_at > ? AND NOT email = ?", time, current_user.email ], :order => :id)
   end
-  
+
   def get_proposed_games
-    proposed_games = Game.includes([:players]).all(:conditions => ['status = ? AND players.user_id = ?', Game::PROPOSED, current_user.id])
-    games_string = proposed_games.inject(' AND ') { |string, game| string += "game_id = #{game.id} OR " }
-    players = Player.all(:conditions => ['user_id <> ?' + games_string[0..-5], current_user.id], :group => :game_id) # this is matching current_user.id for some reason
-    
-    (games_array = []).tap do |games_array|
-      next_game_index = get_index_of_next_game_in(players)
-      while(next_game_index)
-        games_array << players.slice!(0..next_game_index-1)
-        next_game_index = get_index_of_next_game_in(players)
-      end
-      games_array << players
+    players_array = Player.includes([:game]).all(:conditions => ['user_id = ? AND games.status = ?', current_user.id, Game::PROPOSED])
+    games_string = players_array.inject(' AND ') { |string, player| string += "p.game_id = #{player.game_id} OR " }
+    players_array = ActiveRecord::Base.connection.execute(
+      'SELECT DISTINCT p.id AS player_id, p.game_id AS game_id, u.email AS email FROM users u, players p WHERE u.id = p.user_id' + games_string[0..-5]
+    );
+  
+    players_array.size.times do |i|
+      players_array[i] = players_array[i].delete_if { |key, value| key.kind_of? Integer } 
     end
   end
 
