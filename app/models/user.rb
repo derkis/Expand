@@ -29,4 +29,9 @@ class User < ActiveRecord::Base
 
   # Setup accessible (or protected) attributes for your model
   attr_accessible :email, :password, :password_confirmation, :remember_me
+  
+  def get_other_users_since(time)
+    User.all(:conditions => [ "last_request_at > ? AND NOT email = ?", time, self.email ], :order => :id)
+  end
+  
 end

@@ -12,7 +12,8 @@
 
 class Game < ActiveRecord::Base
   
-  after_initialize :init
+  after_create :create_defaults
+  before_update :start_game_defaults
   
   PROPOSED = 0; STARTED = 1; FINISHED = 2
   
@@ -25,13 +26,30 @@ class Game < ActiveRecord::Base
   
   validates :status, :numericality => :true, :inclusion => { :in => [ PROPOSED, STARTED, FINISHED ] }
  
-  def init
+  def create_defaults
     self.status ||= PROPOSED
-    # Set to default standard game description (12x9 with 25 count of stock cards, see seeds.rb)
-    self.game_description_id ||= 1
-
-    self.game_description = GameDescription.find(game_description_id)
-
-    self.board = "e" * (self.game_description.height * self.game_description.width)
   end
+  
+  def start_game_defaults
+    if(self.status_was == PROPOSED and self.status == STARTED and !self.game_description_id)
+      self.game_description_id ||= 1
+      self.game_description = GameDescription.find(game_description_id)
+      self.board = "e" * (self.game_description.height * self.game_description.width)
+    end
+  end
+  
+  # queries
+  def self.get_proposed_games_for(current_user)
+    players_array = Player.includes([:game]).all(:conditions => ['user_id = ? AND games.status = ?', current_user.id, Game::PROPOSED])
+    games_string = players_array.inject(' AND ') { |string, player| string += "p.game_id = #{player.game_id} OR " }
+    players_array = ActiveRecord::Base.connection.execute(
+      'SELECT DISTINCT p.id AS player_id, p.game_id AS game_id, u.email AS email FROM users u, players p WHERE u.id = p.user_id' + games_string[0..-5]
+    );
+
+    players_array.size.times do |i|
+      players_array[i] = players_array[i].delete_if { |key, value| key.kind_of? Integer } 
+    end
+    players_array.group_by { |player| player["game_id"] }
+  end
+  
 end
