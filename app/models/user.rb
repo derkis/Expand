@@ -22,14 +22,13 @@ class User < ActiveRecord::Base
   has_many :players
   has_many :games, :through => :players
   
-  # Include default devise modules. Others available are:
   # :token_authenticatable, :encryptable, :confirmable, :lockable, :timeoutable and :omniauthable
   devise :database_authenticatable, :registerable, :recoverable, 
     :trackable, :validatable, :timeoutable
 
-  # Setup accessible (or protected) attributes for your model
   attr_accessible :email, :password, :password_confirmation, :remember_me
   
+  # queries
   def get_other_users_since(time)
     User.all(:conditions => [ "last_request_at > ? AND NOT email = ?", time, self.email ], :order => :id)
   end

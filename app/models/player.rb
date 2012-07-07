@@ -12,14 +12,14 @@
 
 class Player < ActiveRecord::Base
   
-  after_initialize :init
+  after_create :create_defaults
   
   belongs_to :user
   belongs_to :game
   
   attr_accessible :user_id, :game_id, :accepted
   
-  def init
+  def create_defaults
     self.accepted ||= false
   end
   
