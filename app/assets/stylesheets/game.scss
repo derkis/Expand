@@ -1,0 +1,21 @@
+.players
+{
+  float:right;
+  background-color: #eeeeee;
+  width:200px;
+}
+.board_body
+{
+  display:table;
+}
+.row
+{
+  display:table-row;
+  height: 50px;
+}
+.cell
+{
+  display:table-cell;
+  width: 50px;
+}
+

@@ -32,12 +32,21 @@ class Game < ActiveRecord::Base
   
   def start_game_defaults
     if(self.status_was == PROPOSED and self.status == STARTED and !self.game_description_id)
-      self.game_description_id ||= 1
-      self.game_description = GameDescription.find(game_description_id)
-      self.board = "e" * (self.game_description.height * self.game_description.width)
+      start
     end
   end
   
+  def start
+    # Ensure status is indeed started
+    self.status ||= STARTED
+    # Make sure we have assigned ourselves a game description
+    self.game_description_id ||= 1
+    # Now load said description by id
+    self.game_description = GameDescription.find(game_description_id)
+    # Setup the board as all empty
+    self.board = "e" * (self.game_description.height * self.game_description.width)
+  end
+
   # queries
   def self.get_proposed_games_for(current_user)
     players_array = Player.includes([:game]).all(:conditions => ['user_id = ? AND games.status = ?', current_user.id, Game::PROPOSED])

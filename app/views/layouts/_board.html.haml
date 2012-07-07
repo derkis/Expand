@@ -1,0 +1,16 @@
+// Board HAML
+.board_body
+  - i = "A"
+  - l = 0
+  .row
+    .cell
+    - @board[0].each do |col|
+      .cell
+        = l = l.succ
+  - @board.each do |row|
+    .row 
+      .cell
+        = i
+        - i = i.succ
+      - row.each do |cell|
+        = render :partial => "layouts/cell", :locals => {:cell => cell}

@@ -1,0 +1,47 @@
+#mainbar {
+  position: relative;
+  top: 30%;
+  height: 13em;
+  margin: 0 -1em 0;
+  background: #365656;
+  border-style: solid none solid;
+  border-width: 0.4em;
+  border-color: #568A8A;
+  clear: both; }
+  #mainbar img {
+    float: left;
+    padding-left: 6em; }
+  #mainbar .login_links {
+    overflow: hidden;
+    height: inherit; }
+    #mainbar .login_links .button {
+      height: 5em;
+      width: 10em; }
+    #mainbar .login_links nav {
+      float: none;
+      height: 4em;
+      width: 5em; }
+      #mainbar .login_links nav ul li {
+        display: block; }
+
+.transparency {
+  display: none;
+  position: absolute;
+  min-height: 100%;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  background-color: #000000;
+  opacity: 0.5; }
+
+.login_popup, .registration_popup {
+  display: none;
+  position: absolute;
+  background-color: white;
+  width: 500px;
+  height: 500px;
+  top: 50%;
+  left: 50%;
+  margin-top: -250px;
+  margin-left: -250px; }

@@ -1,13 +1,32 @@
 class TestGameController < ApplicationController
-  
+      
     include GamesHelper
- 
+
+    layout "game"
+     
     def start
         # SETUP MOCK USERS
         @u1 = User.find(:all, :conditions => {:email => "p1@test.com"})[0]
+        if @u1 == nil
+            @u1 = User.new(:email => "p1@test.com", :password => "password", :password_confirmation => "password")
+            @u1.save
+        end
         @u2 = User.find(:all, :conditions => {:email => "p2@test.com"})[0]
+        if @u2 == nil
+            @u2 = User.new(:email => "p2@test.com", :password => "password", :password_confirmation => "password")
+            @u2.save
+        end
         @u3 = User.find(:all, :conditions => {:email => "p3@test.com"})[0]
+        if @u3 == nil
+            @u3 = User.new(:email => "p3@test.com", :password => "password", :password_confirmation => "password")
+            @u3.save
+        end
+
         @u4 = User.find(:all, :conditions => {:email => "p4@test.com"})[0]
+        if @u4 == nil
+            @u4 = User.new(:email => "p4@test.com", :password => "password", :password_confirmation => "password")
+            @u4.save
+        end
 
         # SETUP GAME DESCRIPTION
 
@@ -15,7 +34,7 @@ class TestGameController < ApplicationController
 
         # SETUP TEST GAME
         @game = Game.new
-        @game.game_description_id = @description.id
+        @game.start
         @game.save
 
         # SETUP PLAYERS
@@ -46,10 +65,12 @@ class TestGameController < ApplicationController
     end
 
     def play
-        @title = 'playing game'
+        @game = Game.find(session[:game_id])
+        @title = 'playing game #{@game.id}'
         #Create mock game just for initial display...
-        #@board = getBoardArrayFromGame(@game)
+        @board = getBoardArrayFromGame(@game)
 
+        puts "BLAH BLAH #{@game.players}"
         render("games/game")
     end
 end

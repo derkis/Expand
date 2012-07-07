@@ -1,0 +1,10 @@
+!!!
+%html{ :xmlns => "http://www.w3.org/1999/xhtml", "xml:lang" => "en", :lang => "en" }
+  %head
+  %title= @title
+  = render 'layouts/stylesheets'
+  = javascript_include_tag "game"
+  = csrf_meta_tags
+%body
+  = render 'layouts/header'
+  = yield

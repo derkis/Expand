@@ -26,8 +26,6 @@ ActiveRecord::Schema.define(:version => 20120629001255) do
     t.datetime "updated_at",          :null => false
     t.integer  "status"
     t.string   "board"
-    t.integer  "width"
-    t.integer  "height"
     t.integer  "game_description_id"
   end
 
