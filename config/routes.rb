@@ -1,7 +1,7 @@
 Expand::Application.routes.draw do
   
   root :to => 'home#index'
-    
+
   devise_for :users, :controllers => { :sessions => 'sessions' }
   
   resources :games, :except => :index
@@ -18,6 +18,8 @@ Expand::Application.routes.draw do
   end
   
   match 'proposed_games' => 'games#proposed_games', :as => :proposed_games, :via => :get
+
+  match 'poll_game_state' => 'games#poll_game_state', :as => :poll_game_state, :via => :get
       
   # The priority is based upon order of creation:
   # first created -> highest priority.

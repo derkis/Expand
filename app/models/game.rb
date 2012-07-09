@@ -21,7 +21,7 @@ class Game < ActiveRecord::Base
   has_many :users, :through => :players
   belongs_to :game_description
 
-  attr_accessible :players, :players_attributes, :status
+  attr_accessible :players, :players_attributes, :status, :game_description
   accepts_nested_attributes_for :players, :allow_destroy => true
   
   validates :status, :numericality => :true, :inclusion => { :in => [ PROPOSED, STARTED, FINISHED ] }

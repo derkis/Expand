@@ -11,5 +11,19 @@
   height: 50px; }
 
 .cell {
+  text-align: center;
+  vertical-align: middle;
   display: table-cell;
-  width: 50px; }
+  width: 50px;
+  border-style: dotted;
+  border-width: 2px;
+  border-color: gray; }
+
+.gameCell {
+  text-align: center;
+  vertical-align: middle;
+  display: table-cell;
+  width: 50px;
+  border-style: inset;
+  border-width: 3px;
+  border-color: black; }

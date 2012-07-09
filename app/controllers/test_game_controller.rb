@@ -4,6 +4,8 @@ class TestGameController < ApplicationController
 
     layout "game"
      
+    before_filter :authenticate_user!
+
     def start
         # SETUP MOCK USERS
         @u1 = User.find(:all, :conditions => {:email => "p1@test.com"})[0]
@@ -70,7 +72,6 @@ class TestGameController < ApplicationController
         #Create mock game just for initial display...
         @board = getBoardArrayFromGame(@game)
 
-        puts "BLAH BLAH #{@game.players}"
         render("games/game")
     end
 end

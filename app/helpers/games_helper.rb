@@ -10,7 +10,7 @@ module GamesHelper
           c = 0
 
           while c < game.game_description.width
-            board[r][c] = game.board[ix]
+            board[r][c] = {:state => game.board[ix], :row => r, :column => c}
             ix = ix + 1
             c = c + 1
           end

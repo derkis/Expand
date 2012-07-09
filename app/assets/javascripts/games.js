@@ -1,9 +1,5 @@
 $(document).ready(function() {
 	setTimeout(polling_wrapper, 10000);
-
-    $("cell").click(function(event)
-        {$(this).backgroundColor = 0; alert("click fuckers")}
-    );
 });
 
 function polling_wrapper() {
@@ -18,6 +14,7 @@ function check_users() {
 		var displayed_users = $('.user_row');
 		var displayed_user, online_user;
 		var disp_i = 0, online_i = 0;
+
 		while(disp_i < displayed_users.length && online_i < data.length) {
 			displayed_user = displayed_users[disp_i];
 			online_user = data[online_i];
