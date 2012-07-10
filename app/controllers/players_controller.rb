@@ -8,7 +8,7 @@ class PlayersController < ApplicationController
     @player.update_attributes(params[:player])
     
     respond_to do |format|
-      format.json { render :json => @player.to_json }
+      format.json { render :json => @player.game_id.to_json }
       format.all { not_found() }
     end
   end

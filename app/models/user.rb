@@ -19,6 +19,9 @@
 #
 
 class User < ActiveRecord::Base
+  
+  before_create :create_defaults
+  
   has_many :players
   has_many :games, :through => :players
   
@@ -27,6 +30,19 @@ class User < ActiveRecord::Base
     :trackable, :validatable, :timeoutable
 
   attr_accessible :email, :password, :password_confirmation, :remember_me
+  
+  def create_defaults
+    self.last_request_at ||= Time.now
+  end
+  
+  # convenience methods
+  
+  def can_create_game?
+    ActiveRecord::Base.connection.execute(
+      "SELECT g.id AS game_id FROM games g, players p 
+        WHERE g.id = p.game_id AND g.proposing_player = p.id AND p.user_id = #{self.id}"
+    ).empty?;
+  end
   
   # queries
   def get_other_users_since(time)
