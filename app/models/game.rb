@@ -61,4 +61,41 @@ class Game < ActiveRecord::Base
     players_array.group_by { |player| player["game_id"] }
   end
   
+  def refresh_player_tiles
+    board.chars.to_a.each do |t|
+      pid = t.ord - 48
+      if pid >= 0 && pid <= 9 
+        # Okay this tile is owned by a player
+        players[pid].@tileCount = players[pid].@tileCount + 1 
+      end
+    end
+
+    pix = 0
+    players.each do |p|
+       while p.@tileCount < 6
+         ix = find_random_unused_tile          
+         board[pix] = p
+       end 
+       pix = pix + 1
+    end    
+
+    save
+  end
+
+  def board_size
+    game_description.height * game_description.width
+  end
+
+  # Returns the index of a random tile on the board
+  # that has not been assigned ever for this game.
+  def find_random_unused_tile
+    tiles = Array.new
+    i = 0
+    board.chars.to_a.each {|c|
+        tiles.push(i) if c == "e"
+        i = i + 1
+    }
+    tiles = tiles.shuffle
+    tiles[0]
+  end
 end

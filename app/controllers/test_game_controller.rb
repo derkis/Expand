@@ -60,6 +60,8 @@ class TestGameController < ApplicationController
         @p4.game_id = @game.id
         @p4.save
 
+        @game.refresh_player_tiles
+
         session[:game_id] = @game.id
 
         # REDIRECT TO START GAME
