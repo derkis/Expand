@@ -7,3 +7,6 @@ tmp/
 *.swp
 *.vim
 *.sass*
+.DS_STORE
+**/.DS_STORE
+**/**/.DS_STORE
