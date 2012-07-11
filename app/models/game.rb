@@ -13,7 +13,7 @@
 class Game < ActiveRecord::Base
   
   before_validation :set_default_status, :on => :create
-  after_create :set_proposing_player
+  after_commit :set_proposing_player, :on => :create
   before_update :start_game_setup
   
   PROPOSED = 0; STARTED = 1; FINISHED = 2
@@ -69,7 +69,7 @@ class Game < ActiveRecord::Base
     games_string = players_array.inject(' AND (') { |string, player| string += "p.game_id = #{player.game_id} OR " }
     players_array = ActiveRecord::Base.connection.execute(
       'SELECT DISTINCT p.id AS player_id, p.game_id AS game_id, p.accepted AS accepted, u.email AS email 
-        FROM users u, players p WHERE u.id = p.user_id' + games_string[0..-5] + ')'
+        FROM users u, players p WHERE u.id = p.user_id' + ((games_string.length > 6) ? (games_string[0..-5]) + ')' : '')
     );
 
     players_array.size.times do |i|
