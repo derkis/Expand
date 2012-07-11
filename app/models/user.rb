@@ -36,12 +36,11 @@ class User < ActiveRecord::Base
   end
   
   # convenience methods
-  
   def can_create_game?
     ActiveRecord::Base.connection.execute(
       "SELECT g.id AS game_id FROM games g, players p 
-        WHERE g.id = p.game_id AND g.proposing_player = p.id AND p.user_id = #{self.id}"
-    ).empty?;
+        WHERE g.id = p.game_id AND g.proposing_player = p.id AND g.status = #{Game::PROPOSED} AND p.user_id = #{self.id}"
+    ).empty?
   end
   
   # queries

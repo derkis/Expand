@@ -20,7 +20,7 @@ module GamesWebservices
   def poll_game_state
     game = Game.find(session[:game_id])
     respond_to do |format|
-      format.json { render :json => game.to_json(:include => :game_description) }
+      format.json { render :json => game.to_json(:include => :game_description)}
       format.all { not_found() }
     end
   end
