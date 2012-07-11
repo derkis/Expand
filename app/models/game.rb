@@ -12,8 +12,9 @@
 
 class Game < ActiveRecord::Base
   
-  after_create :create_defaults
-  before_update :start_game_defaults
+  before_validation :set_default_status, :on => :create
+  after_create :set_proposing_player
+  before_update :start_game_setup
   
   PROPOSED = 0; STARTED = 1; FINISHED = 2
   
@@ -21,16 +22,31 @@ class Game < ActiveRecord::Base
   has_many :users, :through => :players
   belongs_to :game_description
 
-  attr_accessible :players, :players_attributes, :status, :game_description
+  attr_accessible :players, :players_attributes, :status, :proposing_player, :game_description
   accepts_nested_attributes_for :players, :allow_destroy => true
   
   validates :status, :numericality => :true, :inclusion => { :in => [ PROPOSED, STARTED, FINISHED ] }
- 
-  def create_defaults
+  validate :validate_number_of_players
+  
+  def validate_number_of_players
+    self.errors.add(:base, "Game must have at least 2 players") if self.players.reject(&:marked_for_destruction?).length < 2
+  end
+     
+  def set_default_status
     self.status ||= PROPOSED
   end
   
-  def start_game_defaults
+  def set_proposing_player # TODO: this isn't working properly
+    self.players.each do |player|
+      if self.proposing_player == player.user_id
+        self.proposing_player = player.id
+        self.save
+        break
+      end
+    end
+  end
+  
+  def start_game_setup
     if(self.status_was == PROPOSED and self.status == STARTED and !self.game_description_id)
       start
     end
@@ -50,9 +66,10 @@ class Game < ActiveRecord::Base
   # queries
   def self.get_proposed_games_for(current_user)
     players_array = Player.includes([:game]).all(:conditions => ['user_id = ? AND games.status = ?', current_user.id, Game::PROPOSED])
-    games_string = players_array.inject(' AND ') { |string, player| string += "p.game_id = #{player.game_id} OR " }
+    games_string = players_array.inject(' AND (') { |string, player| string += "p.game_id = #{player.game_id} OR " }
     players_array = ActiveRecord::Base.connection.execute(
-      'SELECT DISTINCT p.id AS player_id, p.game_id AS game_id, u.email AS email FROM users u, players p WHERE u.id = p.user_id' + games_string[0..-5]
+      'SELECT DISTINCT p.id AS player_id, p.game_id AS game_id, p.accepted AS accepted, u.email AS email 
+        FROM users u, players p WHERE u.id = p.user_id' + games_string[0..-5] + ')'
     );
 
     players_array.size.times do |i|
@@ -97,5 +114,28 @@ class Game < ActiveRecord::Base
     }
     tiles = tiles.shuffle
     tiles[0]
+  end
+  
+  # this might work
+  def find_empty_tile
+    find_empty_tile_r(board, 0, rand(self.board.length))
+  end
+  
+  def find_empty_tile(sub_board, start_index, check_index)
+    if sub_board[check_index] == 'e'
+      return start_index + check_index
+    elsif sub_board.length == 1
+      return nil
+    end
+    
+    sub_boards = [sub_board[0..check_index-1], sub_board[check_index+1..sub_board.length-1]]
+    if rand(2) == 0
+      return_index = find_empty_tile(sub_boards[0], start_index, check_index / 2)
+      return_index = find_empty_tile(sub_boards[1], start_index + check_index + 1, check_index / 2) unless return_index 
+    else
+      return_index = find_empty_tile(sub_boards[1], start_index + check_index + 1, check_index / 2) 
+      return_index = find_empty_tile(sub_boards[0], start_index, check_index / 2) unless return_index
+    end  
+    return_index
   end
 end

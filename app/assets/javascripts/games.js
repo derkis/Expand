@@ -99,16 +99,17 @@ function add_game_invitation_tag(this_player, players) {
 
 	var game_invitation_tag =
 		'<div class="game_invite" player_id=' + this_player['player_id'] + ' game_id=' + this_player['game_id'] + '>' +
-			'Play a game with: ' + players_string + 
-			'<button type="button" onclick="accept_game_invitation(' + this_player['player_id'] + ')">' +
+			'<span class="players_text">Play a game with: ' + players_string + '<\/span>' +
+			'<button type="button" onclick="accept_game_invitation(' + this_player['player_id'] + ',' + this_player['game_id'] + ')"' + ((this_player.accepted) ? ' disabled="disabled">' : '>') +
 				'Accept' +
 			'<\/button>' +
+			((this_player.accepted) ? '<span class="waiting_text">Waiting for other players to accept...<\/span>' : '') +
 		'<\/div>';
 	$('#game_invites').append(game_invitation_tag);
 }
 
 // POST player accept
-function accept_game_invitation(player_id) {
+function accept_game_invitation(player_id, game_id) {
 	console.log('POST for ' + player_id);
 	
 	$.ajax({
@@ -120,6 +121,13 @@ function accept_game_invitation(player_id) {
 		success: function(data) {
 			console.log('PUT player update');
 			console.log(data);
+			disable_game_invitation(data);
 		}
 	});
+}
+
+function disable_game_invitation(game_id) {
+	var game_invitation = $('.game_invite[game_id=' + game_id + ']');
+	game_invitation.children('button[type="button"]').attr('disabled', 'disabled');
+	game_invitation.append('<span class="waiting_text">Waiting for other players to accept...</span>')
 }

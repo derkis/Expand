@@ -26,10 +26,13 @@ ActiveRecord::Schema.define(:version => 20120709231226) do
     t.datetime "updated_at",          :null => false
     t.integer  "status"
     t.string   "board"
+    t.integer  "width"
+    t.integer  "height"
     t.integer  "game_description_id"
     t.integer  "turn_state"
     t.integer  "turn_player_id"
     t.string   "tiles"
+    t.integer  "proposing_player"
   end
 
   create_table "players", :force => true do |t|

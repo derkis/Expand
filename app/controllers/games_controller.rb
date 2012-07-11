@@ -15,8 +15,12 @@ class GamesController < ApplicationController
   end
   
   def create
-    @game = Game.new(params[:game])
-    @game.save    
+    if(current_user.can_create_game?)
+      @game = Game.new(params[:game])
+      @game.save
+    else
+      logger.debug("You've already proposed a game") # TODO: this action needs to render JSON
+    end
     render :nothing => true
   end
   
