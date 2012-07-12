@@ -5,6 +5,7 @@ $(document).ready(function() {
 function polling_wrapper() {
 	check_users();
 	check_game_invitations();
+	check_ready_game();
 	setTimeout(polling_wrapper, 10000);
 }
 
@@ -108,22 +109,56 @@ function add_game_invitation_tag(this_player, players) {
 	$('#game_invites').append(game_invitation_tag);
 }
 
-// POST player accept
-function accept_game_invitation(player_id, game_id) {
-	console.log('POST for ' + player_id);
+// ready games polling
+function check_ready_game() {
+	$.getJSON('ready_game.json', function(ready_game) {
+		console.log(ready_game);
+		if(ready_game && $('#start_game_prompt').children().length == 0)
+			add_ready_game_prompt(ready_game);
+	});
+}
+
+function add_ready_game_prompt(ready_game) {
+	var players_string = '';
+	for(var i=0 ; i<ready_game.other_players.length-1 ; i++)
+		players_string += ready_game.other_players[i] + ' and ';
+	players_string += ready_game.other_players[ready_game.other_players.length-1];
 	
+	var start_game_prompt_tag =
+		'<span class ="players_text">Begin game with: ' + players_string + '?<\/span>' +
+		'<button type="button" onclick="start_game(' + ready_game.game_id + ')">Start<\/button>';
+	$('#start_game_prompt').append(start_game_prompt_tag);
+}
+
+// PUT player accept
+function accept_game_invitation(player_id, game_id) {	
 	$.ajax({
 		type: 'PUT',
 		url: 'players/' + player_id,
 		data: JSON.stringify({ 'player': { 'accepted': true } }),
 		contentType: 'application/json',
-		dataType: "json",
+		dataType: 'json',
 		success: function(data) {
 			console.log('PUT player update');
 			console.log(data);
 			disable_game_invitation(data);
 		}
 	});
+}
+
+// PUT game start
+function start_game(game_id) {
+	$.ajax({
+		type: 'PUT',
+		url: 'games/' + game_id,
+		data: JSON.stringify({ 'game': { 'status': 1 } }), // 1 is currently the value for game, but this is not semantic
+		contentType: 'application/json',				   // and I don't think we can extract the constant from the model
+		dataType: 'json',								   // alternatively, we could probably GET an action in the controller
+		success: function(data) {                          // which manages starting the game on the backend.
+			console.log('game should be started');
+			window.location.replace('games/' + game_id);
+		}
+	});		
 }
 
 function disable_game_invitation(game_id) {

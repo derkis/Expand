@@ -43,6 +43,10 @@ class User < ActiveRecord::Base
     ).empty?
   end
   
+  def can_view_game?(game_id)
+    !Player.includes([:game]).first(:conditions => ['game_id = ? AND user_id = ?', game_id, self.id]).nil?
+  end
+  
   # queries
   def get_other_users_since(time)
     User.all(:conditions => [ "last_request_at > ? AND NOT email = ?", time, self.email ], :order => :id)
