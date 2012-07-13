@@ -3,7 +3,7 @@
 	%head
 		%title= @title
 		= render 'layouts/stylesheets'
-		= javascript_include_tag 'application', controller_name
+		= javascript_include_tag 'application', controller_name, "#{controller_name}_#{action_name}"
 		= csrf_meta_tags
 %body
 	= render 'layouts/notices'

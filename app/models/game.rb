@@ -36,7 +36,7 @@ class Game < ActiveRecord::Base
     self.status ||= PROPOSED
   end
   
-  def set_proposing_player # TODO: this isn't working properly
+  def set_proposing_player
     self.players.each do |player|
       if self.proposing_player == player.user_id
         self.proposing_player = player.id
@@ -118,6 +118,25 @@ class Game < ActiveRecord::Base
     tiles[0]
   end
   
+  def self.get_ready_game_for(current_user)
+    game = Game.includes([:players]).first(:conditions =>
+      ['game_id = players.game_id AND proposing_player = players.id AND status = ? AND players.user_id = ?', 
+        Game::PROPOSED, current_user.id]
+    )
+    return nil unless game
+    players_are_ready = game.players.inject(true) { |is_ready, player| is_ready &&= player.accepted }
+    other_player_emails = User.includes([:players]).all(:select => :email, :conditions =>
+      ['user_id = players.user_id AND players.game_id = ? AND NOT user_id = ?', game.id, current_user.id]
+    ).map(&:email)
+    { :game_id => game.id, :other_players => other_player_emails } if players_are_ready
+  end
+
+  def self.get_started_game_for(current_user)
+    Game.includes([:players]).first(:select => :game_id, :conditions =>
+      ['status = ? AND game_id = players.game_id AND players.user_id = ?', Game::STARTED, current_user.id]
+    )
+  end
+
   # this might work
   def find_empty_tile
     find_empty_tile_r(board, 0, rand(self.board.length))

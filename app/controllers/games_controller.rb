@@ -1,11 +1,15 @@
 require 'games_webservices'
+require 'games_helper'
 
 class GamesController < ApplicationController
   
   include GamesWebservices
+  include GamesHelper
   
   before_filter :authenticate_user!
-  after_filter :set_last_request_at
+  before_filter :redirect_user_to_started_game, :only => :index
+  before_filter :verify_user_in_game, :only => [:update, :show]
+  after_filter :set_last_request_at, :only => [:index, :create, :update, :show]
   
   def index
     @title = 'portal'
@@ -22,6 +26,21 @@ class GamesController < ApplicationController
       logger.debug("You've already proposed a game") # TODO: this action needs to render JSON
     end
     render :nothing => true
+  end
+  
+  def update
+    @game = Game.find(params[:id])
+    @game.update_attributes(params[:game])
+    
+    respond_to do |format|
+      format.json { render :json => @game.id.to_json }
+      format.all { not_found() }
+    end
+  end
+  
+  def show
+    logger.debug "   DEBUG: show action name: #{action_name}"
+    @game = Game.find(params[:id])
   end
   
 end

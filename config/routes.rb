@@ -16,7 +16,11 @@ Expand::Application.routes.draw do
   devise_scope :user do
      get 'users_online', :to => 'sessions#users_online', :as => :users_online
   end
+  
   match 'proposed_games' => 'games#proposed_games', :as => :proposed_games, :via => :get
+  match 'ready_game' => 'games#ready_game', :as => :ready_game, :via => :get
+  match 'started_game' => 'games#started_game', :as => :started_game, :via => :get
+  
   match 'poll_game_state' => 'games#poll_game_state', :as => :poll_game_state, :via => :get
       
   # The priority is based upon order of creation:
