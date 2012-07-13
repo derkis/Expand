@@ -79,17 +79,19 @@ class Game < ActiveRecord::Base
   end
   
   def refresh_player_tiles
+    @tileCounts = Hash.new
+
     board.chars.to_a.each do |t|
       pid = t.ord - 48
       if pid >= 0 && pid <= 9 
-        # Okay this tile is owned by a player
-        players[pid].@tileCount = players[pid].@tileCount + 1 
+        @tileCounts[pid] = 0 if !@tileCounts.has_key?pid
+        @tileCounts[pid] = @tileCounts[pid] + 1 
       end
     end
 
     pix = 0
     players.each do |p|
-       while p.@tileCount < 6
+       while @tilesCounts[p.id] < 6
          ix = find_random_unused_tile          
          board[pix] = p
        end 
