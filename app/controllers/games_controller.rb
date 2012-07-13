@@ -7,8 +7,9 @@ class GamesController < ApplicationController
   include GamesHelper
   
   before_filter :authenticate_user!
+  before_filter :redirect_user_to_started_game, :only => :index
   before_filter :verify_user_in_game, :only => [:update, :show]
-  after_filter :set_last_request_at
+  after_filter :set_last_request_at, :only => [:index, :create, :update, :show]
   
   def index
     @title = 'portal'
@@ -38,7 +39,16 @@ class GamesController < ApplicationController
   end
   
   def show
+    logger.debug "   DEBUG: show action name: #{action_name}"
     @game = Game.find(params[:id])
+  end
+
+  def derp
+    started_game = Game.get_started_game_for(current_user)
+    respond_to do |format|
+      format.json { render :json => started_game.id.to_json }
+      format.all { not_found() }
+    end
   end
   
 end

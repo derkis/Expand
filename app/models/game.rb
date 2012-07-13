@@ -91,6 +91,12 @@ class Game < ActiveRecord::Base
     { :game_id => game.id, :other_players => other_player_emails } if players_are_ready
   end
 
+  def self.get_started_game_for(current_user)
+    Game.includes([:players]).first(:select => :game_id, :conditions =>
+      ['status = ? AND game_id = players.game_id AND players.user_id = ?', Game::STARTED, current_user.id]
+    )
+  end
+
   # this might work
   def find_empty_tile
     find_empty_tile_r(board, 0, rand(self.board.length))

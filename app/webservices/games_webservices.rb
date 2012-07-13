@@ -1,5 +1,13 @@
 module GamesWebservices
   
+  def proposed_games
+    proposed_games = Game.get_proposed_games_for(current_user)
+    respond_to do |format|
+      format.json { render :json => proposed_games.to_json }
+      format.all { not_found() }
+    end
+  end
+
   def ready_game
     ready_game = Game.get_ready_game_for(current_user)
     respond_to do |format|
@@ -7,16 +15,15 @@ module GamesWebservices
       format.all { not_found() }
     end
   end
-  
-  def proposed_games
-    proposed_games = Game.get_proposed_games_for(current_user)
-    logger.debug "  DEBUG: game_players #{proposed_games}"
+
+  def started_game
+    started_game = Game.get_started_game_for(current_user)
     respond_to do |format|
-      format.json { render :json => proposed_games.to_json }
+      format.json { render :json => started_game.id.to_json }
       format.all { not_found() }
     end
   end
-
+  
   def poll_game_state
     game = Game.find(session[:game_id])
     respond_to do |format|
