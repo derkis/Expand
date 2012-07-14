@@ -1,9 +1,11 @@
 require 'games_webservices'
+require 'games_tests'
 require 'games_helper'
 
 class GamesController < ApplicationController
   
   include GamesWebservices
+  include GamesTests
   include GamesHelper
   
   before_filter :authenticate_user!
@@ -37,10 +39,24 @@ class GamesController < ApplicationController
       format.all { not_found() }
     end
   end
-  
+
   def show
     logger.debug "   DEBUG: show action name: #{action_name}"
+    logger.debug "   DEBUG: game: #{@game}"
     @game = Game.find(params[:id])
+    respond_to do |format|
+      
+      format.html do
+        @title = 'playing game #{@game.id}'
+        #Create mock game just for initial display...
+        @board = getBoardArrayFromGame(@game)
+      end
+
+      format.json do
+        render :json => @game.to_json(:include => :game_description)
+      end
+
+    end
+    
   end
-  
 end

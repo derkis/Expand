@@ -7,8 +7,7 @@ Expand::Application.routes.draw do
   resources :games, :except => :index
   match 'portal' => 'games#index', :as => :portal, :via => :get
   
-  match 'test' => 'test_game#start', :as => :test, :via => :get 
-  match 'testContinue' => 'test_game#play', :as => :testContinue, :via => :get
+  match 'test' => 'games#new_game_test', :as => :new_game_test, :via => :get
 
   resources :players, :only => :update
   
@@ -21,7 +20,7 @@ Expand::Application.routes.draw do
   match 'ready_game' => 'games#ready_game', :as => :ready_game, :via => :get
   match 'started_game' => 'games#started_game', :as => :started_game, :via => :get
   
-  match 'poll_game_state' => 'games#poll_game_state', :as => :poll_game_state, :via => :get
+  # match 'poll_game_state/:id/' => 'games#poll_game_state', :as => :poll_game_state, :via => :get
       
   # The priority is based upon order of creation:
   # first created -> highest priority.

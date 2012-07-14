@@ -1,2 +1,6 @@
-%h1 this is the action we play the game on
-%h1= @game
+#game{ :game_id => @game.id}
+  .layout
+    .players
+      = render "games/partials/players"
+    .board
+      = render "games/partials/board"

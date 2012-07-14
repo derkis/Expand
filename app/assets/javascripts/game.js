@@ -1,6 +1,5 @@
-//= require jquery
-//= require jquery_ujs
 chars = ["A","B","C","D","E","F","G","H","I","J","K","L"];
+
 $(document).ready(function() {
     polling_wrapper();
 
