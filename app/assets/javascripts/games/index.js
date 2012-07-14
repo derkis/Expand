@@ -66,14 +66,14 @@ function remove_user_tag(displayed_user) {
 
 // game invitation polling
 function check_game_invitations() {
-	$.getJSON('proposed_games.json', function(games) {
+	$.getJSON('games/proposed.json', function(games) {
 		var current_users_email = $(".profile_link").text();
 		for(var game_id in games) {
 			var game = games[game_id];
 			var should_add_invitation = true;
 			$.each($('.game_invite'), function(index, value) {
-				var game_id2 = $(value).attr('game_id');
-				if(game_id2 == "" + game_id)
+				var other_game_id = $(value).attr('game_id');
+				if(other_game_id == "" + game_id)
 					should_add_invitation = false;
 			});
 			
@@ -112,7 +112,7 @@ function add_game_invitation_tag(this_player, players) {
 
 // ready games polling
 function check_ready_game() {
-	$.getJSON('ready_game.json', function(ready_game) {
+	$.getJSON('games/ready.json', function(ready_game) {
 		if(ready_game && $('#start_game_prompt').children().length == 0)
 		add_ready_game_prompt(ready_game);
 	});
@@ -132,7 +132,7 @@ function add_ready_game_prompt(ready_game) {
 
 // started game polling
 function check_started_game() {
-	$.getJSON('started_game.json', function(game_id) {
+	$.getJSON('games/started.json', function(game_id) {
 		window.location.replace('games/' + game_id);
 	});
 }

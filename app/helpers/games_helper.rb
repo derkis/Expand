@@ -6,7 +6,7 @@ module GamesHelper
 
   def redirect_user_to_started_game
     game = Game.get_started_game_for(current_user)
-    # redirect_to game if game
+    redirect_to game if game
   end
     
   # @param [Game] game
