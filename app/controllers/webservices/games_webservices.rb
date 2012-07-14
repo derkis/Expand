@@ -24,12 +24,4 @@ module GamesWebservices
     end
   end
 
-  def poll_game_state
-    game = Game.find(params[:id])
-    respond_to do |format|
-      format.json { render :json => game.to_json(:include => :game_description) }
-      format.all { not_found() }
-    end
-  end
-  
 end

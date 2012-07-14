@@ -5,8 +5,8 @@ require 'games_helper'
 class GamesController < ApplicationController
   
   include GamesWebservices
-  include GamesTests
   include GamesHelper
+  include GamesTests
   
   before_filter :authenticate_user!
   before_filter :redirect_user_to_started_game, :only => :index
@@ -25,7 +25,7 @@ class GamesController < ApplicationController
       @game = Game.new(params[:game])
       @game.save
     else
-      logger.debug("You've already proposed a game") # TODO: this action needs to render JSON
+      logger.debug("You've already proposed a game") # TODO: this needs to be handled somehow
     end
     render :nothing => true
   end
@@ -41,15 +41,12 @@ class GamesController < ApplicationController
   end
 
   def show
-    logger.debug "   DEBUG: show action name: #{action_name}"
-    logger.debug "   DEBUG: game: #{@game}"
     @game = Game.find(params[:id])
     respond_to do |format|
       
       format.html do
-        @title = 'playing game #{@game.id}'
-        #Create mock game just for initial display...
-        @board = getBoardArrayFromGame(@game)
+        @title = 'game'
+        @board = get_board_array_from_game(@game)
       end
 
       format.json do

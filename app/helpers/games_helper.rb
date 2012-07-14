@@ -9,8 +9,7 @@ module GamesHelper
     redirect_to game if game
   end
     
-  # @param [Game] game
-  def getBoardArrayFromGame(game)
+  def get_board_array_from_game(game)
     board = Array.new(game.game_description.height) {Array.new}
 
     r = 0
@@ -29,4 +28,5 @@ module GamesHelper
 
     return board
   end
+  
 end
