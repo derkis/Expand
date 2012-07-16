@@ -1,5 +1,6 @@
-$dark_background: #365656;
-$light_background: #568A8A;
+$dark_background: #464646;
+$light_background: #707070;
+$font_size: 10px;
 
 // fonts -- I'd like to be able to move this into the application.scss
 // and access it here too, but we need to figure out how to load these
@@ -13,7 +14,7 @@ $light_background: #568A8A;
 @import url(http://fonts.googleapis.com/css?family=Press+Start+2P);
 
 @mixin pixel_font($font_size) { 
-	font-family: Pixel, 'Press Start 2P', cursive;
+	font-family: Pixel, "Press Start 2P", cursive;
 	font-size: $font_size;
 }
 
@@ -44,20 +45,25 @@ $light_background: #568A8A;
 		.signin_popover {
 			display: none;
 			position: absolute;
-			width: 200px;
-			height: 100px;
 			border-width:14px 14px 28px 28px;
 			-moz-border-image: url(../popover_border.png) 14 14 28 28 fill stretch;
 			-webkit-border-image: url(../popover_border.png) 14 14 28 28 fill stretch;
 			border-image: url(../popover_border.png) 14 14 28 28 fill stretch;
 			
 			.signin_label {
-				@include pixel_font(10px);
+				@include pixel_font($font_size);
 				color: #fff;
 			}
 
+			.signin_field input {
+				@include pixel_font($font_size);
+				height: $font_size + 5px;
+				-moz-border-radius: 15px;
+				border-radius: 15px;
+			}
+
 			a {
-				@include pixel_font(10px);
+				@include pixel_font($font_size);
 			}
 		}
 
