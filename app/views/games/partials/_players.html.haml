@@ -1,3 +1,9 @@
+- i = 0
 - @game.players.each do |p|
     .player
         = p.user[:email]
+    .tiles
+        - tiles = find_tiles_for i, @game.board
+        - tiles.each do |t|
+            = tile_ix_to_name t, @game.game_description
+    - i += 1

@@ -61,6 +61,8 @@ class Game < ActiveRecord::Base
     self.game_description = GameDescription.find(game_description_id)
     # Setup the board as all empty
     self.board = "e" * (self.game_description.height * self.game_description.width)
+
+    refresh_player_tiles
   end
 
   # queries
@@ -79,26 +81,28 @@ class Game < ActiveRecord::Base
   end
   
   def refresh_player_tiles
-    @tileCounts = Hash.new
+    @tileCounts = Hash.new(0)
 
-    board.chars.to_a.each do |t|
+    self.board.chars.to_a.each do |t|
       pid = t.ord - 48
-      if pid >= 0 && pid <= 9 
-        @tileCounts[pid] = 0 if !@tileCounts.has_key?pid
-        @tileCounts[pid] = @tileCounts[pid] + 1 
+      if pid >= 0 && pid <= 9
+        @tileCounts[pid] += 1 
       end
     end
 
-    pix = 0
-    players.each do |p|
-       while @tilesCounts[p.id] < 6
-         ix = find_random_unused_tile          
-         board[pix] = p
-       end 
-       pix = pix + 1
-    end    
+    unusedTiles = find_unused_tile_indexes
+    unusedTiles = unusedTiles.shuffle!
 
-    save
+    pid = 0
+    players.each do |p|
+       puts "Player Distribute: #{pid}"
+       while @tileCounts[pid] < 6  
+        ix = unusedTiles.pop
+        board[ix] = pid.to_s
+        @tileCounts[pid] += 1
+       end 
+       pid += 1
+    end
   end
 
   def board_size
@@ -107,15 +111,14 @@ class Game < ActiveRecord::Base
 
   # Returns the index of a random tile on the board
   # that has not been assigned ever for this game.
-  def find_random_unused_tile
+  def find_unused_tile_indexes
     tiles = Array.new
     i = 0
-    board.chars.to_a.each {|c|
+    self.board.chars.to_a.each do |c|
         tiles.push(i) if c == "e"
-        i = i + 1
-    }
-    tiles = tiles.shuffle
-    tiles[0]
+        i += 1
+    end
+    tiles
   end
   
   def self.get_ready_game_for(current_user)
@@ -135,28 +138,5 @@ class Game < ActiveRecord::Base
     Game.includes([:players]).first(:select => :game_id, :conditions =>
       ['status = ? AND game_id = players.game_id AND players.user_id = ?', Game::STARTED, current_user.id]
     )
-  end
-
-  # this might work
-  def find_empty_tile
-    find_empty_tile_r(board, 0, rand(self.board.length))
-  end
-  
-  def find_empty_tile(sub_board, start_index, check_index)
-    if sub_board[check_index] == 'e'
-      return start_index + check_index
-    elsif sub_board.length == 1
-      return nil
-    end
-    
-    sub_boards = [sub_board[0..check_index-1], sub_board[check_index+1..sub_board.length-1]]
-    if rand(2) == 0
-      return_index = find_empty_tile(sub_boards[0], start_index, check_index / 2)
-      return_index = find_empty_tile(sub_boards[1], start_index + check_index + 1, check_index / 2) unless return_index 
-    else
-      return_index = find_empty_tile(sub_boards[1], start_index + check_index + 1, check_index / 2) 
-      return_index = find_empty_tile(sub_boards[0], start_index, check_index / 2) unless return_index
-    end  
-    return_index
   end
 end
