@@ -17,8 +17,7 @@ html, body {
 	padding: 0;
 }
 
-/* Links */
-
+// links
 a {
   	color: #09c;
   	text-decoration: none;
@@ -26,8 +25,7 @@ a {
 	&:visited { color: #069; }
 }
 
-/* Navigation */
-
+// navigation
 nav {
 	float: right;
 	padding: 0 0.7em;
@@ -50,4 +48,9 @@ nav {
 			}
 		}
 	}
+}
+
+// makes image height flexible with respect to container
+img {
+	max-width: 100%; max-height: 100%;
 }

@@ -1,0 +1,36 @@
+@import url(http://fonts.googleapis.com/css?family=Press+Start+2P);
+@font-face {
+  font-family: Pixel;
+  src: url(../Ants_on_a_Log_by_nintentofu.ttf) format("truetype"); }
+
+#mainbar {
+  position: relative;
+  top: 30%;
+  height: 17%;
+  max-height: 100%;
+  background: #365656;
+  border-color: #568a8a;
+  border-style: solid none solid;
+  border-width: 0.4em;
+  clear: both; }
+  #mainbar img {
+    float: left; }
+  #mainbar .user_links .signin_button {
+    width: 111px;
+    height: 50px; }
+  #mainbar .user_links .signin_popover {
+    display: none;
+    position: absolute;
+    width: 200px;
+    height: 100px;
+    border-width: 14px 14px 28px 28px;
+    -moz-border-image: url(../popover_border.png) 14 14 28 28 fill stretch;
+    -webkit-border-image: url(../popover_border.png) 14 14 28 28 fill stretch;
+    border-image: url(../popover_border.png) 14 14 28 28 fill stretch; }
+    #mainbar .user_links .signin_popover .signin_label {
+      font-family: Pixel, 'Press Start 2P', cursive;
+      font-size: 10px;
+      color: #fff; }
+    #mainbar .user_links .signin_popover a {
+      font-family: Pixel, 'Press Start 2P', cursive;
+      font-size: 10px; }

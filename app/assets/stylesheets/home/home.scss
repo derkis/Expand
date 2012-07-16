@@ -1,0 +1,68 @@
+$dark_background: #365656;
+$light_background: #568A8A;
+
+// fonts -- I'd like to be able to move this into the application.scss
+// and access it here too, but we need to figure out how to load these
+// css files conditionally from the sprockets 'require' directives...or
+// some other way
+@font-face {
+    font-family: Pixel;
+    src: url(../Ants_on_a_Log_by_nintentofu.ttf) format("truetype");
+}
+
+@import url(http://fonts.googleapis.com/css?family=Press+Start+2P);
+
+@mixin pixel_font($font_size) { 
+	font-family: Pixel, 'Press Start 2P', cursive;
+	font-size: $font_size;
+}
+
+
+// index page styling -- probably move this into the index file
+#mainbar {
+	position: relative;
+	top: 30%;
+	height: 17%;
+	max-height: 100%;
+	background: $dark_background;
+	border-color: $light_background;
+	border-style: solid none solid;
+	border-width: 0.4em;
+	clear: both;
+	
+	img {
+		float: left;
+	}
+	
+	.user_links {
+		
+		.signin_button {
+			width: 111px;
+			height: 50px;
+		}
+		
+		.signin_popover {
+			display: none;
+			position: absolute;
+			width: 200px;
+			height: 100px;
+			border-width:14px 14px 28px 28px;
+			-moz-border-image: url(../popover_border.png) 14 14 28 28 fill stretch;
+			-webkit-border-image: url(../popover_border.png) 14 14 28 28 fill stretch;
+			border-image: url(../popover_border.png) 14 14 28 28 fill stretch;
+			
+			.signin_label {
+				@include pixel_font(10px);
+				color: #fff;
+			}
+
+			a {
+				@include pixel_font(10px);
+			}
+		}
+
+		nav {
+
+		}
+	}
+}
