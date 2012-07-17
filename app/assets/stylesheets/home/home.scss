@@ -1,23 +1,8 @@
+@import "../partials/font";
+
 $dark_background: #464646;
 $light_background: #707070;
-$font_size: 10px;
-
-// fonts -- I'd like to be able to move this into the application.scss
-// and access it here too, but we need to figure out how to load these
-// css files conditionally from the sprockets 'require' directives...or
-// some other way
-@font-face {
-    font-family: Pixel;
-    src: url(../Ants_on_a_Log_by_nintentofu.ttf) format("truetype");
-}
-
-@import url(http://fonts.googleapis.com/css?family=Press+Start+2P);
-
-@mixin pixel_font($font_size) { 
-	font-family: Pixel, "Press Start 2P", cursive;
-	font-size: $font_size;
-}
-
+$primary_color: #a66c5a;
 
 // index page styling -- probably move this into the index file
 #mainbar {
@@ -45,25 +30,22 @@ $font_size: 10px;
 		.signin_popover {
 			display: none;
 			position: absolute;
-			border-width:14px 14px 28px 28px;
+			border-width: 14px 14px 28px 28px;
 			-moz-border-image: url(../popover_border.png) 14 14 28 28 fill stretch;
 			-webkit-border-image: url(../popover_border.png) 14 14 28 28 fill stretch;
 			border-image: url(../popover_border.png) 14 14 28 28 fill stretch;
-			
-			.signin_label {
-				@include pixel_font($font_size);
-				color: #fff;
-			}
 
 			.signin_field input {
-				@include pixel_font($font_size);
-				height: $font_size + 5px;
-				-moz-border-radius: 15px;
-				border-radius: 15px;
+				@include pixel_font($font_size_std);
+				height: $font_size_std + 10px;
+				background-color: transparent;
+				border-width: 12px 12px 12px 12px;
+				border-image: url(../form.png) 12 12 12 12 fill stretch;
+				margin-bottom: 10px;
 			}
 
 			a {
-				@include pixel_font($font_size);
+				margin-left: 3px;
 			}
 		}
 

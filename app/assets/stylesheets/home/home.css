@@ -25,16 +25,13 @@
     -moz-border-image: url(../popover_border.png) 14 14 28 28 fill stretch;
     -webkit-border-image: url(../popover_border.png) 14 14 28 28 fill stretch;
     border-image: url(../popover_border.png) 14 14 28 28 fill stretch; }
-    #mainbar .user_links .signin_popover .signin_label {
-      font-family: Pixel, "Press Start 2P", cursive;
-      font-size: 10px;
-      color: #fff; }
     #mainbar .user_links .signin_popover .signin_field input {
       font-family: Pixel, "Press Start 2P", cursive;
-      font-size: 10px;
-      height: 15px;
-      -moz-border-radius: 15px;
-      border-radius: 15px; }
+      font-size: 12px;
+      height: 22px;
+      background-color: transparent;
+      border-width: 12px 12px 12px 12px;
+      border-image: url(../form.png) 12 12 12 12 fill stretch;
+      margin-bottom: 10px; }
     #mainbar .user_links .signin_popover a {
-      font-family: Pixel, "Press Start 2P", cursive;
-      font-size: 10px; }
+      margin-left: 3px; }

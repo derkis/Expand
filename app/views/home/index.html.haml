@@ -3,12 +3,8 @@
 	.user_links
 		= form_for(@user, :url => :user_session) do |f|
 			.signin_popover
-				.signin_row
-					.signin_label= f.label :email
-					.signin_field= f.email_field :email
-				.signin_row
-					.signin_label= f.label :password
-					.signin_field= f.password_field :password
+				.signin_field= f.email_field :email, :placeholder => 'e-mail'
+				.signin_field= f.password_field :password, :placeholder => 'password'
 				= link_to "Forgot your password?", :new_user_password
 			= f.submit 'Sign in', :class => 'signin_button', :type => :image, :src => 'assets/signin_button.png'
 		%nav

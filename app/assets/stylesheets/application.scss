@@ -1,15 +1,4 @@
-/*
- * This is a manifest file that'll be compiled into application.css, which will include all the files
- * listed below.
- *
- * Any CSS and SCSS file within this directory, lib/assets/stylesheets, vendor/assets/stylesheets,
- * or vendor/assets/stylesheets of plugins, if any, can be referenced here using a relative path.
- *
- * You're free to add application-wide styles to this file and they'll appear at the top of the
- * compiled file, but it's generally better to create a new file per style scope.
- *
- *= require_self
-*/
+@import "partials/font";
 
 html, body {
 	height: 100%;
@@ -19,10 +8,11 @@ html, body {
 
 // links
 a {
-  	color: #09c;
+	@include pixel_font($font_size_std);
+  	color: $link_color;
   	text-decoration: none;
-	&:hover { color: #069; text-decoration: underline; }
-	&:visited { color: #069; }
+	&:hover { color: $link_color_hover !important; }
+	&:visited { color: $link_color_visited; }
 }
 
 // navigation
@@ -43,8 +33,6 @@ nav {
 			a {
 				padding: 0 5px;
 			  	font-weight: bold;
-				&:visited { color: #09c; }
-				&:hover { text-decoration: underline; }
 			}
 		}
 	}
