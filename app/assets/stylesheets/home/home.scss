@@ -1,13 +1,10 @@
 @import "../partials/font";
-
-$dark_background: #464646;
-$light_background: #707070;
-$primary_color: #a66c5a;
+@import "../partials/color";
 
 // index page styling -- probably move this into the index file
 #mainbar {
 	position: relative;
-	top: 30%;
+	top: 15em;
 	height: 136px;
 	max-height: 100%;
 	background: $dark_background;

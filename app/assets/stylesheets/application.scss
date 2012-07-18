@@ -1,7 +1,7 @@
 @import "partials/font";
+@import "partials/color";
 
 html, body {
-	height: 100%;
 	margin: 0;
 	padding: 0;
 }
@@ -14,30 +14,42 @@ a {
 	&:visited { color: $font_color_link_visited; }
 }
 
+#header {
+	height: 1em; 
+	margin: .5em;
+	border-width: 0 0 1px 0;
+
+	.flash {
+		@include pixel_font($font_size_flash, $font_color_flash);
+		display: inline-block;
+		border-width: 9px 8px 9px 50px;
+		border-image: url(/assets/flash.png) 9 8 9 50 fill stretch;
+		&:empty { display: none; }
+	}
+
+	.user_nav {
+
+	}
+}
+
+.push { }
+
+
 // navigation
 nav {
 	float: right;
-	padding: 0 0.7em;
 	white-space: nowrap;
 	
 	ul {
-		margin: 0;
-		padding: 0;
-		
 		li {
 			list-style-type: none;
 			display: inline-block;
 			padding: 0.2em 0;
-			
-			a {
-				padding: 0 5px;
-			  	font-weight: bold;
-			}
+			a { padding: 0 5px; font-weight: bold; }
 		}
 	}
 }
 
 // makes image height flexible with respect to container
-img {
-	max-width: 100%; max-height: 100%;
-}
+img { max-width: 100%; max-height: 100%; }
+

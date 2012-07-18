@@ -3,7 +3,6 @@
   src: url(/assets/fffharmo.ttf) format("truetype"); }
 
 html, body {
-  height: 100%;
   margin: 0;
   padding: 0; }
 
@@ -17,20 +16,30 @@ a {
   a:visited {
     color: #66636f; }
 
+#header {
+  height: 1em;
+  margin: .5em;
+  border-width: 0 0 1px 0; }
+  #header .flash {
+    font-family: Pixel, cursive;
+    font-size: 14px;
+    color: white;
+    display: inline-block;
+    border-width: 9px 8px 9px 50px;
+    border-image: url(/assets/flash.png) 9 8 9 50 fill stretch; }
+    #header .flash:empty {
+      display: none; }
+
 nav {
   float: right;
-  padding: 0 0.7em;
   white-space: nowrap; }
-  nav ul {
-    margin: 0;
-    padding: 0; }
-    nav ul li {
-      list-style-type: none;
-      display: inline-block;
-      padding: 0.2em 0; }
-      nav ul li a {
-        padding: 0 5px;
-        font-weight: bold; }
+  nav ul li {
+    list-style-type: none;
+    display: inline-block;
+    padding: 0.2em 0; }
+    nav ul li a {
+      padding: 0 5px;
+      font-weight: bold; }
 
 img {
   max-width: 100%;

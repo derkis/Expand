@@ -1,7 +1,6 @@
 #header
+	= render 'layouts/notices'
 	- if user_signed_in?
 		%nav{ :class => :user_nav }
 			= link_to "#{current_user.email}", :edit_user_registration, :class => :profile_link
 			= link_to 'logout', :destroy_user_session, :method => :delete
-		
-			

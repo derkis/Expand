@@ -1,0 +1,8 @@
+@font-face {
+  font-family: Pixel;
+  src: url(/assets/fffharmo.ttf) format("truetype"); }
+
+.wrapper {
+  margin: 1em;
+  background: #707070;
+  border-radius: 5px; }
