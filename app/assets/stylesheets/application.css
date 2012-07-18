@@ -1,7 +1,6 @@
-@import url(http://fonts.googleapis.com/css?family=Press+Start+2P);
 @font-face {
   font-family: Pixel;
-  src: url(../Ants_on_a_Log_by_nintentofu.ttf) format("truetype"); }
+  src: url(/assets/fffharmo.ttf) format("truetype"); }
 
 html, body {
   height: 100%;
@@ -9,7 +8,7 @@ html, body {
   padding: 0; }
 
 a {
-  font-family: Pixel, "Press Start 2P", cursive;
+  font-family: Pixel, cursive;
   font-size: 12px;
   color: #78dabb;
   text-decoration: none; }

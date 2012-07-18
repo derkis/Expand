@@ -8,7 +8,7 @@ $primary_color: #a66c5a;
 #mainbar {
 	position: relative;
 	top: 30%;
-	height: 17%;
+	height: 136px;
 	max-height: 100%;
 	background: $dark_background;
 	border-color: $light_background;
@@ -16,18 +16,25 @@ $primary_color: #a66c5a;
 	border-width: 0.4em;
 	clear: both;
 	
-	img {
-		float: left;
-	}
+	.title { float: left; padding-left: 20px; }
 	
-	.user_links {
-		
-		.signin_button {
+	.buttons {
+		position: relative;
+		height: 112px;
+		top: 12px;
+
+		.image_button {
+			@include pixel_font($font_size_btn, $font_color_btn);
+			border: none;
+			background: url(../signin_button.png) no-repeat center center;
 			width: 111px;
 			height: 50px;
+			&:hover { background: url(../signin_button_hover.png) no-repeat center center; }
 		}
-		
-		.signin_popover {
+
+		#signin_button { margin-bottom: 12px; }
+	
+		.popover {
 			display: none;
 			position: absolute;
 			border-width: 14px 14px 28px 28px;
@@ -35,22 +42,19 @@ $primary_color: #a66c5a;
 			-webkit-border-image: url(../popover_border.png) 14 14 28 28 fill stretch;
 			border-image: url(../popover_border.png) 14 14 28 28 fill stretch;
 
-			.signin_field input {
-				@include pixel_font($font_size_std);
-				height: $font_size_std + 10px;
-				background-color: transparent;
-				border-width: 12px 12px 12px 12px;
-				border-image: url(../form.png) 12 12 12 12 fill stretch;
-				margin-bottom: 10px;
+			.form_field {
+				input {
+					@include pixel_font($font_size_std, $font_color_std);
+					height: $font_size_std + 10px;
+					background-color: transparent;
+					border-width: 12px 12px 12px 12px;
+					border-image: url(../form.png) 12 12 12 12 fill stretch;
+					margin-bottom: 10px;
+				}
+				&:last-child input { margin-bottom: 0px; }
 			}
 
-			a {
-				margin-left: 3px;
-			}
-		}
-
-		nav {
-
+			a { margin-left: 3px; }
 		}
 	}
 }

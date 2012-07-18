@@ -1,16 +1,20 @@
 $font_size_std: 12px;
-$link_color: #78dabb;
-$link_color_hover: #d78d84;
-$link_color_visited: #66636f;
+$font_size_btn: 16px;
+
+$font_color_std: #000;
+$font_color_btn: #fff;
+
+$font_color_link: #78dabb;
+$font_color_link_hover: #d78d84;
+$font_color_link_visited: #66636f;
 
 @font-face {
     font-family: Pixel;
-    src: url(../Ants_on_a_Log_by_nintentofu.ttf) format("truetype");
+	src: url(/assets/fffharmo.ttf) format("truetype");
 }
 
-@import url(http://fonts.googleapis.com/css?family=Press+Start+2P);
-
-@mixin pixel_font($font_size) { 
-	font-family: Pixel, "Press Start 2P", cursive;
+@mixin pixel_font($font_size, $font_color) { 
+	font-family: Pixel, cursive;
 	font-size: $font_size;
+	color: $font_color;
 }
