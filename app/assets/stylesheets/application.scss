@@ -1,56 +1,55 @@
-/*
- * This is a manifest file that'll be compiled into application.css, which will include all the files
- * listed below.
- *
- * Any CSS and SCSS file within this directory, lib/assets/stylesheets, vendor/assets/stylesheets,
- * or vendor/assets/stylesheets of plugins, if any, can be referenced here using a relative path.
- *
- * You're free to add application-wide styles to this file and they'll appear at the top of the
- * compiled file, but it's generally better to create a new file per style scope.
- *
- *= require_self
-*/
+@import "partials/font";
+@import "partials/color";
 
 html, body {
-	height: 100%;
 	margin: 0;
 	padding: 0;
 }
 
 // links
 a {
-  	color: #09c;
+	@include pixel_font($font_size_std, $font_color_link);
   	text-decoration: none;
-	&:hover { color: #069; text-decoration: underline; }
-	&:visited { color: #069; }
+	&:hover { color: $font_color_link_hover !important; }
+	&:visited { color: $font_color_link_visited; }
 }
+
+#header {
+	height: 1em; 
+	margin: .5em;
+	border-width: 0 0 1px 0;
+
+	.flash {
+		@include pixel_font($font_size_flash, $font_color_flash);
+		display: inline-block;
+		border-width: 9px 8px 9px 50px;
+		border-image: url(/assets/flash.png) 9 8 9 50 fill stretch;
+		&:empty { display: none; }
+	}
+
+	.user_nav {
+
+	}
+}
+
+.push { }
+
 
 // navigation
 nav {
 	float: right;
-	padding: 0 0.7em;
 	white-space: nowrap;
 	
 	ul {
-		margin: 0;
-		padding: 0;
-		
 		li {
 			list-style-type: none;
 			display: inline-block;
 			padding: 0.2em 0;
-			
-			a {
-				padding: 0 5px;
-			  	font-weight: bold;
-				&:visited { color: #09c; }
-				&:hover { text-decoration: underline; }
-			}
+			a { padding: 0 5px; font-weight: bold; }
 		}
 	}
 }
 
 // makes image height flexible with respect to container
-img {
-	max-width: 100%; max-height: 100%;
-}
+img { max-width: 100%; max-height: 100%; }
+

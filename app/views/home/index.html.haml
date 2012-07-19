@@ -1,17 +1,17 @@
 #mainbar
 	= image_tag('title.png', :class => 'title', :alt => 'Expand')
-	.user_links
+	.buttons
 		= form_for(@user, :url => :user_session) do |f|
-			.signin_popover
-				.signin_row
-					.signin_label= f.label :email
-					.signin_field= f.email_field :email
-				.signin_row
-					.signin_label= f.label :password
-					.singin_field= f.password_field :password
+			#signin_form.popover
+				.form_field= f.email_field :email, :placeholder => 'e-mail'
+				.form_field= f.password_field :password, :placeholder => 'password'
 				= link_to "Forgot your password?", :new_user_password
-			= f.submit 'Sign in', :class => 'signin_button', :type => :image, :src => 'assets/signin_button.png'
-		%nav
-			%ul
-				%li= link_to 'Play Now', '/portal' 
-				%li= link_to 'Register', :new_user_registration, { :class => 'registration_link' }
+			= f.submit 'Sign in', :id => 'signin_button', :class => 'image_button'
+		
+		= form_for(@user, :url => :user_registration) do |f|
+			#signup_form.popover
+				.form_field= f.email_field :email, :placeholder => 'e-mail'
+				.form_field= f.password_field :password, :placeholder => 'password'
+				.form_field= f.password_field :password_confirmation, :placeholder => 'confirmation'
+			= f.submit 'Sign up', :id => 'signup_button', :class => 'image_button'
+				

@@ -1,0 +1,14 @@
+$font_size_std: 12px;
+$font_size_btn: 16px;
+$font_size_flash: 14px;
+
+@font-face {
+    font-family: Pixel;
+	src: url(/assets/fffharmo.ttf) format("truetype");
+}
+
+@mixin pixel_font($font_size, $font_color) { 
+	font-family: Pixel, cursive;
+	font-size: $font_size;
+	color: $font_color;
+}

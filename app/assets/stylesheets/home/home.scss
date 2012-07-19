@@ -1,28 +1,11 @@
-$dark_background: #365656;
-$light_background: #568A8A;
-
-// fonts -- I'd like to be able to move this into the application.scss
-// and access it here too, but we need to figure out how to load these
-// css files conditionally from the sprockets 'require' directives...or
-// some other way
-@font-face {
-    font-family: Pixel;
-    src: url(../Ants_on_a_Log_by_nintentofu.ttf) format("truetype");
-}
-
-@import url(http://fonts.googleapis.com/css?family=Press+Start+2P);
-
-@mixin pixel_font($font_size) { 
-	font-family: Pixel, 'Press Start 2P', cursive;
-	font-size: $font_size;
-}
-
+@import "../partials/font";
+@import "../partials/color";
 
 // index page styling -- probably move this into the index file
 #mainbar {
 	position: relative;
-	top: 30%;
-	height: 17%;
+	top: 15em;
+	height: 136px;
 	max-height: 100%;
 	background: $dark_background;
 	border-color: $light_background;
@@ -30,39 +13,45 @@ $light_background: #568A8A;
 	border-width: 0.4em;
 	clear: both;
 	
-	img {
-		float: left;
-	}
+	.title { float: left; padding-left: 20px; }
 	
-	.user_links {
-		
-		.signin_button {
+	.buttons {
+		position: relative;
+		height: 112px;
+		top: 12px;
+
+		.image_button {
+			@include pixel_font($font_size_btn, $font_color_btn);
+			border: none;
+			background: url(../signin_button.png) no-repeat center center;
 			width: 111px;
 			height: 50px;
+			&:hover { background: url(../signin_button_hover.png) no-repeat center center; }
 		}
-		
-		.signin_popover {
+
+		#signin_button { margin-bottom: 12px; }
+	
+		.popover {
 			display: none;
 			position: absolute;
-			width: 200px;
-			height: 100px;
-			border-width:14px 14px 28px 28px;
+			border-width: 14px 14px 28px 28px;
 			-moz-border-image: url(../popover_border.png) 14 14 28 28 fill stretch;
 			-webkit-border-image: url(../popover_border.png) 14 14 28 28 fill stretch;
 			border-image: url(../popover_border.png) 14 14 28 28 fill stretch;
-			
-			.signin_label {
-				@include pixel_font(10px);
-				color: #fff;
+
+			.form_field {
+				input {
+					@include pixel_font($font_size_std, $font_color_std);
+					height: $font_size_std + 10px;
+					background-color: transparent;
+					border-width: 12px 12px 12px 12px;
+					border-image: url(../form.png) 12 12 12 12 fill stretch;
+					margin-bottom: 10px;
+				}
+				&:last-child input { margin-bottom: 0px; }
 			}
 
-			a {
-				@include pixel_font(10px);
-			}
-		}
-
-		nav {
-
+			a { margin-left: 3px; }
 		}
 	}
 }
