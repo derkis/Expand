@@ -11,25 +11,55 @@
 #  turn_id          :integer
 #
 
+# == Schema Information
+#
+# Table name: games
+#
+#  id               :integer         not null, primary key
+#  created_at       :datetime        not null
+#  updated_at       :datetime        not null
+#  status           :integer
+#  template_id      :integer
+#  proposing_player :integer
+#  turn_id          :integer
+#
 class Game < ActiveRecord::Base
   
+  #####################################################
+  # Callbacks
+  #####################################################
   before_validation :set_default_status, :on => :create
   after_commit :set_proposing_player, :on => :create
-  before_update :start_game_setup
+  before_update :before_update_handler
   
+  #####################################################
+  # Constants
+  #####################################################
   PROPOSED = 0; STARTED = 1; FINISHED = 2
   
+  #####################################################
+  # Associations
+  #####################################################
   has_many :players, :dependent => :destroy
   has_many :users, :through => :players
-  has_many :turns
+  has_many :turns, :dependent => :destroy
   belongs_to :template
 
+  #####################################################
+  # Attribute Settings
+  #####################################################
   attr_accessible :players, :players_attributes, :status, :proposing_player, :template
   accepts_nested_attributes_for :players, :allow_destroy => true
   
+  #####################################################
+  # Validation
+  #####################################################
   validates :status, :numericality => :true, :inclusion => { :in => [ PROPOSED, STARTED, FINISHED ] }
   validate :validate_number_of_players
   
+  #####################################################
+  # Methods
+  #####################################################
   def validate_number_of_players
     self.errors.add(:base, 'Game must have at least 2 players') if self.players.reject(&:marked_for_destruction?).length < 2
   end
@@ -48,18 +78,16 @@ class Game < ActiveRecord::Base
     end
   end
   
-  def start_game_setup
-    if(self.status_was == PROPOSED and self.status == STARTED and !self.template_id)
-      start
-    end
+  def before_update_handler
+    start if self.status_was == PROPOSED
   end
   
   def start
     self.status ||= STARTED
     self.template_id ||= 1
-
-    # self.game_description = Template.find(game_description_id)
-    # self.board = 'e' * (self.game_description.height * self.game_description.width)
+    self.template.save
+    
+    save
 
     self.turn_id ||= Turn.create_first_turn_for(self, random_player_id).id
   end
@@ -71,8 +99,6 @@ class Game < ActiveRecord::Base
   def random_player_id
     self.players.shuffle.first.id
   end
-
-
 
   # queries -- todo: put in a module
   def self.get_proposed_games_for(current_user)
@@ -108,5 +134,4 @@ class Game < ActiveRecord::Base
       ['status = ? AND game_id = players.game_id AND players.user_id = ?', Game::STARTED, current_user.id]
     )
   end
-
 end

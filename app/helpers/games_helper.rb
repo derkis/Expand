@@ -21,7 +21,8 @@ module GamesHelper
       c = 0
 
       while c < game.template.width
-        board[r][c] = {:state => game.turns.last.board[ix], :row => r, :column => c}
+        lastTurn = game.turns.last
+        board[r][c] = lastTurn.board[ix]
         ix = ix + 1
         c = c + 1
       end

@@ -1,7 +1,6 @@
 module GamesTests
   
   def new_test_game
-    @description = GameDescription.find(1)
     @game = Game.new({ 
       'proposing_player' => 1, 
       'players_attributes' => {
@@ -13,8 +12,6 @@ module GamesTests
     })
 
     @game.start
-    @game.save
     redirect_to @game
   end
-
 end

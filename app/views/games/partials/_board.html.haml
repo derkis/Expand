@@ -7,10 +7,10 @@
     - @board[0].each do |col|
       .cell
         = l = l.succ
-  - @board.each do |row|
+  - @board.each_with_index do |row, rowIX|
     .row 
       .cell
         = i
         - i = i.succ
-      - row.each do |cell|
-        = render :partial => "games/partials/cell", :locals => {:cell => cell}
+      - row.each_with_index do |cell, colIX|
+        = render :partial => "games/partials/cell", :locals => {:cell => cell, :rowIX => rowIX, :colIX => colIX}
