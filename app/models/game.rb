@@ -2,12 +2,13 @@
 #
 # Table name: games
 #
-#  id                  :integer         not null, primary key
-#  created_at          :datetime        not null
-#  updated_at          :datetime        not null
-#  status              :integer
-#  board               :string(255)
-#  game_description_id :integer
+#  id               :integer         not null, primary key
+#  created_at       :datetime        not null
+#  updated_at       :datetime        not null
+#  status           :integer
+#  template_id      :integer
+#  proposing_player :integer
+#  turn_id          :integer
 #
 
 class Game < ActiveRecord::Base
@@ -20,16 +21,17 @@ class Game < ActiveRecord::Base
   
   has_many :players, :dependent => :destroy
   has_many :users, :through => :players
-  belongs_to :game_description
+  has_many :turns
+  belongs_to :template
 
-  attr_accessible :players, :players_attributes, :status, :proposing_player, :game_description
+  attr_accessible :players, :players_attributes, :status, :proposing_player, :template
   accepts_nested_attributes_for :players, :allow_destroy => true
   
   validates :status, :numericality => :true, :inclusion => { :in => [ PROPOSED, STARTED, FINISHED ] }
   validate :validate_number_of_players
   
   def validate_number_of_players
-    self.errors.add(:base, "Game must have at least 2 players") if self.players.reject(&:marked_for_destruction?).length < 2
+    self.errors.add(:base, 'Game must have at least 2 players') if self.players.reject(&:marked_for_destruction?).length < 2
   end
      
   def set_default_status
@@ -47,25 +49,32 @@ class Game < ActiveRecord::Base
   end
   
   def start_game_setup
-    if(self.status_was == PROPOSED and self.status == STARTED and !self.game_description_id)
+    if(self.status_was == PROPOSED and self.status == STARTED and !self.template_id)
       start
     end
   end
   
   def start
-    # Ensure status is indeed started
     self.status ||= STARTED
-    # Make sure we have assigned ourselves a game description
-    self.game_description_id ||= 1
-    # Now load said description by id
-    self.game_description = GameDescription.find(game_description_id)
-    # Setup the board as all empty
-    self.board = "e" * (self.game_description.height * self.game_description.width)
+    self.template_id ||= 1
 
-    refresh_player_tiles
+    # self.game_description = Template.find(game_description_id)
+    # self.board = 'e' * (self.game_description.height * self.game_description.width)
+
+    self.turn_id ||= Turn.create_first_turn_for(self, random_player_id).id
   end
 
-  # queries
+  def board_area
+    template.height * template.width
+  end
+
+  def random_player_id
+    self.players.shuffle.first.id
+  end
+
+
+
+  # queries -- todo: put in a module
   def self.get_proposed_games_for(current_user)
     players_array = Player.includes([:game]).all(:conditions => ['user_id = ? AND games.status = ?', current_user.id, Game::PROPOSED])
     games_string = players_array.inject(' AND (') { |string, player| string += "p.game_id = #{player.game_id} OR " }
@@ -77,56 +86,16 @@ class Game < ActiveRecord::Base
     players_array.size.times do |i|
       players_array[i] = players_array[i].delete_if { |key, value| key.kind_of? Integer } 
     end
-    players_array.group_by { |player| player["game_id"] }
-  end
-  
-  def refresh_player_tiles
-    @tileCounts = Hash.new(0)
-
-    self.board.chars.to_a.each do |t|
-      pid = t.ord - 48
-      if pid >= 0 && pid <= 9
-        @tileCounts[pid] += 1 
-      end
-    end
-
-    unusedTiles = find_unused_tile_indexes
-    unusedTiles = unusedTiles.shuffle!
-
-    pid = 0
-    players.each do |p|
-       puts "Player Distribute: #{pid}"
-       while @tileCounts[pid] < 6  
-        ix = unusedTiles.pop
-        board[ix] = pid.to_s
-        @tileCounts[pid] += 1
-       end 
-       pid += 1
-    end
+    players_array.group_by { |player| player['game_id'] }
   end
 
-  def board_size
-    game_description.height * game_description.width
-  end
-
-  # Returns the index of a random tile on the board
-  # that has not been assigned ever for this game.
-  def find_unused_tile_indexes
-    tiles = Array.new
-    i = 0
-    self.board.chars.to_a.each do |c|
-        tiles.push(i) if c == "e"
-        i += 1
-    end
-    tiles
-  end
-  
   def self.get_ready_game_for(current_user)
     game = Game.includes([:players]).first(:conditions =>
       ['game_id = players.game_id AND proposing_player = players.id AND status = ? AND players.user_id = ?', 
         Game::PROPOSED, current_user.id]
     )
     return nil unless game
+
     players_are_ready = game.players.inject(true) { |is_ready, player| is_ready &&= player.accepted }
     other_player_emails = User.includes([:players]).all(:select => :email, :conditions =>
       ['user_id = players.user_id AND players.game_id = ? AND NOT user_id = ?', game.id, current_user.id]
@@ -139,4 +108,5 @@ class Game < ActiveRecord::Base
       ['status = ? AND game_id = players.game_id AND players.user_id = ?', Game::STARTED, current_user.id]
     )
   end
+
 end

@@ -2,12 +2,13 @@
 #
 # Table name: games
 #
-#  id                  :integer         not null, primary key
-#  created_at          :datetime        not null
-#  updated_at          :datetime        not null
-#  status              :integer
-#  board               :string(255)
-#  game_description_id :integer
+#  id               :integer         not null, primary key
+#  created_at       :datetime        not null
+#  updated_at       :datetime        not null
+#  status           :integer
+#  template_id      :integer
+#  proposing_player :integer
+#  turn_id          :integer
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html

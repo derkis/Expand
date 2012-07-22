@@ -8,7 +8,7 @@ class TestGameController < ApplicationController
 
     def start
         # SETUP GAME DESCRIPTION
-        @description = GameDescription.find(1)
+        @description = Template.find(1)
 
         # SETUP TEST GAME
         @game = Game.new({"proposing_player" => 1, 

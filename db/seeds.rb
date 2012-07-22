@@ -5,7 +5,7 @@
 #
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
-GameDescription.create(:id=>1,:height=>9,:width=>12,:stock_count=>25)
+Template.create(:id=>1,:height=>9,:width=>12,:stock_count=>25)
 User.create(:email => "p1@test.com", :password => "password", :password_confirmation => "password")
 User.create(:email => "p2@test.com", :password => "password", :password_confirmation => "password")
 User.create(:email => "p3@test.com", :password => "password", :password_confirmation => "password")

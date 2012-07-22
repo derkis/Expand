@@ -50,7 +50,7 @@ class GamesController < ApplicationController
       end
 
       format.json do
-        render :json => @game.to_json(:include => :game_description)
+        render :json => @game.to_json(:include => :template)
       end
 
     end

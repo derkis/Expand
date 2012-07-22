@@ -12,16 +12,16 @@ module GamesHelper
   end
     
   def get_board_array_from_game(game)
-    board = Array.new(game.game_description.height) {Array.new}
+    board = Array.new(game.template.height) { Array.new }
 
     r = 0
     ix = 0
 
-    while r < game.game_description.height
+    while r < game.template.height
       c = 0
 
-      while c < game.game_description.width
-        board[r][c] = {:state => game.board[ix], :row => r, :column => c}
+      while c < game.template.width
+        board[r][c] = {:state => game.turns.last.board[ix], :row => r, :column => c}
         ix = ix + 1
         c = c + 1
       end
@@ -42,9 +42,9 @@ module GamesHelper
     ret
   end
 
-  def tile_ix_to_name (ix, game_description)
-    row = ix / game_description.width
-    col = ix % game_description.width + 1
+  def tile_ix_to_name (ix, template)
+    row = ix / template.width
+    col = ix % template.width + 1
 
     CHARS[row] + col.to_s
   end

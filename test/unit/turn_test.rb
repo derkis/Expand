@@ -1,19 +1,22 @@
 # == Schema Information
 #
-# Table name: players
+# Table name: turns
 #
 #  id         :integer         not null, primary key
+#  game_id    :integer
+#  player_id  :integer
+#  number     :integer
+#  board      :string(255)
+#  data       :text
+#  action     :text
 #  created_at :datetime        not null
 #  updated_at :datetime        not null
-#  game_id    :integer
-#  user_id    :integer
-#  accepted   :boolean
 #  tiles      :string(255)
 #
 
 require 'test_helper'
 
-class PlayerTest < ActiveSupport::TestCase
+class TurnTest < ActiveSupport::TestCase
   # test "the truth" do
   #   assert true
   # end
