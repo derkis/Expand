@@ -3,7 +3,7 @@ chars = ["A","B","C","D","E","F","G","H","I","J","K","L"];
 $(document).ready(function() {
     polling_wrapper();
 
-    $(".gameCell").hover(
+    $(".game_cell").hover(
         function() {$(this).css("background-color", "gray")}, 
         function() {$(this).css("background-color", "white")}
     );
@@ -12,8 +12,9 @@ $(document).ready(function() {
 function polling_wrapper() {
     $.getJSON(document.URL + '.json', null, function(data) {
         console.log(data)
-        render(data.board, data.game_description.width, data.game_description.height);
+        render(data.current_turn.board, data.template.width, data.template.height);
     });
+    
     setTimeout(polling_wrapper, 15000);
 }
 
