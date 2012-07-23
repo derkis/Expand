@@ -50,7 +50,7 @@ class GamesController < ApplicationController
       end
 
       format.json do
-        render :json => @game.to_json(:include => :template)
+        render :json => @game.to_json(:include => :template, :methods => :cur_turn)
       end
 
     end

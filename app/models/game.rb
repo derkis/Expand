@@ -60,6 +60,10 @@ class Game < ActiveRecord::Base
   #####################################################
   # Methods
   #####################################################
+  def cur_turn
+    turns.last
+  end
+
   def validate_number_of_players
     self.errors.add(:base, 'Game must have at least 2 players') if self.players.reject(&:marked_for_destruction?).length < 2
   end
@@ -86,7 +90,7 @@ class Game < ActiveRecord::Base
     self.status ||= STARTED
     self.template_id ||= 1
     self.template.save
-    
+
     save
 
     self.turn_id ||= Turn.create_first_turn_for(self, random_player_id).id
