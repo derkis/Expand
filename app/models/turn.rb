@@ -34,8 +34,7 @@ class Turn < ActiveRecord::Base
 	# starting player id.
 	#--------------------------------------------------
 	def self.create_first_turn_for(_game, starting_player_id)
-		@turn = Turn.new({:game_id => _game.id})
-		@turn.player_id = starting_player_id,
+		@turn = Turn.new({:game_id => _game.id, :player_id => starting_player_id})
 		@turn.number = 0,
 		@turn.board = 'e' * _game.board_area
 		@turn.refresh_player_tiles

@@ -21,6 +21,10 @@ class Player < ActiveRecord::Base
 
   attr_accessible :user_id, :game_id, :accepted
 
+  def is_active
+    game.cur_turn.player_id == id
+  end
+  
   def create_defaults
     self.accepted ||= false
   end

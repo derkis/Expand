@@ -12,13 +12,20 @@ $(document).ready(function() {
 function polling_wrapper() {
     $.getJSON(document.URL + '.json', null, function(data) {
         console.log(data)
-        render(data.cur_turn.board, data.template.width, data.template.height);
+        renderBoard(data.cur_turn.board, data.template.width, data.template.height);
+        renderPlayers(data.cur_turn)
     });
     
     setTimeout(polling_wrapper, 15000);
 }
 
-function render(board, width, height) {
+function renderPlayers(cur_turn)
+{
+    playerDiv = "#player_" + cur_turn.player_id;
+    $(playerDiv).css("background-color", "red");
+}
+
+function renderBoard(board, width, height) {
     r = 0
     c = 0
     for (chr = 0; chr < board.length; chr++)

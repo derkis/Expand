@@ -3,6 +3,9 @@
   background-color: #eeeeee;
   width: 200px; }
 
+#player_active {
+  background-color: #ef6666; }
+
 .board_body {
   display: table; }
 

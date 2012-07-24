@@ -1,7 +1,7 @@
 - @game.players.each_with_index do |p, i|
-    .player
+    .player{:id => "player_#{p.id}"}
         = p.user[:email]
-    .tiles
-        - tiles = find_tiles_for i, @game.cur_turn.board
-        - tiles.each do |t|
-            = tile_ix_to_name t, @game.template
+        .tiles
+            - tiles = find_tiles_for i, @game.cur_turn.board
+            - tiles.each do |t|
+                = tile_ix_to_name t, @game.template
