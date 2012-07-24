@@ -21,7 +21,7 @@ module GamesHelper
       c = 0
 
       while c < game.template.width
-        lastTurn = game.turns.last
+        lastTurn = game.cur_turn
         board[r][c] = lastTurn.board[ix]
         ix = ix + 1
         c = c + 1
@@ -34,10 +34,8 @@ module GamesHelper
   
   def find_tiles_for (playerIX, board)
     ret = Array.new
-    i = 0
-    board.chars.to_a.each do |c|
+    board.chars.to_a.each_with_index do |c, i|
       ret.push(i) if c.ord - 48 == playerIX
-      i += 1
     end
     ret.sort
     ret

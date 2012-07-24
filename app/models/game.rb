@@ -91,7 +91,10 @@ class Game < ActiveRecord::Base
     self.template_id ||= 1
     self.template.save
 
-    save
+    self.save
+
+    puts "WHATEVS"
+    puts self.id
 
     self.turn_id ||= Turn.create_first_turn_for(self, random_player_id).id
   end

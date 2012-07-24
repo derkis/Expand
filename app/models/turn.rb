@@ -24,7 +24,7 @@ class Turn < ActiveRecord::Base
 	#####################################################
  	# Attribute Settings
   	#####################################################
-	attr_accessible :game_id, :player_id, :number, :board, :tiles 
+	attr_accessible :game_id, :player_id, :number, :board, :tiles
 
 	#####################################################
  	# Methods
@@ -33,15 +33,14 @@ class Turn < ActiveRecord::Base
 	# Creates the first turn given a game and a 
 	# starting player id.
 	#--------------------------------------------------
-	def self.create_first_turn_for(game, starting_player_id)
-		turn = Turn.create({
-			:game_id => game.id,
-			:player_id => starting_player_id,
-			:number => 0,
-			:board => 'e' * game.board_area
-		})
-		turn.refresh_player_tiles
-		turn
+	def self.create_first_turn_for(_game, starting_player_id)
+		@turn = Turn.new({:game_id => _game.id})
+		@turn.player_id = starting_player_id,
+		@turn.number = 0,
+		@turn.board = 'e' * _game.board_area
+		@turn.refresh_player_tiles
+		@turn.save!
+		@turn
 	end
 
 	#--------------------------------------------------
@@ -49,26 +48,24 @@ class Turn < ActiveRecord::Base
 	# player has the game allotted amount
 	#--------------------------------------------------
 	def refresh_player_tiles
-		@tile_counts = Hash.new(0)
+		tile_counts = Hash.new(0)
 
 		self.board.chars.to_a.each do |t|
 			pid = t.ord - 48
 			if pid >= 0 && pid <= 9
-				@tile_counts[pid] += 1 
+				tile_counts[pid] += 1 
 			end
 		end
 
 		unused_tiles = find_unused_tile_indices.shuffle!
 
-		pid = 0
-		self.game.players.each do |p|
-			puts "Player Distribute: #{pid}"
-			while @tile_counts[pid] < game.template.tile_count  
+		self.game.players.each_with_index do |p, pid|
+			while tile_counts[pid] < game.template.tile_count  
 				ix = unused_tiles.pop
-				board[ix] = pid.to_s
-				@tile_counts[pid] += 1
-			end 
-			pid += 1
+				puts ix.to_s
+				self.board[ix] = pid.to_s
+				tile_counts[pid] += 1
+			end
 		end
 	end
 

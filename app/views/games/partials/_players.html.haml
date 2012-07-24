@@ -1,9 +1,7 @@
-- i = 0
-- @game.players.each do |p|
+- @game.players.each_with_index do |p, i|
     .player
         = p.user[:email]
     .tiles
-        - tiles = find_tiles_for i, @game.turns.last.board
+        - tiles = find_tiles_for i, @game.cur_turn.board
         - tiles.each do |t|
-            = tile_ix_to_name t, @game.game_description
-    - i += 1
+            = tile_ix_to_name t, @game.template

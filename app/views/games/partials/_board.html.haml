@@ -1,4 +1,9 @@
 // Board HAML
+.board_content
+  = @game.cur_turn.board
+.cur_turn
+  Current Turn:
+  = @game.cur_turn.number + 1
 .board_body
   - i = "A"
   - l = 0
