@@ -12,42 +12,62 @@
   border-style: solid none solid;
   border-width: 0.4em;
   clear: both; }
-  #mainbar .title {
-    float: left;
-    padding-left: 20px; }
-  #mainbar .buttons {
-    position: relative;
-    height: 112px;
-    top: 12px; }
-    #mainbar .buttons .image_button {
-      font-family: Pixel, cursive;
-      font-size: 16px;
-      color: white;
-      border: none;
-      background: url(../signin_button.png) no-repeat center center;
-      width: 111px;
-      height: 50px; }
-      #mainbar .buttons .image_button:hover {
-        background: url(../signin_button_hover.png) no-repeat center center; }
-    #mainbar .buttons #signin_button {
-      margin-bottom: 12px; }
-    #mainbar .buttons .popover {
-      display: none;
-      position: absolute;
-      border-width: 14px 14px 28px 28px;
-      -moz-border-image: url(../popover_border.png) 14 14 28 28 fill stretch;
-      -webkit-border-image: url(../popover_border.png) 14 14 28 28 fill stretch;
-      border-image: url(../popover_border.png) 14 14 28 28 fill stretch; }
-      #mainbar .buttons .popover .form_field input {
+  #mainbar #title_container {
+    width: 970px;
+    height: 135px;
+    margin: 0px auto; }
+    #mainbar #title_container .title {
+      float: left; }
+    #mainbar #title_container .buttons {
+      position: relative;
+      height: 112px;
+      top: 12px; }
+      #mainbar #title_container .buttons .image_button {
         font-family: Pixel, cursive;
-        font-size: 12px;
-        color: black;
-        height: 22px;
-        background-color: transparent;
-        border-width: 12px 12px 12px 12px;
-        border-image: url(../form.png) 12 12 12 12 fill stretch;
-        margin-bottom: 10px; }
-      #mainbar .buttons .popover .form_field:last-child input {
-        margin-bottom: 0px; }
-      #mainbar .buttons .popover a {
-        margin-left: 3px; }
+        font-size: 16px;
+        color: white;
+        border: none;
+        background: url(../signin_button.png) no-repeat center center;
+        width: 111px;
+        height: 50px; }
+        #mainbar #title_container .buttons .image_button:hover {
+          background: url(../signin_button_hover.png) no-repeat center center; }
+      #mainbar #title_container .buttons #signin_button {
+        margin-bottom: 12px; }
+      #mainbar #title_container .buttons .popover {
+        display: none;
+        position: absolute;
+        border-width: 14px 14px 28px 28px;
+        -moz-border-image: url(../popover_border.png) 14 14 28 28 fill stretch;
+        -webkit-border-image: url(../popover_border.png) 14 14 28 28 fill stretch;
+        border-image: url(../popover_border.png) 14 14 28 28 fill stretch; }
+        #mainbar #title_container .buttons .popover .form_field input {
+          font-family: Pixel, cursive;
+          font-size: 12px;
+          color: black;
+          height: 22px;
+          background-color: transparent;
+          border-width: 12px 12px 12px 12px;
+          border-image: url(../form.png) 12 12 12 12 fill stretch;
+          margin-bottom: 10px; }
+        #mainbar #title_container .buttons .popover .form_field:last-child input {
+          margin-bottom: 0px; }
+        #mainbar #title_container .buttons .popover .arrow {
+          position: absolute;
+          left: 133px; }
+        #mainbar #title_container .buttons .popover a {
+          margin-left: 3px; }
+      #mainbar #title_container .buttons #signin_form {
+        border-width: 14px 14px 28px 28px;
+        -moz-border-image: url(../popover_border.png) 14 14 28 28 fill stretch;
+        -webkit-border-image: url(../popover_border.png) 14 14 28 28 fill stretch;
+        border-image: url(../popover_border.png) 14 14 28 28 fill stretch; }
+        #mainbar #title_container .buttons #signin_form .down_arrow {
+          top: 147px; }
+      #mainbar #title_container .buttons #signup_form {
+        border-width: 14px 14px 28px 28px;
+        -moz-border-image: url(../popover_border.png) 14 14 28 28 fill stretch;
+        -webkit-border-image: url(../popover_border.png) 14 14 28 28 fill stretch;
+        border-image: url(../popover_border.png) 14 14 28 28 fill stretch; }
+        #mainbar #title_container .buttons #signup_form .up_arrow {
+          top: -43px; }

@@ -1,6 +1,14 @@
 @import "../partials/font";
 @import "../partials/color";
 
+	
+@mixin border_image($image_url, $top, $right, $bottom, $left) {
+	border-width: #{$top}px #{$right}px #{$bottom}px #{$left}px;
+	-moz-border-image: url(../#{$image_url}.png) $top $right $bottom $left fill stretch;
+	-webkit-border-image: url(../#{$image_url}.png) $top $right $bottom $left fill stretch;
+	border-image: url(../#{$image_url}.png) $top $right $bottom $left fill stretch;
+}
+
 // index page styling -- probably move this into the index file
 #mainbar {
 	position: relative;
@@ -13,45 +21,65 @@
 	border-width: 0.4em;
 	clear: both;
 	
-	.title { float: left; padding-left: 20px; }
-	
-	.buttons {
-		position: relative;
-		height: 112px;
-		top: 12px;
+	#title_container {
+		width: 970px;
+		height: 135px;
+		margin: 0px auto;
 
-		.image_button {
-			@include pixel_font($font_size_btn, $font_color_btn);
-			border: none;
-			background: url(../signin_button.png) no-repeat center center;
-			width: 111px;
-			height: 50px;
-			&:hover { background: url(../signin_button_hover.png) no-repeat center center; }
+		.title { 
+			float: left; 
 		}
+		
+		.buttons {
+			position: relative;
+			height: 112px;
+			top: 12px;
 
-		#signin_button { margin-bottom: 12px; }
-	
-		.popover {
-			display: none;
-			position: absolute;
-			border-width: 14px 14px 28px 28px;
-			-moz-border-image: url(../popover_border.png) 14 14 28 28 fill stretch;
-			-webkit-border-image: url(../popover_border.png) 14 14 28 28 fill stretch;
-			border-image: url(../popover_border.png) 14 14 28 28 fill stretch;
-
-			.form_field {
-				input {
-					@include pixel_font($font_size_std, $font_color_std);
-					height: $font_size_std + 10px;
-					background-color: transparent;
-					border-width: 12px 12px 12px 12px;
-					border-image: url(../form.png) 12 12 12 12 fill stretch;
-					margin-bottom: 10px;
-				}
-				&:last-child input { margin-bottom: 0px; }
+			.image_button {
+				@include pixel_font($font_size_btn, $font_color_btn);
+				border: none;
+				background: url(../signin_button.png) no-repeat center center;
+				width: 111px;
+				height: 50px;
+				&:hover { background: url(../signin_button_hover.png) no-repeat center center; }
 			}
 
-			a { margin-left: 3px; }
+			#signin_button { margin-bottom: 12px; }
+
+			.popover {
+				display: none;
+				position: absolute;
+				@include border_image(popover_border, 14, 14, 28, 28);
+
+				.form_field {
+					input {
+						@include pixel_font($font_size_std, $font_color_std);
+						height: $font_size_std + 10px;
+						background-color: transparent;
+						border-width: 12px 12px 12px 12px;
+						border-image: url(../form.png) 12 12 12 12 fill stretch;
+						margin-bottom: 10px;
+					}
+					&:last-child input { margin-bottom: 0px; }
+				}
+
+				.arrow {
+					position: absolute;
+					left: 133px;
+				}
+
+				a { margin-left: 3px; }
+			}
+
+			#signin_form {
+				@include border_image(popover_border, 14, 14, 28, 28);
+				.down_arrow { top: 147px; }
+			}
+
+			#signup_form {
+				@include border_image(popover_border, 14, 14, 28, 28);
+				.up_arrow { top: -43px; }
+			}
 		}
 	}
 }

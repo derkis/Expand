@@ -1,67 +1,83 @@
+var fade_speed = 'fast';
+var max_user_columns = 2;
+
 $(document).ready(function() {
+	$('.user_cell').click(function(click_event) {
+		var user_checkbox = $(click_event.currentTarget).children('.user_checkbox');
+		var is_checked = !user_checkbox.is(':checked');
+		user_checkbox.attr('checked', is_checked);
+		if(is_checked) { 
+			$('#checked_user_list').append(click_event.currentTarget);
+		} else { 
+			organize_users_default();
+		}
+	});
+
 	setTimeout(polling_wrapper, 10000);
+	organize_users_default();
 });
 
 function polling_wrapper() {
-	check_users();
+	check_new_users();
 	check_game_invitations();
 	check_ready_game();
 	check_started_game();
 	setTimeout(polling_wrapper, 10000);
 }
 
-// online user polling
-function check_users() {
-	$.getJSON('users_online.json', function(data) {
-		var displayed_users = $('.user_row');
-		var displayed_user, online_user;
-		var disp_i = 0, online_i = 0;
+function organize_users_default() {
+	organize_users($('.user_checkbox:not(:checked)').parent(), $('.user_checkbox:checked').parent());
+}
 
-		while(disp_i < displayed_users.length && online_i < data.length) {
-			displayed_user = displayed_users[disp_i];
-			online_user = data[online_i];
-			var displayed_uid = $(displayed_user).attr("user_id");
-			var online_uid = online_user.id;
-			if(displayed_uid == online_uid) {
-				disp_i++; online_i++;		
-			} else if (displayed_uid > online_uid) {
-				add_user_tag(online_user, displayed_user);
-				online_i++;
-			} else { // displayed_uid < online_uid
-				remove_user_tag(displayed_user);
-				disp_i++;
-			}
+function organize_users(unchecked_users, checked_users) {
+	var user_list = $('#online_user_table');
+	user_list.children('.user_row').remove();
+	for(var slice_start = 0 ; slice_start < unchecked_users.length ; slice_start += max_user_columns) {
+		var current_row = $('<div class="user_row" />');
+		user_list.append(current_row);
+		current_row.append(unchecked_users.slice(slice_start, slice_start + max_user_columns));
+	}
+
+	var checked_user_list = $('#checked_user_list');
+	checked_user_list.children('.user_cell').remove();
+	for(var i=0 ; i<checked_users.length ; i++)
+		checked_user_list.append(checked_users[i]);
+}
+
+// online user polling
+function check_new_users() {
+	$.getJSON('users_online.json', function(online_users) {
+		var unchecked_users = [], checked_users = [];
+		for(var i=0 ; i<online_users.length ; i++) {
+			var online_user = online_users[i];
+			var existing_user_checkbox = $('.user_checkbox[value="' + online_user.id + '"]:first');
+			if(existing_user_checkbox.length != 0) {
+				if(existing_user_checkbox.is(':checked'))
+					checked_users.push(existing_user_checkbox.parent().get(0));
+				else
+ 					unchecked_users.push(existing_user_checkbox.parent().get(0));
+			} else
+				unchecked_users.push(new_user_tag_for(online_user));
 		}
-		
-		for( ; disp_i < displayed_users.length ; disp_i++) {
-			displayed_user = displayed_users[disp_i];
-			remove_user_tag(displayed_user);
-		}
-		
-		var last_displayed_user = displayed_users[displayed_users.length-1];	
-		for( ; online_i < data.length ; online_i++) {
-			online_user = data[online_i];
-			add_user_tag(online_user, last_displayed_user);	
-		}
+		organize_users(unchecked_users, checked_users);
 	});
 }
 
-function add_user_tag(online_user, displayed_user) {
-	var new_user_tag =
-		'<tr>' +
-		'	<td class="user_row" user_id="' + online_user.id + '">' +
-		'		<label for="game_players_attributes_0_user_id">' + online_user.email + '<\/label>' +
-		'		<input class="player_checkbox" id="game_players_attributes_' + online_user.id + '_user_id" name="game[players_attributes][' + online_user.id + '][user_id]" type="checkbox" value="' + online_user.id + '">' +
-		'	<\/td>' +
-		'<\/tr>'
-	if(displayed_user)
-		$(displayed_user).parent().before(new_user_tag);
-	else
-		$('.table_title').after(new_user_tag);
+function new_user_tag_for(online_user) {
+	var new_user_tag = $(
+		'<div class="user_cell" user_id="' + online_user.id + '">' +
+		'	<input class="user_checkbox" id="game_players_attributes_' + online_user.id + '_user_id" name="game[players_attributes][' + online_user.id + '][user_id]" type="checkbox" value="' + online_user.id + '">' +
+		'	<label for="game_players_attributes_0_user_id">' + online_user.email + '<\/label>' +
+		'<\/div>'
+	)[0];
+	return new_user_tag;
 }
 
 function remove_user_tag(displayed_user) {
-	$(displayed_user).parent().remove();
+	var displayed_user_tag = $(displayed_user).parent();
+	displayed_user_tag.fadeOut(fade_speed, function() {
+		displayed_user_tag.remove();
+	});
 }
 
 // game invitation polling
@@ -107,7 +123,7 @@ function add_game_invitation_tag(this_player, players) {
 			'<\/button>' +
 			((this_player.accepted) ? '<span class="waiting_text">Waiting for other players to accept...<\/span>' : '') +
 		'<\/div>';
-	$('#game_invites').append(game_invitation_tag);
+	$('#game_invites').append(game_invitation_tag).fadeIn(fade_speed);
 }
 
 // ready games polling
@@ -127,7 +143,7 @@ function add_ready_game_prompt(ready_game) {
 	var start_game_prompt_tag =
 		'<span class ="players_text">Begin game with: ' + players_string + '?<\/span>' +
 		'<button type="button" onclick="start_game(' + ready_game.game_id + ')">Start<\/button>';
-	$('#start_game_prompt').append(start_game_prompt_tag);
+	$('#start_game_prompt').append(start_game_prompt_tag).fadeIn(fade_speed);
 }
 
 // started game polling

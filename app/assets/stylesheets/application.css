@@ -4,7 +4,8 @@
 
 html, body {
   margin: 0;
-  padding: 0; }
+  padding: 0;
+  height: 100%; }
 
 a {
   font-family: Pixel, cursive;
@@ -17,8 +18,9 @@ a {
     color: #66636f; }
 
 #header {
-  height: 1em;
-  margin: .5em;
+  height: 1.5em;
+  padding-top: .5em;
+  margin: 0 .5em .5em .5em;
   border-width: 0 0 1px 0; }
   #header .flash {
     font-family: Pixel, cursive;
@@ -35,8 +37,7 @@ nav {
   white-space: nowrap; }
   nav ul li {
     list-style-type: none;
-    display: inline-block;
-    padding: 0.2em 0; }
+    display: inline-block; }
     nav ul li a {
       padding: 0 5px;
       font-weight: bold; }

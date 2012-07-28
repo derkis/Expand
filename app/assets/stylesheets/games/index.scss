@@ -1,8 +1,63 @@
 @import "../partials/font";
 @import "../partials/color";
 
+$max_user_columns: 2;
+$cell_width: 200px;
+$cell_padding: 5px;
+$row_height: 20px;
+$row_padding: 5px;
+
 .wrapper {
-	margin: 1em;
 	background: $light-background;
+	overflow: auto;
+	margin: 0 1em;
 	border-radius: 5px;
+
+	#online_user_table {
+		@include pixel_font($font_size_title, $font_color_title);
+		display: table;
+		float: left;
+		margin: 1em;
+
+		.table_title {
+			display: table-header-group
+		}
+
+		.user_row {
+			display: table-row;
+			height: $row_height;
+			
+			.user_cell {
+				@include pixel_font($font_size_std, $font_color_user);
+				display: table-cell;
+				width: $cell_width;
+				padding-right: $cell_padding;
+			}
+		}
+	}
+
+	#notable_user_panel {
+		float: right;
+
+		.user_list {
+			@include pixel_font($font_size_std, $font_color_user);
+			display: block;
+			background: $primary-color;
+			width: 20em;
+			min-height: 10em;
+			margin: 1em;
+			border-radius: 5px;
+		}		
+
+		#checked_user_list {
+			position: relative;
+
+			input {
+				position: absolute;
+				bottom: 0;
+			}
+		}
+	}
+	
+	
 }

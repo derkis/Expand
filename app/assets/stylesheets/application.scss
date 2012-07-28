@@ -4,6 +4,7 @@
 html, body {
 	margin: 0;
 	padding: 0;
+	height: 100%;
 }
 
 // links
@@ -15,8 +16,9 @@ a {
 }
 
 #header {
-	height: 1em; 
-	margin: .5em;
+	height: 1.5em;
+	padding-top: .5em; 
+	margin: 0 .5em .5em .5em;
 	border-width: 0 0 1px 0;
 
 	.flash {
@@ -26,14 +28,7 @@ a {
 		border-image: url(/assets/flash.png) 9 8 9 50 fill stretch;
 		&:empty { display: none; }
 	}
-
-	.user_nav {
-
-	}
 }
-
-.push { }
-
 
 // navigation
 nav {
@@ -44,7 +39,7 @@ nav {
 		li {
 			list-style-type: none;
 			display: inline-block;
-			padding: 0.2em 0;
+			// padding: 0.2em 0;
 			a { padding: 0 5px; font-weight: bold; }
 		}
 	}

@@ -19,7 +19,7 @@ module GamesWebservices
   def started_games
     started_game = Game.get_started_game_for(current_user)
     respond_to do |format|
-      format.json { render :json => started_game.id.to_json }
+      format.json { render :json => (started_game) ? started_game.id.to_json : [] }
       format.all { not_found() }
     end
   end

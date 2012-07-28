@@ -1,17 +1,20 @@
 #mainbar
-	= image_tag('title.png', :class => 'title', :alt => 'Expand')
-	.buttons
-		= form_for(@user, :url => :user_session) do |f|
-			#signin_form.popover
-				.form_field= f.email_field :email, :placeholder => 'e-mail'
-				.form_field= f.password_field :password, :placeholder => 'password'
-				= link_to "Forgot your password?", :new_user_password
-			= f.submit 'Sign in', :id => 'signin_button', :class => 'image_button'
-		
-		= form_for(@user, :url => :user_registration) do |f|
-			#signup_form.popover
-				.form_field= f.email_field :email, :placeholder => 'e-mail'
-				.form_field= f.password_field :password, :placeholder => 'password'
-				.form_field= f.password_field :password_confirmation, :placeholder => 'confirmation'
-			= f.submit 'Sign up', :id => 'signup_button', :class => 'image_button'
+	#title_container
+		= image_tag('title.png', :class => 'title', :alt => 'Expand')
+		.buttons
+			= form_for(@user, :url => :user_session) do |f|
+				#signin_form.popover
+					= image_tag('down_arrow.png', :class => 'down_arrow arrow')
+					.form_field= f.email_field :email, :placeholder => 'e-mail'
+					.form_field= f.password_field :password, :placeholder => 'password'
+					= link_to "Forgot your password?", :new_user_password
+				= f.submit 'Sign in', :id => 'signin_button', :class => 'image_button'
+			
+			= form_for(@user, :url => :user_registration) do |f|
+				#signup_form.popover
+					= image_tag('up_arrow.png', :class => 'up_arrow arrow')
+					.form_field= f.email_field :email, :placeholder => 'e-mail'
+					.form_field= f.password_field :password, :placeholder => 'password'
+					.form_field= f.password_field :password_confirmation, :placeholder => 'confirmation'
+				= f.submit 'Sign up', :id => 'signup_button', :class => 'image_button'
 				
