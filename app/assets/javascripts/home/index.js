@@ -34,7 +34,6 @@ $(document).ready(function() {
 		return false;
 	});
 	
-	
 });
 
 function set_popover_position(button, popover) {
@@ -46,17 +45,18 @@ function set_popover_position(button, popover) {
 		popover_position.top -= popover_size.height + popover_vertical_offset;
 	else
 		popover_position.top += button.outerHeight() + popover_vertical_offset;
-	// popover_position.left += $(button).outerWidth();
-	// popover_position.top -= (get_popover_size(popover).height - $(button).outerHeight()) / 2;
-	// popover_position.top -= $('#mainbar').offset().top + $('.buttons').position().top;
+
 	$(popover).css({ 'left': popover_position.left, 'top': popover_position.top });
 }
 
 function get_popover_size(popover) {
 	popover = $(popover);
-	var border_size = popover.css('border-image-slice').split(" "); // [top, right, bottom, left]
-	var bottom_shadow_size 	= border_size[2] - border_size[0];
-	var left_shadow_size 	= border_size[3] - border_size[1];
+	var border_top 		= parseInt(popover.css('border-top-width'), 10);
+	var border_right 	= parseInt(popover.css('border-right-width'), 10);
+	var border_bottom 	= parseInt(popover.css('border-bottom-width'), 10);
+	var border_left 	= parseInt(popover.css('border-left-width'), 10);
+	var bottom_shadow_size	= border_bottom - border_top;
+	var left_shadow_size 	= border_left - border_right;
 	return {
 		'height': popover.outerHeight() - bottom_shadow_size,
 		'width'	: popover.outerWidth() - left_shadow_size

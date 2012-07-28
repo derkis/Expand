@@ -26,14 +26,15 @@ $row_padding: 5px;
 		.user_row {
 			display: table-row;
 			height: $row_height;
-			
-			.user_cell {
-				@include pixel_font($font_size_std, $font_color_user);
-				display: table-cell;
-				width: $cell_width;
-				padding-right: $cell_padding;
-			}
+
+			.user_cell { display: table-cell; }
 		}
+	}
+
+	.user_cell {
+		@include pixel_font($font_size_std, $font_color_user);
+		width: $cell_width;
+		padding-right: $cell_padding;
 	}
 
 	#notable_user_panel {
@@ -41,18 +42,21 @@ $row_padding: 5px;
 
 		.user_list {
 			@include pixel_font($font_size_std, $font_color_user);
-			display: block;
 			background: $primary-color;
-			width: 20em;
-			min-height: 10em;
+			width: 300px;
+			min-height: 6em;
 			margin: 1em;
 			border-radius: 5px;
+
+			.user_cell {
+				display: inline-block;
+			}
 		}		
 
 		#checked_user_list {
 			position: relative;
 
-			input {
+		input[type=submit] {
 				position: absolute;
 				bottom: 0;
 			}

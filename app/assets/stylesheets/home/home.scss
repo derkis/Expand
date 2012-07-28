@@ -1,11 +1,10 @@
 @import "../partials/font";
 @import "../partials/color";
 
-	
 @mixin border_image($image_url, $top, $right, $bottom, $left) {
 	border-width: #{$top}px #{$right}px #{$bottom}px #{$left}px;
-	-moz-border-image: url(../#{$image_url}.png) $top $right $bottom $left fill stretch;
 	-webkit-border-image: url(../#{$image_url}.png) $top $right $bottom $left fill stretch;
+	-moz-border-image: url(../#{$image_url}.png) $top $right $bottom $left;
 	border-image: url(../#{$image_url}.png) $top $right $bottom $left fill stretch;
 }
 
@@ -54,10 +53,9 @@
 				.form_field {
 					input {
 						@include pixel_font($font_size_std, $font_color_std);
+						@include border_image(form, 12, 12, 12, 12);
 						height: $font_size_std + 10px;
 						background-color: transparent;
-						border-width: 12px 12px 12px 12px;
-						border-image: url(../form.png) 12 12 12 12 fill stretch;
 						margin-bottom: 10px;
 					}
 					&:last-child input { margin-bottom: 0px; }

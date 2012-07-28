@@ -2,17 +2,6 @@ var fade_speed = 'fast';
 var max_user_columns = 2;
 
 $(document).ready(function() {
-	$('.user_cell').click(function(click_event) {
-		var user_checkbox = $(click_event.currentTarget).children('.user_checkbox');
-		var is_checked = !user_checkbox.is(':checked');
-		user_checkbox.attr('checked', is_checked);
-		if(is_checked) { 
-			$('#checked_user_list').append(click_event.currentTarget);
-		} else { 
-			organize_users_default();
-		}
-	});
-
 	setTimeout(polling_wrapper, 10000);
 	organize_users_default();
 });
@@ -42,6 +31,22 @@ function organize_users(unchecked_users, checked_users) {
 	checked_user_list.children('.user_cell').remove();
 	for(var i=0 ; i<checked_users.length ; i++)
 		checked_user_list.append(checked_users[i]);
+
+	bind_cell_click_handlers();
+}
+
+function bind_cell_click_handlers() {
+	$('.user_cell label').click(function(click_event) {
+		var user_cell = $(click_event.currentTarget).parent();
+		var user_checkbox = user_cell.children('.user_checkbox');
+		var is_checked = !user_checkbox.is(':checked');
+		user_checkbox.attr('checked', is_checked);
+		if(is_checked) { 
+			$('#checked_user_list').append(click_event.currentTarget);
+		} else { 
+			organize_users_default();
+		}
+	});
 }
 
 // online user polling
@@ -149,7 +154,8 @@ function add_ready_game_prompt(ready_game) {
 // started game polling
 function check_started_game() {
 	$.getJSON('games/started.json', function(game_id) {
-		window.location.replace('games/' + game_id);
+		if(game_id)
+			window.location.replace('games/' + game_id);
 	});
 }
 

@@ -20,26 +20,28 @@
       display: table-row;
       height: 20px; }
       .wrapper #online_user_table .user_row .user_cell {
-        font-family: Pixel, cursive;
-        font-size: 12px;
-        color: white;
-        display: table-cell;
-        width: 200px;
-        padding-right: 5px; }
+        display: table-cell; }
+  .wrapper .user_cell {
+    font-family: Pixel, cursive;
+    font-size: 12px;
+    color: white;
+    width: 200px;
+    padding-right: 5px; }
   .wrapper #notable_user_panel {
     float: right; }
     .wrapper #notable_user_panel .user_list {
       font-family: Pixel, cursive;
       font-size: 12px;
       color: white;
-      display: block;
       background: #a66c5a;
-      width: 20em;
-      min-height: 10em;
+      width: 300px;
+      min-height: 6em;
       margin: 1em;
       border-radius: 5px; }
+      .wrapper #notable_user_panel .user_list .user_cell {
+        display: inline-block; }
     .wrapper #notable_user_panel #checked_user_list {
       position: relative; }
-      .wrapper #notable_user_panel #checked_user_list input {
+      .wrapper #notable_user_panel #checked_user_list input[type=submit] {
         position: absolute;
         bottom: 0; }
