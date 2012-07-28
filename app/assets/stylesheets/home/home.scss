@@ -72,12 +72,10 @@
 			}
 
 			#signin_form {
-				@include border_image(popover_border, 14, 14, 28, 28);
 				.down_arrow { top: 147px; }
 			}
 
 			#signup_form {
-				@include border_image(popover_border, 14, 14, 28, 28);
 				.up_arrow { top: -43px; }
 			}
 		}
