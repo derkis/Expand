@@ -27,8 +27,17 @@
     border-bottom: 3px #707070 dashed; }
     .panel #top_bar .title {
       margin: 0.5em 0 0.5em 1em; }
+  .panel .user_table {
+    display: table; }
+    .panel .user_table .padding_row {
+      display: table-row;
+      height: 5px; }
+    .panel .user_table .user_row {
+      display: table-row;
+      height: 20px; }
+      .panel .user_table .user_row .user_cell {
+        display: table-cell; }
   .panel #online_user_table {
-    display: table;
     float: left;
     margin: .5em 1em; }
     .panel #online_user_table .table_title {
@@ -36,14 +45,6 @@
       font-size: 20px;
       color: #a66c5a;
       display: table-header-group; }
-    .panel #online_user_table .padding_row {
-      display: table-row;
-      height: 5px; }
-    .panel #online_user_table .user_row {
-      display: table-row;
-      height: 20px; }
-      .panel #online_user_table .user_row .user_cell {
-        display: table-cell; }
   .panel .user_cell {
     font-family: Pixel, cursive;
     font-size: 12px;
@@ -51,7 +52,8 @@
     width: 200px;
     padding-right: 5px; }
   .panel #notable_user_panel {
-    float: right; }
+    float: right;
+    height: 100%; }
     .panel #notable_user_panel .table_title {
       font-family: Pixel, cursive;
       font-size: 12px;

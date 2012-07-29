@@ -1,9 +1,17 @@
 var fade_speed = 75;
 var max_user_columns = 4;
+var friends_list_base_height;
 
 $(document).ready(function() {
-	// setTimeout(polling_wrapper, 10000);
+	setTimeout(polling_wrapper, 10000);
 	organize_users_default();
+	bind_cell_click_handlers();
+});
+
+$(window).load(function() {
+	var friends_list = $('#friend_user_list');
+	friends_list_base_height = $('.panel').height() - $('.title').outerHeight(true) - friends_list.outerHeight(true) + friends_list.height();
+	resize_friends_list();
 });
 
 function polling_wrapper() {
@@ -27,16 +35,16 @@ function organize_users(unchecked_users, checked_users) {
 		current_row.append(unchecked_users.slice(slice_start, slice_start + max_user_columns));
 	}
 
-	var checked_user_list = $('#checked_user_list');
-	checked_user_list.children('.user_cell').remove();
+	var checked_user_table = $('#checked_user_list').children('.user_table');
+	checked_user_table.children('.user_row').remove();
 	for(var i=0 ; i<checked_users.length ; i++)
-		checked_user_list.append(checked_users[i]);
+		append_cell_to_table($(checked_users[i]), checked_user_table, false);
 
-	bind_cell_click_handlers();
+	resize_friends_list();
 }
 
 function bind_cell_click_handlers() {
-	$('.user_cell label').click(function(click_event) {
+	$('.user_cell label').live('click', function(click_event) {
 		var cell = $(click_event.currentTarget).parent();
 		var checkbox = cell.children('.user_checkbox');
 		var is_checked = !checkbox.is(':checked');
@@ -44,7 +52,7 @@ function bind_cell_click_handlers() {
 		move_cell(cell, is_checked)
 	});
 
-	$('.user_cell input').click(function(click_event) {
+	$('.user_cell input').live('click', function(click_event) {
 		var checkbox = $(click_event.currentTarget);
 		move_cell(checkbox.parent(), checkbox.is(':checked'));
 	});
@@ -53,12 +61,24 @@ function bind_cell_click_handlers() {
 function move_cell(cell, is_checked) {
 	cell.hide(function() {
 		if(is_checked) {
-			$('#checked_user_list').append(cell.fadeIn(fade_speed));
-		} else { 
+			append_cell_to_table(cell, $('#checked_user_list').children('.user_table'), true);
+			resize_friends_list();
+		} else {
+			var row = cell.parent();
+			cell.unwrap();
 			organize_users_default();
 			cell.show();
 		}
 	});
+}
+
+function append_cell_to_table(cell, table, should_fade_in) {
+	var cell_row = $('<div class="user_row" />').append(cell.fadeIn((should_fade_in) ? fade_speed : 0));;
+	table.append(cell_row);
+}
+
+function resize_friends_list() {
+	$('#friend_user_list').css('height', friends_list_base_height - $('#checked_user_list').outerHeight(true));
 }
 
 // online user polling

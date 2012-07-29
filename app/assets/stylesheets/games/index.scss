@@ -31,15 +31,8 @@ $row_padding: 5px;
 		}
 	}
 
-	#online_user_table {
+	.user_table {
 		display: table;
-		float: left;
-		margin: .5em 1em;
-
-		.table_title { 
-			@include pixel_font($font_size_title, $font_color_title);
-			display: table-header-group; 
-		}
 
 		.padding_row {
 			display: table-row;
@@ -49,8 +42,19 @@ $row_padding: 5px;
 		.user_row {
 			display: table-row;
 			height: $row_height;
+			
 			.user_cell { display: table-cell; }
 		}
+	}
+
+	#online_user_table {
+		float: left;
+		margin: .5em 1em;
+
+		.table_title { 
+			@include pixel_font($font_size_title, $font_color_title);
+			display: table-header-group; 
+		}		
 	}
 
 	.user_cell {
@@ -61,6 +65,7 @@ $row_padding: 5px;
 
 	#notable_user_panel {
 		float: right;
+		height: 100%;
 
 		.table_title {
 			@include pixel_font($font_size_std, $font_color_title);
@@ -80,8 +85,7 @@ $row_padding: 5px;
 
 			input[type=submit] {
 				position: absolute;
-				left: 100%;
-				top: 100%;
+				left: 100%; top: 100%;
 				margin: -50px 0 0 -111px;
 			}
 		}
