@@ -1,12 +1,13 @@
 @import "../partials/font";
 @import "../partials/color";
+@import "../partials/mixins";
 
-@mixin border_image($image_url, $top, $right, $bottom, $left) {
-	border-width: #{$top}px #{$right}px #{$bottom}px #{$left}px;
-	-webkit-border-image: url(../#{$image_url}.png) $top $right $bottom $left fill stretch;
-	-moz-border-image: url(../#{$image_url}.png) $top $right $bottom $left;
-	border-image: url(../#{$image_url}.png) $top $right $bottom $left fill stretch;
-}
+// @mixin border_image($image_url, $top, $right, $bottom, $left) {
+// 	border-width: #{$top}px #{$right}px #{$bottom}px #{$left}px;
+// 	-webkit-border-image: url(../#{$image_url}.png) $top $right $bottom $left fill stretch;
+// 	-moz-border-image: url(../#{$image_url}.png) $top $right $bottom $left;
+// 	border-image: url(../#{$image_url}.png) $top $right $bottom $left fill stretch;
+// }
 
 // index page styling -- probably move this into the index file
 #mainbar {
@@ -46,14 +47,14 @@
 			#signin_button { margin-bottom: 12px; }
 
 			.popover {
+				@include border_image(popover_border, 14, 14, 28, 28, stretch);
 				display: none;
 				position: absolute;
-				@include border_image(popover_border, 14, 14, 28, 28);
 
 				.form_field {
 					input {
 						@include pixel_font($font_size_std, $font_color_std);
-						@include border_image(form, 12, 12, 12, 12);
+						@include border_image(form, 12, 12, 12, 12, stretch);
 						height: $font_size_std + 10px;
 						background-color: transparent;
 						margin-bottom: 10px;

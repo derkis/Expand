@@ -1,8 +1,8 @@
-var fade_speed = 'fast';
-var max_user_columns = 2;
+var fade_speed = 75;
+var max_user_columns = 4;
 
 $(document).ready(function() {
-	setTimeout(polling_wrapper, 10000);
+	// setTimeout(polling_wrapper, 10000);
 	organize_users_default();
 });
 
@@ -37,14 +37,26 @@ function organize_users(unchecked_users, checked_users) {
 
 function bind_cell_click_handlers() {
 	$('.user_cell label').click(function(click_event) {
-		var user_cell = $(click_event.currentTarget).parent();
-		var user_checkbox = user_cell.children('.user_checkbox');
-		var is_checked = !user_checkbox.is(':checked');
-		user_checkbox.attr('checked', is_checked);
-		if(is_checked) { 
-			$('#checked_user_list').append(click_event.currentTarget);
+		var cell = $(click_event.currentTarget).parent();
+		var checkbox = cell.children('.user_checkbox');
+		var is_checked = !checkbox.is(':checked');
+		checkbox.attr('checked', is_checked);
+		move_cell(cell, is_checked)
+	});
+
+	$('.user_cell input').click(function(click_event) {
+		var checkbox = $(click_event.currentTarget);
+		move_cell(checkbox.parent(), checkbox.is(':checked'));
+	});
+}
+
+function move_cell(cell, is_checked) {
+	cell.fadeOut(fade_speed, function() {
+		if(is_checked) {
+			$('#checked_user_list').append(cell.fadeIn(fade_speed));
 		} else { 
 			organize_users_default();
+			cell.show();
 		}
 	});
 }
@@ -70,10 +82,14 @@ function check_new_users() {
 
 function new_user_tag_for(online_user) {
 	var new_user_tag = $(
-		'<div class="user_cell" user_id="' + online_user.id + '">' +
+		// '<div class="user_cell" user_id="' + online_user.id + '">' +
+		// '	<input class="user_checkbox" id="game_players_attributes_' + online_user.id + '_user_id" name="game[players_attributes][' + online_user.id + '][user_id]" type="checkbox" value="' + online_user.id + '">' +
+		// '	<label for="game_players_attributes_' + online_user.id + '_user_id">' + online_user.email + '<\/label>' +
+		// '<\/div>'
+		'<label class="user_cell" user_id="' + online_user.id + '">' +
 		'	<input class="user_checkbox" id="game_players_attributes_' + online_user.id + '_user_id" name="game[players_attributes][' + online_user.id + '][user_id]" type="checkbox" value="' + online_user.id + '">' +
-		'	<label for="game_players_attributes_0_user_id">' + online_user.email + '<\/label>' +
-		'<\/div>'
+		'	<span>' + online_user.email + '<\/span>' +
+		'<\/label>'
 	)[0];
 	return new_user_tag;
 }

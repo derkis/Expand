@@ -1,5 +1,6 @@
 @import "../partials/font";
 @import "../partials/color";
+@import "../partials/mixins";
 
 $max_user_columns: 2;
 $cell_width: 200px;
@@ -8,19 +9,38 @@ $row_height: 20px;
 $row_padding: 5px;
 
 .wrapper {
-	background: $light-background;
 	overflow: auto;
-	margin: 0 1em;
-	border-radius: 5px;
+	background: $dark_background;
+	border-color: $light_background;
+	border-style: solid none solid;
+	border-width: 0.4em;
+	// margin-top: 7em;
+
+	#top_bar {
+		display: inline-block;
+		width: 100%;
+		border-color: $light_background;
+		border-style: none none dashed none;
+		border-width: 3px;
+
+		.title {
+			margin: 0.5em 0 0.5em 1em;
+		}
+	}
 
 	#online_user_table {
 		@include pixel_font($font_size_title, $font_color_title);
 		display: table;
 		float: left;
-		margin: 1em;
+		margin: .5em 1em;
 
 		.table_title {
-			display: table-header-group
+			display: table-header-group;
+		}
+
+		.padding_row {
+			display: table-row;
+			height: 5px;
 		}
 
 		.user_row {
@@ -41,16 +61,12 @@ $row_padding: 5px;
 		float: right;
 
 		.user_list {
+			@include border_image(dotted_border, 9, 9, 9, 9, repeat);
 			@include pixel_font($font_size_std, $font_color_user);
-			background: $primary-color;
-			width: 300px;
+			width: 20em;
 			min-height: 6em;
 			margin: 1em;
-			border-radius: 5px;
-
-			.user_cell {
-				display: inline-block;
-			}
+			padding: 0.5em;
 		}		
 
 		#checked_user_list {

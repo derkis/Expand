@@ -35,19 +35,19 @@
       #mainbar #title_container .buttons #signin_button {
         margin-bottom: 12px; }
       #mainbar #title_container .buttons .popover {
-        display: none;
-        position: absolute;
         border-width: 14px 14px 28px 28px;
         -webkit-border-image: url(../popover_border.png) 14 14 28 28 fill stretch;
-        -moz-border-image: url(../popover_border.png) 14 14 28 28;
-        border-image: url(../popover_border.png) 14 14 28 28 fill stretch; }
+        -moz-border-image: url(../popover_border.png) 14 14 28 28 stretch;
+        border-image: url(../popover_border.png) 14 14 28 28 fill stretch;
+        display: none;
+        position: absolute; }
         #mainbar #title_container .buttons .popover .form_field input {
           font-family: Pixel, cursive;
           font-size: 12px;
           color: black;
           border-width: 12px 12px 12px 12px;
           -webkit-border-image: url(../form.png) 12 12 12 12 fill stretch;
-          -moz-border-image: url(../form.png) 12 12 12 12;
+          -moz-border-image: url(../form.png) 12 12 12 12 stretch;
           border-image: url(../form.png) 12 12 12 12 fill stretch;
           height: 22px;
           background-color: transparent;

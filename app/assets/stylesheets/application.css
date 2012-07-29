@@ -7,16 +7,6 @@ html, body {
   padding: 0;
   height: 100%; }
 
-a {
-  font-family: Pixel, cursive;
-  font-size: 12px;
-  color: #78dabb;
-  text-decoration: none; }
-  a:hover {
-    color: #d78d84 !important; }
-  a:visited {
-    color: #66636f; }
-
 #header {
   height: 1.5em;
   padding-top: .5em;
@@ -32,6 +22,16 @@ a {
     #header .flash:empty {
       display: none; }
 
+a {
+  font-family: Pixel, cursive;
+  font-size: 12px;
+  color: #78dabb;
+  text-decoration: none; }
+  a:hover {
+    color: #d78d84 !important; }
+  a:visited {
+    color: #66636f; }
+
 nav {
   float: right;
   white-space: nowrap; }
@@ -45,3 +45,21 @@ nav {
 img {
   max-width: 100%;
   max-height: 100%; }
+
+input[type=checkbox] + span::before {
+  content: '';
+  display: inline-block;
+  background: url(checkbox.png) no-repeat 0 0;
+  vertical-align: middle;
+  width: 18px;
+  height: 21px; }
+
+input[type=checkbox]:checked + span::before {
+  background-position: 0 -21px; }
+
+input[type=checkbox]:disabled + span, input[type=checkbox]:disabled + span::before {
+  opacity: .4; }
+
+input[type=checkbox] {
+  position: absolute;
+  opacity: 0; }

@@ -7,14 +7,6 @@ html, body {
 	height: 100%;
 }
 
-// links
-a {
-	@include pixel_font($font_size_std, $font_color_link);
-  	text-decoration: none;
-	&:hover { color: $font_color_link_hover !important; }
-	&:visited { color: $font_color_link_visited; }
-}
-
 #header {
 	height: 1.5em;
 	padding-top: .5em; 
@@ -30,6 +22,14 @@ a {
 	}
 }
 
+// links
+a {
+	@include pixel_font($font_size_std, $font_color_link);
+  	text-decoration: none;
+	&:hover { color: $font_color_link_hover !important; }
+	&:visited { color: $font_color_link_visited; }
+}
+
 // navigation
 nav {
 	float: right;
@@ -39,12 +39,28 @@ nav {
 		li {
 			list-style-type: none;
 			display: inline-block;
-			// padding: 0.2em 0;
 			a { padding: 0 5px; font-weight: bold; }
 		}
 	}
 }
 
-// makes image height flexible with respect to container
-img { max-width: 100%; max-height: 100%; }
+img { max-width: 100%; max-height: 100%; } // makes image height flexible with respect to container
+
+input[type=checkbox] + span::before { 
+	content: ''; 
+	display: inline-block;
+	background: url(checkbox.png) no-repeat 0 0; 
+	vertical-align: middle;  
+	width: 18px; 
+	height: 21px;
+}
+
+input[type=checkbox]:checked + span::before { background-position: 0 -21px; }
+input[type=checkbox]:disabled + span, input[type=checkbox]:disabled + span::before { opacity: .4; }
+input[type=checkbox]:focus + span::before, input[type=checkbox]:active + span::before { }
+
+input[type=checkbox] { 
+	position: absolute; 
+	opacity: 0; 
+}
 

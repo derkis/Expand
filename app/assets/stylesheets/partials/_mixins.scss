@@ -1,0 +1,6 @@
+@mixin border_image($image_url, $top, $right, $bottom, $left, $border_style) {
+	border-width: #{$top}px #{$right}px #{$bottom}px #{$left}px;
+	-webkit-border-image: url(../#{$image_url}.png) $top $right $bottom $left fill $border_style;
+	-moz-border-image: url(../#{$image_url}.png) $top $right $bottom $left $border_style;
+	border-image: url(../#{$image_url}.png) $top $right $bottom $left fill $border_style;
+}
