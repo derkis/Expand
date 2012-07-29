@@ -51,7 +51,7 @@ function bind_cell_click_handlers() {
 }
 
 function move_cell(cell, is_checked) {
-	cell.fadeOut(fade_speed, function() {
+	cell.hide(function() {
 		if(is_checked) {
 			$('#checked_user_list').append(cell.fadeIn(fade_speed));
 		} else { 
@@ -82,10 +82,6 @@ function check_new_users() {
 
 function new_user_tag_for(online_user) {
 	var new_user_tag = $(
-		// '<div class="user_cell" user_id="' + online_user.id + '">' +
-		// '	<input class="user_checkbox" id="game_players_attributes_' + online_user.id + '_user_id" name="game[players_attributes][' + online_user.id + '][user_id]" type="checkbox" value="' + online_user.id + '">' +
-		// '	<label for="game_players_attributes_' + online_user.id + '_user_id">' + online_user.email + '<\/label>' +
-		// '<\/div>'
 		'<label class="user_cell" user_id="' + online_user.id + '">' +
 		'	<input class="user_checkbox" id="game_players_attributes_' + online_user.id + '_user_id" name="game[players_attributes][' + online_user.id + '][user_id]" type="checkbox" value="' + online_user.id + '">' +
 		'	<span>' + online_user.email + '<\/span>' +

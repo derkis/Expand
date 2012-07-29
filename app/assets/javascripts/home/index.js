@@ -7,13 +7,6 @@ var popover_vertical_offset = 25;
 
 $(document).ready(function() {
 
-	// popover setup
-	$('.title').load(function() { // wait for image to load
-		set_popover_position(signin_button, signin_popover);
-		set_popover_position(signup_button, signup_popover);
-		fade_in_popover_if_necessary(signin_popover);
-	});
-
 	// handlers for showing popovers 
 	$(signin_button).mouseenter(function() {
 		fade_in_popover_if_necessary(signin_popover);
@@ -36,6 +29,13 @@ $(document).ready(function() {
 	
 });
 
+// popover setup
+$(window).load(function() { // wait for image to load
+	set_popover_position(signin_button, signin_popover);
+	set_popover_position(signup_button, signup_popover);
+	fade_in_popover_if_necessary(signin_popover);
+});
+	
 function set_popover_position(button, popover) {
 	button = $(button);
 	var popover_position = button.position();

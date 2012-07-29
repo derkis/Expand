@@ -8,20 +8,23 @@ $cell_padding: 5px;
 $row_height: 20px;
 $row_padding: 5px;
 
-.wrapper {
-	overflow: auto;
-	background: $dark_background;
-	border-color: $light_background;
-	border-style: solid none solid;
-	border-width: 0.4em;
-	// margin-top: 7em;
+.push {
+	position:relative; float:left; 
+	width:1px; height:50%;	
+	margin-bottom:-22.5em;
+}
+
+.panel {
+	@include border_image(round_shadow, 10, 10, 22, 22, stretch);
+	position:relative; clear:left; overflow: auto;
+	margin: 0 auto;
+	border-radius: 10px;
+	width: 65em; height: 38em;
 
 	#top_bar {
 		display: inline-block;
 		width: 100%;
-		border-color: $light_background;
-		border-style: none none dashed none;
-		border-width: 3px;
+		border-bottom: 3px $light_background dashed;
 
 		.title {
 			margin: 0.5em 0 0.5em 1em;
@@ -29,13 +32,13 @@ $row_padding: 5px;
 	}
 
 	#online_user_table {
-		@include pixel_font($font_size_title, $font_color_title);
 		display: table;
 		float: left;
 		margin: .5em 1em;
 
-		.table_title {
-			display: table-header-group;
+		.table_title { 
+			@include pixel_font($font_size_title, $font_color_title);
+			display: table-header-group; 
 		}
 
 		.padding_row {
@@ -46,7 +49,6 @@ $row_padding: 5px;
 		.user_row {
 			display: table-row;
 			height: $row_height;
-
 			.user_cell { display: table-cell; }
 		}
 	}
@@ -60,22 +62,32 @@ $row_padding: 5px;
 	#notable_user_panel {
 		float: right;
 
+		.table_title {
+			@include pixel_font($font_size_std, $font_color_title);
+		}
+
 		.user_list {
 			@include border_image(dotted_border, 9, 9, 9, 9, repeat);
 			@include pixel_font($font_size_std, $font_color_user);
 			width: 20em;
-			min-height: 6em;
 			margin: 1em;
 			padding: 0.5em;
 		}		
 
 		#checked_user_list {
 			position: relative;
+			min-height: 111px;
 
-		input[type=submit] {
+			input[type=submit] {
 				position: absolute;
-				bottom: 0;
+				left: 100%;
+				top: 100%;
+				margin: -50px 0 0 -111px;
 			}
+		}
+
+		#friend_user_list {
+
 		}
 	}
 	

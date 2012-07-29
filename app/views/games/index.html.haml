@@ -1,5 +1,6 @@
 #start_game_prompt
-.wrapper
+.push
+.panel
 	#top_bar
 		= image_tag('title_small.png', :class => 'title', :alt => 'Expand')
 		#game_invites
@@ -11,12 +12,12 @@
 				.padding_row
 			#notable_user_panel
 				#checked_user_list.user_list
-					= game_f.submit 'Send Invites', :disabled => !current_user.can_create_game?, :onclick => 'disable_button()'
+					.table_title= 'selected_users:'
+					= game_f.submit 'invite', :class => 'image_button', :disabled => !current_user.can_create_game?, :onclick => 'disable_button()'
 				#friend_user_list.user_list
+					.table_title= 'friend_users:'
 			- @online_users.each do |user|
-				-# .user_cell{ :user_id => "#{user.id}" }
 				%label{ :class => 'user_cell', :user_id => "#{user.id}" }
 					= check_box_tag("game[players_attributes][#{user.id}][user_id]", user.id, false, :class => :user_checkbox)
 					%span= user.email
-					-# players_f.label :user_id, user.email
 			= players_f.hidden_field :user_id, :value => current_user.id	

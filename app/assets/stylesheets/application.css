@@ -22,6 +22,17 @@ html, body {
     #header .flash:empty {
       display: none; }
 
+.image_button {
+  font-family: Pixel, cursive;
+  font-size: 16px;
+  color: white;
+  border: none;
+  background: url(signin_button.png) no-repeat center center;
+  width: 111px;
+  height: 50px; }
+  .image_button:hover {
+    background: url(signin_button_hover.png) no-repeat center center; }
+
 a {
   font-family: Pixel, cursive;
   font-size: 12px;

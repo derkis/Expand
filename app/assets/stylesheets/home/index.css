@@ -1,0 +1,55 @@
+@font-face {
+  font-family: Pixel;
+  src: url(/assets/fffharmo.ttf) format("truetype"); }
+
+#mainbar {
+  position: relative;
+  top: 15em;
+  height: 136px;
+  max-height: 100%;
+  background: #464646;
+  border-color: #707070;
+  border-style: solid none solid;
+  border-width: 0.4em;
+  clear: both; }
+  #mainbar #title_container {
+    width: 970px;
+    height: 135px;
+    margin: 0px auto; }
+    #mainbar #title_container .title {
+      float: left; }
+    #mainbar #title_container .buttons {
+      position: relative;
+      height: 112px;
+      top: 12px; }
+      #mainbar #title_container .buttons #signin_button {
+        margin-bottom: 12px; }
+      #mainbar #title_container .buttons .popover {
+        border-width: 14px 14px 28px 28px;
+        -webkit-border-image: url(../popover_border.png) 14 14 28 28 fill stretch;
+        -moz-border-image: url(../popover_border.png) 14 14 28 28 stretch;
+        border-image: url(../popover_border.png) 14 14 28 28 fill stretch;
+        display: none;
+        position: absolute; }
+        #mainbar #title_container .buttons .popover .form_field input {
+          font-family: Pixel, cursive;
+          font-size: 12px;
+          color: black;
+          border-width: 12px 12px 12px 12px;
+          -webkit-border-image: url(../form.png) 12 12 12 12 fill stretch;
+          -moz-border-image: url(../form.png) 12 12 12 12 stretch;
+          border-image: url(../form.png) 12 12 12 12 fill stretch;
+          height: 22px;
+          background-color: transparent;
+          margin-bottom: 10px; }
+        #mainbar #title_container .buttons .popover .form_field:last-child input {
+          margin-bottom: 0px; }
+        #mainbar #title_container .buttons .popover .arrow {
+          position: absolute;
+          left: 133px; }
+        #mainbar #title_container .buttons .popover a {
+          margin-left: 3px; }
+      #mainbar #title_container .buttons #signin_form .down_arrow {
+        top: 147px; }
+      #mainbar #title_container .buttons #signup_form .up_arrow {
+        top: -43px; }
