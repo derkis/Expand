@@ -48,6 +48,7 @@ class Game < ActiveRecord::Base
   #####################################################
   # Attribute Settings
   #####################################################
+  attr_accessor :current_user
   attr_accessible :players, :players_attributes, :status, :proposing_player, :template
   accepts_nested_attributes_for :players, :allow_destroy => true
   
@@ -62,6 +63,14 @@ class Game < ActiveRecord::Base
   #####################################################
   def cur_turn
     turns.last
+  end
+
+  def debug_mode
+    self.players.each do |p|
+      return true if p.id == 1
+    end
+
+    return false
   end
 
   def validate_number_of_players
@@ -107,7 +116,19 @@ class Game < ActiveRecord::Base
     self.players.shuffle.first.id
   end
 
-  # queries -- todo: put in a module
+  def current_user_valid_actions
+    # If the player is not the current player, they cannot do anything
+    if current_user.id == cur_turn.player.user.id
+      return [:type => "PLACE_TILE"]
+    end
+
+    return [:type => "DEBUG"] if debug_mode
+    return [:type => "NOT_YOUR_TURN"]
+  end
+
+  #####################################################
+  # Queries
+  #####################################################
   def self.get_proposed_games_for(current_user)
     players_array = Player.includes([:game]).all(:conditions => ['user_id = ? AND games.status = ?', current_user.id, Game::PROPOSED])
     games_string = players_array.inject(' AND (') { |string, player| string += "p.game_id = #{player.game_id} OR " }

@@ -42,6 +42,8 @@ class GamesController < ApplicationController
 
   def show
     @game = Game.find(params[:id])
+    @game.current_user = current_user
+    
     respond_to do |format|
       
       format.html do
@@ -50,10 +52,10 @@ class GamesController < ApplicationController
       end
 
       format.json do
-        render :json => @game.to_json(:include => :template, :methods => :cur_turn)
+        render :json => @game.to_json(
+                                :include => :template, 
+                                :methods => [:cur_turn, :current_user_valid_actions])
       end
-
     end
-    
   end
 end

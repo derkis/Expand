@@ -15,7 +15,7 @@ function polling_wrapper() {
         renderBoard(data.cur_turn.board, data.template.width, data.template.height);
         renderPlayers(data.cur_turn)
     });
-    
+
     setTimeout(polling_wrapper, 15000);
 }
 
@@ -25,20 +25,33 @@ function renderPlayers(cur_turn)
     $(playerDiv).css("background-color", "red");
 }
 
-function renderBoard(board, width, height) {
-    r = 0
-    c = 0
-    for (chr = 0; chr < board.length; chr++)
-    {
-        cellID = "#cell" + r + "_" + c;
+function renderBoard(boardStr, width, height) {
+    r = 0;
+    c = 0;
 
-        $(cellID).text(chars[r] + (c+1));
+    for (chr = 0; chr < boardStr.length; chr++)
+    {
+        renderCell(r, c, boardStr[chr], $("#cell" + r + "_" + c));
 
         c++;
+
         if (c >= width)
         {
             c = 0;
             r++;
         }
+    }
+}
+
+function renderCell(row, column, type, cell)
+{
+    switch (type)
+    {
+        case "e":
+            cell.css("background-color", "gray");
+            cell.text(chars[r] + (c+1));
+        break;
+        default:
+            cell.text(type);
     }
 }
