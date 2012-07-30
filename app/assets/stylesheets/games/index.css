@@ -48,7 +48,7 @@
   .panel .user_cell {
     font-family: Pixel, cursive;
     font-size: 12px;
-    color: #707070;
+    color: white;
     width: 200px;
     padding-right: 5px; }
   .panel #notable_user_panel {
@@ -65,7 +65,7 @@
       border-image: url(../dotted_border.png) 9 9 9 9 fill repeat;
       font-family: Pixel, cursive;
       font-size: 12px;
-      color: #707070;
+      color: white;
       width: 20em;
       margin: 1em;
       padding: 0.5em; }
