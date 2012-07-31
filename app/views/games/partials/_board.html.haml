@@ -5,17 +5,12 @@
   Current Turn:
   = @game.cur_turn.number + 1
 .board_body
-  - i = "A"
-  - l = 0
   .row
     .cell
-    - @board[0].each do |col|
-      .cell
-        = l = l.succ
-  - @board.each_with_index do |row, rowIX|
+    - @board[0].each_index do |column_index|
+      .cell= column_index + 1
+  - @board.each_with_index do |row_array, row_index|
     .row 
-      .cell
-        = i
-        - i = i.succ
-      - row.each_with_index do |cell, colIX|
-        = render :partial => "games/partials/cell", :locals => {:cell => cell, :rowIX => rowIX, :colIX => colIX}
+      .cell= (65 + row_index).chr
+      - row_array.each_with_index do |cell, column_index|
+        .game_cell{ :id => "cell_#{row_index}_#{column_index}", :row => row_index, :column => column_index }
