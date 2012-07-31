@@ -1,32 +1,54 @@
-.players {
-  float: right;
-  background-color: #eeeeee;
-  width: 200px; }
+@font-face {
+  font-family: Pixel;
+  src: url(/assets/fffharmo.ttf) format("truetype"); }
 
-#player_active {
-  background-color: #ef6666; }
+.debug_string {
+  font-family: Pixel, cursive;
+  font-size: 12px;
+  color: black; }
 
-.board_body {
-  display: table; }
-
-.row {
-  display: table-row;
-  height: 50px; }
-
-.cell {
-  text-align: center;
-  vertical-align: middle;
-  display: table-cell;
-  width: 50px;
-  border-style: dotted;
-  border-width: 2px;
-  border-color: gray; }
-
-.game_cell {
-  text-align: center;
-  vertical-align: middle;
-  display: table-cell;
-  width: 50px;
-  border-style: inset;
-  border-width: 3px;
-  border-color: black; }
+.wrapper {
+  position: relative;
+  background: #464646;
+  width: 70em;
+  height: 35em;
+  margin: 0 auto; }
+  .wrapper .turn_label {
+    font-family: Pixel, cursive;
+    font-size: 20px;
+    color: #a66c5a;
+    background: #464646; }
+  .wrapper .board {
+    display: table;
+    margin: 0 auto; }
+    .wrapper .board .row {
+      display: table-row;
+      height: 50px; }
+      .wrapper .board .row .cell {
+        font-family: Pixel, cursive;
+        font-size: 12px;
+        color: black;
+        display: table-cell;
+        background: #707070;
+        width: 50px;
+        text-align: center;
+        vertical-align: middle;
+        border: 2px dashed gray; }
+      .wrapper .board .row .game_cell {
+        background: #464646;
+        color: #707070;
+        border: 3px dotted #000; }
+        .wrapper .board .row .game_cell:hover {
+          border-color: #707070; }
+      .wrapper .board .row .enabled {
+        background: #a66c5a;
+        color: white; }
+        .wrapper .board .row .enabled:hover {
+          border-color: #fff;
+          background: #db7556; }
+  .wrapper .players {
+    position: absolute;
+    top: 10px;
+    right: -30px;
+    background-color: #eeeeee;
+    width: 200px; }

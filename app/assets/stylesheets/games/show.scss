@@ -1,45 +1,73 @@
-.players
-{
-  float:right;
-  background-color: #eeeeee;
-  width:200px;
+@import "../partials/font";
+@import "../partials/color";
+
+$cell_height: 50px;
+
+.debug_string {
+	@include pixel_font($font_size_std, $font_color_std);
 }
 
-.player
-{
-  
+.wrapper {
+	position: relative;
+	background: $dark_background;
+	width: 70em; height: 35em;
+	margin: 0 auto;
+
+	.turn_label {
+		@include pixel_font($font_size_title, $font_color_title);
+		background: $dark_background;
+	}
+
+	.board {
+		display:table;
+		margin: 0 auto;
+
+		.row {
+			display:table-row;
+			height: $cell_height;
+
+			.cell {
+				@include pixel_font($font_size_std, $font_color_cell_border);
+				display:table-cell;
+				background: $light-background;
+				width: $cell_height;
+				text-align:center;
+				vertical-align:middle;
+				border: 2px dashed gray;
+			}
+
+			.game_cell {
+				background: $dark_background;
+				color: $font_color_cell;
+				border: 3px dotted #000;
+
+				&:hover {
+					border-color: $light-background;
+				}
+			}
+
+			.enabled {
+				background: $primary_color;
+				color: $font_color_cell_enabled;
+				&:hover {
+					border-color: #fff;
+					background: $primary_color_highlight;
+				}
+			}
+		}
+	}
+
+
+	.players {
+		position: absolute;
+		top: 10px; right: -30px;
+		background-color: #eeeeee;
+		width:200px;
+
+		.player {
+
+		}
+	}
 }
 
-.board_body
-{
-  display:table;
-}
-
-.row
-{
-  display:table-row;
-  height: 50px;
-}
-
-.cell
-{
-  text-align:center;
-  vertical-align:middle;
-  display:table-cell;
-  width: 50px;
-  border-style:dotted;
-  border-width:2px;
-  border-color:gray;
-}
-
-.game_cell
-{
-  text-align:center;
-  vertical-align:middle;
-  display:table-cell;
-  width: 50px;
-  border-style:inset;
-  border-width:3px;
-  border-color:black;
-}
 

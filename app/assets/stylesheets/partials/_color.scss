@@ -1,13 +1,18 @@
 $dark_background: #464646;
 $light_background: #707070;
 $primary_color: #a66c5a;
+$primary_color_highlight: #db7556;
 
 $font_color_std: #000;
 $font_color_btn: #fff;
-$font_color_user: #fff;
-$font_color_title: $primary_color;
 $font_color_flash: #fff;
+$font_color_title: $primary_color;
 
 $font_color_link: #78dabb;
 $font_color_link_hover: #d78d84;
 $font_color_link_visited: #66636f;
+
+$font_color_user: #fff;
+$font_color_cell: $light_background;
+$font_color_cell_border: #000;
+$font_color_cell_enabled: #fff;

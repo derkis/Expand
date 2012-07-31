@@ -1,4 +1,6 @@
-var chars = ["A","B","C","D","E","F","G","H","I","J","K","L"];
+Number.prototype.to_char = function() {
+    return String.fromCharCode(this);
+}
 
 var GAME_ID;
 var TURN_TYPE = {
@@ -8,12 +10,12 @@ var TURN_TYPE = {
 $(document).ready(function() {
     polling_wrapper();
 
-    $(".game_cell").hover(
-        function() {$(this).css("background-color", "gray")}, 
-        function() {$(this).css("background-color", "white")}
-    );
+    // $(".game_cell").hover(
+    //     function() {$(this).css("background-color", "gray")}, 
+    //     function() {$(this).css("background-color", "white")}
+    // );
 
-    $('.game_cell').live('click', function(click_event) {
+    $('.enabled').live('click', function(click_event) {
         var cell = $(this);
         send_place_piece_action(
             parseInt(cell.attr('row')), 
@@ -82,11 +84,12 @@ function render_board(board, num_columns, num_rows) {
 function render_cell(cell, cell_type, row, column) {
     switch(cell_type) {
         case 'e':
-            cell.css('background-color', 'gray');
-            cell.text(chars[row] + (column+1));
+            // cell.css('background-color', 'gray');
+            cell.text((65 + row).to_char() + (column+1));
             break;
         default:
             cell.text(cell_type);
+            cell.addClass('enabled');
     }
 }
 
