@@ -1,5 +1,6 @@
 #game{ :game_id => @game.id }
 	.debug_string= @game.cur_turn.board
 	.wrapper
-		= render "games/partials/players"
-		= render "games/partials/board"
+		= render 'games/partials/players'
+		= render 'games/partials/companies'
+		= render 'games/partials/board'

@@ -50,5 +50,13 @@
     position: absolute;
     top: 10px;
     right: -30px;
-    background-color: #eeeeee;
-    width: 200px; }
+    background-color: #464646;
+    border: 1em dotted #707070; }
+    .wrapper .players .player {
+      font-family: Pixel, cursive;
+      font-size: 14px;
+      color: #a66c5a; }
+      .wrapper .players .player .player_info {
+        font-family: Pixel, cursive;
+        font-size: 10px;
+        color: white; }

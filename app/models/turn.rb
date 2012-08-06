@@ -33,10 +33,10 @@ class Turn < ActiveRecord::Base
 	# Creates the first turn given a game and a 
 	# starting player id.
 	#--------------------------------------------------
-	def self.create_first_turn_for(_game, starting_player_id)
-		@turn = Turn.new({:game_id => _game.id, :player_id => starting_player_id})
+	def self.create_first_turn_for(game, starting_player_id)
+		@turn = Turn.new({ :game_id => game.id, :player_id => starting_player_id })
 		@turn.number = 0,
-		@turn.board = 'e' * _game.board_area
+		@turn.board = 'e' * game.board_area
 		@turn.refresh_player_tiles
 		@turn.save!
 		@turn

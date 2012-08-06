@@ -1,8 +1,8 @@
 .players
 	- @game.players.each_with_index do |player, i|
-		.player{ :id => "player_#{player.id}" }
+		.player{ :player_id => player.id }
 			= player.user[:email]
-			.tiles
+			.player_info
 				- tiles = find_tiles_for i, @game.cur_turn.board
 				- tiles.each do |t|
-					= tile_ix_to_name t, @game.template
+					= tile_ix_to_name(t, @game.template)

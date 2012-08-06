@@ -10,12 +10,10 @@ group :assets do
   gem 'uglifier', '>= 1.0.3'
 end
 
+group :development do
+	gem 'pry'
+end 
+
 gem 'jquery-rails'
 gem 'devise', '~> 2.0.4'
-
 gem 'annotate', '~> 2.4.1.beta' 
-
-# To use debugger
-# gem 'linecache19', '0.5.13', :git => 'https://github.com/robmathews/linecache19-0.5.13.git'
-# gem 'ruby-debug-base19', '0.11.26', :git => 'https://github.com/robmathews/ruby-debug-base19-0.11.26.git'
-# gem 'ruby-debug19', :require => 'ruby-debug'

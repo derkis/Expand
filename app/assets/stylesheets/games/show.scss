@@ -57,17 +57,23 @@ $cell_height: 50px;
 		}
 	}
 
-
 	.players {
 		position: absolute;
 		top: 10px; right: -30px;
-		background-color: #eeeeee;
-		width:200px;
+		background-color: $dark_background;
+		border: 1em dotted $light_background;
 
 		.player {
+			@include pixel_font($font_size_subtitle, $primary_color);
+
+			.player_info {
+				@include pixel_font($font_size_small, $font_color_user);
+			}
 
 		}
 	}
+
+
 }
 
 

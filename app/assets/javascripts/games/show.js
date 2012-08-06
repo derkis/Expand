@@ -4,16 +4,15 @@ Number.prototype.to_char = function() {
 
 var GAME_ID;
 var TURN_TYPE = {
-    PLACE_PIECE: { code: 0, name: 'place_piece' }
+    PLACE_PIECE:    { code: 100, name: 'place_piece' },
+    START_COMPANY:  { code: 200, name: 'start_company' },
+    PURCHASE_STOCK: { code: 300, name: 'puchase_stock' },
+    TRADE_STOCK:    { code: 400, name: 'trade_stock' },
+    MERGE_ORDER:    { code: 500, name: 'merge_order' },
 };
 
 $(document).ready(function() {
     polling_wrapper();
-
-    // $(".game_cell").hover(
-    //     function() {$(this).css("background-color", "gray")}, 
-    //     function() {$(this).css("background-color", "white")}
-    // );
 
     $('.enabled').live('click', function(click_event) {
         var cell = $(this);
@@ -60,12 +59,46 @@ function send_game_update(action) {
     });     
 }
 
+function create_action_and_send_game_update(turn_type, action_data) {
+    var action = { 'turn_type' : turn_type.code };
+    for(action_attribute in action_data)
+        action[action_attribute] = action_data[action_attribute];
+    send_game_update(action)
+}
+
 function send_place_piece_action(row, column) {
-    send_game_update({
-        'turn_type': TURN_TYPE.PLACE_PIECE.code,
-        'row'      : row,
-        'column'   : column
-    });
+    create_action_and_send_game_update(
+        TURN_TYPE.PLACE_PIECE, 
+        { 'row': row, 'column': column }
+    );
+}
+
+function send_start_company_action(company) {
+    create_action_and_send_game_update(
+        TURN_TYPE.CHOOSE_COMPANY,
+        { 'company': company }
+    );
+}
+
+function send_purchase_stock_action(purchases) {
+    create_action_and_send_game_update(
+        TURN_TYPE.PURCHASE_STOCK,
+        { 'purchases': purchases }
+    );
+}
+
+function send_trade_stock_action(trades) {
+    create_action_and_send_game_update(
+        TURN_TYPE.TRADE_STOCK,
+        { 'trades': trades }
+    );
+}
+
+function send_merge_order_action(merge_order) {
+    create_action_and_send_game_update(
+        TURN_TYPE.MERGE_ORDER,
+        { 'merge_order': merge_order }
+    );
 }
 
 // board rendering helpers
@@ -84,7 +117,6 @@ function render_board(board, num_columns, num_rows) {
 function render_cell(cell, cell_type, row, column) {
     switch(cell_type) {
         case 'e':
-            // cell.css('background-color', 'gray');
             cell.text((65 + row).to_char() + (column+1));
             break;
         default:
@@ -94,6 +126,5 @@ function render_cell(cell, cell_type, row, column) {
 }
 
 function render_players(current_turn) {
-    playerDiv = "#player_" + current_turn.player_id;
-    $(playerDiv).css("background-color", "red");
+    $('.player[player_id=' + current_turn.player_id + ']').addClass('current_player');
 }
