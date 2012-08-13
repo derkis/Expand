@@ -36,8 +36,8 @@ function polling_wrapper() {
 function fetch_game_state() {
     $.getJSON(document.URL + '.json', function(game_state) {
         console.log(game_state);
-        render_board(game_state.cur_turn.board, game_state.template.width, game_state.template.height);
-        render_players(game_state.cur_turn);
+        render_board(game_state.current_turn.board, game_state.template.width, game_state.template.height);
+        render_players(game_state.current_turn);
     });
 }
 

@@ -21,7 +21,7 @@ module GamesHelper
       c = 0
 
       while c < game.template.width
-        lastTurn = game.cur_turn
+        lastTurn = game.current_turn
         board[r][c] = lastTurn.board[ix]
         ix = ix + 1
         c = c + 1

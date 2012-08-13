@@ -61,7 +61,7 @@ class Game < ActiveRecord::Base
   #####################################################
   # Methods
   #####################################################
-  def cur_turn
+  def current_turn
     turns.last
   end
 
@@ -113,7 +113,7 @@ class Game < ActiveRecord::Base
 
   def current_user_valid_actions
     # If the player is not the current player, they cannot do anything
-    if current_user.id == cur_turn.player.user.id
+    if current_user.id == current_turn.player.user.id
       return [:type => "PLACE_TILE"]
     end
 

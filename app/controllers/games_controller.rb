@@ -53,8 +53,9 @@ class GamesController < ApplicationController
 
       format.json do
         render :json => @game.to_json(
-                                :include => :template, 
-                                :methods => [:cur_turn, :current_user_valid_actions])
+          :include => :template, 
+          :methods => [:current_turn, :current_user_valid_actions]
+        )
       end
     end
   end
