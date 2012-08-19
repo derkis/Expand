@@ -1,6 +1,7 @@
 require 'games_webservices'
 require 'games_tests'
 require 'games_helper'
+require 'engine'
 
 class GamesController < ApplicationController
   
@@ -42,8 +43,9 @@ class GamesController < ApplicationController
 
   def show
     @game = Game.find(params[:id])
+    @player_index = @game.player_index_for(current_user)
     @game.current_user = current_user
-    
+
     respond_to do |format|
       
       format.html do
@@ -54,7 +56,7 @@ class GamesController < ApplicationController
       format.json do
         render :json => @game.to_json(
           :include => :template, 
-          :methods => [:current_turn, :current_user_valid_actions]
+          :methods => [ :current_turn, :valid_action ]
         )
       end
     end

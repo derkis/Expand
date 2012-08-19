@@ -14,4 +14,5 @@ module GamesTests
     game.start
     redirect_to game
   end
+  
 end

@@ -46,6 +46,12 @@
         .wrapper .board .row .enabled:hover {
           border-color: #fff;
           background: #db7556; }
+      .wrapper .board .row .selected {
+        background: #f09b46;
+        color: white; }
+        .wrapper .board .row .selected:hover {
+          border-color: #fff;
+          background: #f09b46; }
   .wrapper .players {
     position: absolute;
     top: 10px;

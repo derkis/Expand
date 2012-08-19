@@ -1,4 +1,4 @@
-MyApplication::Application.configure do
+Expand::Application.configure do
 	
 	silence_warnings do
 		begin

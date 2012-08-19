@@ -54,6 +54,15 @@ $cell_height: 50px;
 					background: $primary_color_highlight;
 				}
 			}
+
+			.selected {
+				background: $primary_color_selection;
+				color: $font_color_cell_enabled;
+				&:hover {
+					border-color: #fff;
+					background: $primary_color_selection;
+				}
+			}
 		}
 	}
 

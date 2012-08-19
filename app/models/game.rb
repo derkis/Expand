@@ -101,6 +101,7 @@ class Game < ActiveRecord::Base
     self.template.save
     self.save
     self.turn_id ||= Turn.create_first_turn_for(self, random_player_id).id
+    # self.save
   end
 
   def board_area
@@ -111,14 +112,20 @@ class Game < ActiveRecord::Base
     self.players.shuffle.first.id
   end
 
-  def current_user_valid_actions
-    # If the player is not the current player, they cannot do anything
-    if current_user.id == current_turn.player.user.id
-      return [:type => "PLACE_TILE"]
-    end
+  module TurnType
+    NO_ACTION       = { :code => 000, :name => :no_action }
+    PLACE_PIECE     = { :code => 100, :name => :place_piece }
+    START_COMPANY   = { :code => 200, :name => :start_company }
+    PURCHASE_STOCK  = { :code => 300, :name => :puchase_stock }
+    TRADE_STOCK     = { :code => 400, :name => :trade_stock }
+    MERGE_ORDER     = { :code => 500, :name => :merge_order }
+    DEBUG_MODE      = { :code => 999, :name => :debug }
+  end
 
-    return [:type => "DEBUG"] if debug_mode
-    return [:type => "NOT_YOUR_TURN"]
+  def valid_action
+    return :code => TurnType::PLACE_PIECE[:code] if current_user.id == current_turn.player.user.id
+    return :code => TurnType::DEBUG[:code] if debug_mode
+    return :code => TurnType::NO_ACTION[:code]
   end
 
   #####################################################
@@ -157,4 +164,11 @@ class Game < ActiveRecord::Base
       ['status = ? AND game_id = players.game_id AND players.user_id = ?', Game::STARTED, current_user.id]
     )
   end
+
+  def player_index_for(current_user)
+    self.players.each_with_index do |player, index|
+      return index if player.user_id == current_user.id
+    end
+  end
+
 end
