@@ -27,11 +27,14 @@ html, body {
   font-size: 16px;
   color: white;
   border: none;
-  background: url(signin_button.png) no-repeat center center;
+  background: url(button.png) no-repeat center center;
   width: 111px;
   height: 50px; }
   .image_button:hover {
-    background: url(signin_button_hover.png) no-repeat center center; }
+    background: url(button_hover.png) no-repeat center center; }
+  .image_button:disabled {
+    background: url(button_disabled.png) no-repeat center center;
+    color: #707070; }
 
 a {
   font-family: Pixel, cursive;

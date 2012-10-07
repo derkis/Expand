@@ -15,12 +15,52 @@ String.prototype.to_int = function() {
 
 var GAME_ID;
 var TURN_TYPES = {
-    NO_ACTION:      { code: 000, render: render_no_action_turn },
-    PLACE_PIECE:    { code: 100, render: render_place_piece_turn, action_builder: build_place_piece_action },
-    START_COMPANY:  { code: 200, render: render_start_company_turn, action_builder: build_start_company_action },
-    PURCHASE_STOCK: { code: 300, render: render_purchase_stock_turn, action_builder: build_purchase_stock_action },
-    TRADE_STOCK:    { code: 400, render: render_trade_stock_turn, action_builder: build_trade_stock_action },
-    MERGE_ORDER:    { code: 500, render: render_merge_order_turn, action_builder: build_merge_order_action }
+    
+    NO_ACTION: { 
+        code: 000,
+        name: 'no_action',
+        render: render_no_action_turn 
+    },
+    
+    PLACE_PIECE: { 
+        code: 100,
+        name: 'place_piece',
+        render: render_place_piece_turn, 
+        build_action: function() {
+            return { 
+                'row': selected_cell.attr('row').to_int(), 
+                'column': selected_cell.attr('column').to_int()
+            };
+        }
+    },
+    
+    START_COMPANY: { 
+        code: 200, 
+        name: 'start_company',
+        render: render_start_company_turn, 
+        build_action: build_start_company_action 
+    },
+    
+    PURCHASE_STOCK: { 
+        code: 300,
+        name: 'purchase_stock', 
+        render: render_purchase_stock_turn, 
+        build_action: build_purchase_stock_action 
+    },
+    
+    TRADE_STOCK: { 
+        code: 400,
+        name: 'trade_stock', 
+        render: render_trade_stock_turn, 
+        action_builder: build_trade_stock_action 
+    },
+    
+    MERGE_ORDER: { 
+        code: 500,
+        name: 'merge_order', 
+        render: render_merge_order_turn, 
+        action_builder: build_merge_order_action 
+    }
 };
 
 var current_turn_type;
@@ -30,6 +70,8 @@ $(document).ready(function() {
     polling_wrapper();
 
     $('.enabled').live('click', function(click_event) {
+        if(!player_can_act())
+            return;
         var cell = $(this);
         if(selected_cell && selected_cell != cell)
             selected_cell.removeClass('selected');
@@ -58,6 +100,11 @@ function fetch_game_state() {
                     return TURN_TYPES[type_key];
         })(game_state.valid_action.code);
 
+        var turn_button = $('#turn_button');
+        if(player_can_act()) 
+            turn_button.removeAttr('disabled');
+        else turn_button.attr('disabled', 'disabled');
+
         current_turn_type.render();
         render_board(game_state.current_turn.board, game_state.template.width, game_state.template.height);
         render_players(game_state.current_turn);
@@ -82,19 +129,12 @@ function send_game_update(action) {
 }
 
 function create_action_and_send_game_update() {
-    var action = { 'turn_type' : current_turn_type.code };
-    var action_data = current_turn_type.action_builder();
+    var action = { 'turn_type' : current_turn_type.name };
+    var action_data = current_turn_type.build_action();
 
     for(action_attribute in action_data)
         action[action_attribute] = action_data[action_attribute];
     send_game_update(action)
-}
-
-function build_place_piece_action() {
-    return { 
-        'row': selected_cell.attr('row').to_int(), 
-        'column': selected_cell.attr('column').to_int()
-    };
 }
 
 function build_start_company_action() {
@@ -183,4 +223,8 @@ function render_cell(cell, cell_type, row, column) {
 
 function render_players(current_turn) {
     $('.player[player_id=' + current_turn.player_id + ']').addClass('current_player');
+}
+
+function player_can_act() {
+    return current_turn_type != TURN_TYPES.NO_ACTION;
 }

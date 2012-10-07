@@ -33,8 +33,12 @@ class GamesController < ApplicationController
   
   def update
     @game = Game.find(params[:id])
-    @game.update_attributes(params[:game])
-    
+    if(params[:game][:turn])
+      Engine.interpret_turn(@game, params[:game][:turn])
+    else
+      @game.update_attributes(params[:game])
+    end
+
     respond_to do |format|
       format.json { render :json => @game.id.to_json }
       format.all { not_found() }

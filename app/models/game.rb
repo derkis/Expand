@@ -1,68 +1,36 @@
-# == Schema Information
-#
-# Table name: games
-#
-#  id               :integer         not null, primary key
-#  created_at       :datetime        not null
-#  updated_at       :datetime        not null
-#  status           :integer
-#  template_id      :integer
-#  proposing_player :integer
-#  turn_id          :integer
-#
 
-# == Schema Information
-#
-# Table name: games
-#
-#  id               :integer         not null, primary key
-#  created_at       :datetime        not null
-#  updated_at       :datetime        not null
-#  status           :integer
-#  template_id      :integer
-#  proposing_player :integer
-#  turn_id          :integer
-#
 class Game < ActiveRecord::Base
   
-  #####################################################
-  # Callbacks
-  #####################################################
+  # ACTIVE RECORD CALLBACKS
   before_validation :set_default_status, :on => :create
   after_commit :set_proposing_player, :on => :create
   before_update :before_update_handler
   
-  #####################################################
-  # Constants
-  #####################################################
+  # CONSTANTS
   PROPOSED = 0; STARTED = 1; FINISHED = 2
   
-  #####################################################
-  # Associations
-  #####################################################
+  # ASSOSCIATIONS
   has_many :players, :dependent => :destroy
   has_many :users, :through => :players
   has_many :turns, :dependent => :destroy
   belongs_to :template
 
-  #####################################################
-  # Attribute Settings
-  #####################################################
-  attr_accessor :current_user
+  # ACCESSORS
+  attr_accessor :current_user # wat
   attr_accessible :players, :players_attributes, :status, :proposing_player, :template
   accepts_nested_attributes_for :players, :allow_destroy => true
-  
-  #####################################################
-  # Validation
-  #####################################################
+
+  # VALIDATIONS
   validates :status, :numericality => :true, :inclusion => { :in => [ PROPOSED, STARTED, FINISHED ] }
   validate :validate_number_of_players
   
-  #####################################################
-  # Methods
-  #####################################################
+  def validate_number_of_players
+    self.errors.add(:base, 'Game must have at least 2 players') if self.players.reject(&:marked_for_destruction?).length < 2
+  end
+     
+  # METHODS
   def current_turn
-    turns.last
+    Turn.find(self.turn_id)
   end
 
   def debug_mode
@@ -73,10 +41,6 @@ class Game < ActiveRecord::Base
     return false
   end
 
-  def validate_number_of_players
-    self.errors.add(:base, 'Game must have at least 2 players') if self.players.reject(&:marked_for_destruction?).length < 2
-  end
-     
   def set_default_status
     self.status ||= PROPOSED
   end
@@ -112,25 +76,13 @@ class Game < ActiveRecord::Base
     self.players.shuffle.first.id
   end
 
-  module TurnType
-    NO_ACTION       = { :code => 000, :name => :no_action }
-    PLACE_PIECE     = { :code => 100, :name => :place_piece }
-    START_COMPANY   = { :code => 200, :name => :start_company }
-    PURCHASE_STOCK  = { :code => 300, :name => :puchase_stock }
-    TRADE_STOCK     = { :code => 400, :name => :trade_stock }
-    MERGE_ORDER     = { :code => 500, :name => :merge_order }
-    DEBUG_MODE      = { :code => 999, :name => :debug }
-  end
-
   def valid_action
-    return :code => TurnType::PLACE_PIECE[:code] if current_user.id == current_turn.player.user.id
-    return :code => TurnType::DEBUG[:code] if debug_mode
-    return :code => TurnType::NO_ACTION[:code]
+    return :code => Turn::Type[:place_piece][:code] if current_user.id == current_turn.player.user.id
+    return :code => Turn::Type[:debug][:code] if debug_mode
+    return :code => Turn::Type[:no_action][:code]
   end
 
-  #####################################################
-  # Queries
-  #####################################################
+  # QUERIES
   def self.get_proposed_games_for(current_user)
     players_array = Player.includes([:game]).all(:conditions => ['user_id = ? AND games.status = ?', current_user.id, Game::PROPOSED])
     games_string = players_array.inject(' AND (') { |string, player| string += "p.game_id = #{player.game_id} OR " }

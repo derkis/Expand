@@ -25,10 +25,11 @@ html, body {
 .image_button {
 	@include pixel_font($font_size_btn, $font_color_btn);
 	border: none;
-	background: url(signin_button.png) no-repeat center center;
+	background: url(button.png) no-repeat center center;
 	width: 111px;
 	height: 50px;
-	&:hover { background: url(signin_button_hover.png) no-repeat center center; }
+	&:hover { background: url(button_hover.png) no-repeat center center; };
+	&:disabled { background: url(button_disabled.png) no-repeat center center; color: $font_color_btn_disabled };
 }
 
 // links

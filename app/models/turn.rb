@@ -15,24 +15,26 @@
 
 class Turn < ActiveRecord::Base
 
-	#####################################################
-	# Assosications
-  #####################################################
+	# ASSOSCIATIONS
 	belongs_to :game
 	belongs_to :player
 
-	#####################################################
- 	# Attribute Settings
-  #####################################################
+ 	# ATTRIBUTE ACCESSORS
 	attr_accessible :game_id, :player_id, :number, :board, :tiles
 
-	#####################################################
- 	# Methods
-  #####################################################
-  #--------------------------------------------------
-	# Creates the first turn given a game and a 
-	# starting player id.
-	#--------------------------------------------------
+	# CONSTANTS
+	Type = { 
+		:no_action 			=> { :code => 000 },
+		:place_piece    => { :code => 100 },
+		:start_company	=> { :code => 200 },
+		:purchase_stock => { :code => 300 },
+		:trade_stock    => { :code => 400 },
+		:merge_order    => { :code => 500 },
+		:debug_mode     => { :code => 999 }
+	}
+
+ 	# METHODS
+	# creates the first turn given a game and a starting player id.
 	def self.create_first_turn_for(game, starting_player_id)
 		@turn = Turn.new({ :game_id => game.id, :player_id => starting_player_id })
 		@turn.number = 0,
@@ -42,10 +44,7 @@ class Turn < ActiveRecord::Base
 		@turn
 	end
 
-	#--------------------------------------------------
-	# Redistributes all the player tiles until each
-	# player has the game allotted amount
-	#--------------------------------------------------
+	# redistributes all the player tiles until each player has the game allotted amount
 	def refresh_player_tiles
 		tile_counts = Hash.new(0)
 
@@ -68,21 +67,16 @@ class Turn < ActiveRecord::Base
 		end
 	end
 
-	#--------------------------------------------------
-	# Returns a single random unused tile index
-	#--------------------------------------------------
+	# returns a single random unused tile index
 	def get_random_unused_tile
 		find_unused_tile_indices.shuffle!.pop
 	end
 
-	#--------------------------------------------------
-	# Returns an array of indexes into the board
-	# that are unchosen tiles
-	#--------------------------------------------------
+	# returns an array of indexes into the board that are unchosen tiles
 	def find_unused_tile_indices
-    	tiles = Array.new
-    	self.board.chars.to_a.each_with_index { |c, i| tiles.push(i) if c == 'e' }
-    	tiles
-  	end
+  	tiles = Array.new
+  	self.board.chars.to_a.each_with_index { |c, i| tiles.push(i) if c == 'e' }
+  	tiles
+	end
 
 end
