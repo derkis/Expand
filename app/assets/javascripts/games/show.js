@@ -210,9 +210,13 @@ function render_board(board, num_columns, num_rows) {
 function render_cell(cell, cell_type, row, column) {
     var player_index = $('#game').attr('player_index');
     switch(cell_type) {
-        case 'e':
+        case 'e': // empty cell
             cell.text((65 + row).to_char() + (column+1));
+            cell.addClass('empty')
             break;
+        case 'u':
+            cell.addClass('no_hotel');
+
         case player_index:
             cell.text(cell_type);
             cell.addClass('enabled');

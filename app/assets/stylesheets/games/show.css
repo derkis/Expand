@@ -40,6 +40,8 @@
         border: 3px dotted #000; }
         .wrapper .board .row .game_cell:hover {
           border-color: #707070; }
+      .wrapper .board .row .no_hotel {
+        background: #000; }
       .wrapper .board .row .enabled {
         background: #a66c5a;
         color: white; }
@@ -66,3 +68,5 @@
         font-family: Pixel, cursive;
         font-size: 10px;
         color: white; }
+    .wrapper .players .current_player {
+      color: #78dabb; }

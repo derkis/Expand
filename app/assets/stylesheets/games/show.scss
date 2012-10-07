@@ -46,6 +46,10 @@ $cell_height: 50px;
 				}
 			}
 
+			.no_hotel {
+				background: #000;
+			}
+
 			.enabled {
 				background: $primary_color;
 				color: $font_color_cell_enabled;
@@ -80,6 +84,11 @@ $cell_height: 50px;
 			}
 
 		}
+
+		.current_player {
+			color: $font_color_link;
+		}
+
 	}
 
 

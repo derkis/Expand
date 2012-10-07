@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120722214515) do
+ActiveRecord::Schema.define(:version => 20121007201549) do
 
   create_table "games", :force => true do |t|
     t.datetime "created_at",       :null => false
@@ -29,6 +29,7 @@ ActiveRecord::Schema.define(:version => 20120722214515) do
     t.integer  "user_id"
     t.boolean  "accepted"
     t.string   "tiles"
+    t.integer  "index"
   end
 
   create_table "templates", :force => true do |t|

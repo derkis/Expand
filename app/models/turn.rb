@@ -24,24 +24,29 @@ class Turn < ActiveRecord::Base
 
 	# CONSTANTS
 	Type = { 
-		:no_action 			=> { :code => 000 },
+		:no_action 		=> { :code => 000 },
 		:place_piece    => { :code => 100 },
 		:start_company	=> { :code => 200 },
 		:purchase_stock => { :code => 300 },
 		:trade_stock    => { :code => 400 },
-		:merge_order    => { :code => 500 },
-		:debug_mode     => { :code => 999 }
+		:merge_order    => { :code => 500 }
 	}
 
  	# METHODS
 	# creates the first turn given a game and a starting player id.
 	def self.create_first_turn_for(game, starting_player_id)
-		@turn = Turn.new({ :game_id => game.id, :player_id => starting_player_id })
-		@turn.number = 0,
-		@turn.board = 'e' * game.board_area
-		@turn.refresh_player_tiles
-		@turn.save!
-		@turn
+		turn = Turn.new({ :game_id => game.id, :player_id => starting_player_id })
+		turn.number = 0,
+		turn.board = 'e' * game.board_area
+		turn.refresh_player_tiles
+		turn.save!
+		turn
+	end
+
+	def clone_next_turn()
+		turn = Turn.new({ :game_id => game_id, :player_id => player_id, :number => number + 1, :board => board })
+		turn.save!
+		turn
 	end
 
 	# redistributes all the player tiles until each player has the game allotted amount
@@ -74,9 +79,15 @@ class Turn < ActiveRecord::Base
 
 	# returns an array of indexes into the board that are unchosen tiles
 	def find_unused_tile_indices
-  	tiles = Array.new
-  	self.board.chars.to_a.each_with_index { |c, i| tiles.push(i) if c == 'e' }
-  	tiles
+	  	tiles = Array.new
+	  	self.board.chars.to_a.each_with_index { |c, i| tiles.push(i) if c == 'e' }
+	  	tiles
 	end
 
+	def place_piece_for (row, column, player)
+		updated_board = self.board # TODO: get correct hotel character # self.game.player_index_for(player.user).chr
+		updated_board[self.game.piece_index(row, column)] = 'u'
+		self.board = updated_board
+		save!
+	end
 end

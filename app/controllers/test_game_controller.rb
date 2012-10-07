@@ -23,8 +23,6 @@ class TestGameController < ApplicationController
         @game.start
         @game.save
 
-        #@game.refresh_player_tiles
-
         # REDIRECT TO START GAME
         redirect_to "/testContinue"
     end

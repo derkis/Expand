@@ -35,7 +35,7 @@ class Game < ActiveRecord::Base
 
   def debug_mode
     self.players.each do |p|
-      return true if p.id == 1
+      return true if p.user_id == 1
     end
 
     return false
@@ -45,6 +45,14 @@ class Game < ActiveRecord::Base
     self.status ||= PROPOSED
   end
   
+  def next_turn
+     turn = current_turn.clone_next_turn
+     nextPlayerIX = current_turn.player.index + 1 % self.players.count
+     current_turn.player_id = self.players.find_by_index(nextPlayerIX).id
+     turn_id = turn.id
+     turn
+  end
+
   def set_proposing_player
     self.players.each do |player|
       if self.proposing_player == player.user_id
@@ -60,16 +68,25 @@ class Game < ActiveRecord::Base
   end
   
   def start
+    # Assign player indexes
+    self.players.each_with_index do |p, i|
+      p.index = i
+    end
+
     self.status ||= STARTED
     self.template_id ||= 1
     self.template.save
     self.save
     self.turn_id ||= Turn.create_first_turn_for(self, random_player_id).id
-    # self.save
+    self.save
   end
 
   def board_area
     template.height * template.width
+  end
+
+  def piece_index(row, column)
+    row * template.width + column
   end
 
   def random_player_id
@@ -77,8 +94,8 @@ class Game < ActiveRecord::Base
   end
 
   def valid_action
+    return :code => Turn::Type[:place_piece][:code] if debug_mode
     return :code => Turn::Type[:place_piece][:code] if current_user.id == current_turn.player.user.id
-    return :code => Turn::Type[:debug][:code] if debug_mode
     return :code => Turn::Type[:no_action][:code]
   end
 
