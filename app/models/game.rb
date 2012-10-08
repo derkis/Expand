@@ -33,6 +33,10 @@ class Game < ActiveRecord::Base
     Turn.find(self.turn_id)
   end
 
+  def current_player_index
+    current_turn.player.index
+  end
+
   def debug_mode
     self.players.each do |p|
       return true if p.user_id == 1
@@ -47,9 +51,10 @@ class Game < ActiveRecord::Base
   
   def next_turn
      turn = current_turn.clone_next_turn
-     nextPlayerIX = current_turn.player.index + 1 % self.players.count
-     current_turn.player_id = self.players.find_by_index(nextPlayerIX).id
+     nextPlayerIX = (current_turn.player.index + 1) % self.players.count
+     current_turn.update_attributes(:player_id => self.players.find_by_index(nextPlayerIX).id)
      turn_id = turn.id
+     save!
      turn
   end
 

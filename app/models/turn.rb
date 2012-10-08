@@ -85,9 +85,8 @@ class Turn < ActiveRecord::Base
 	end
 
 	def place_piece_for (row, column, player)
-		updated_board = self.board # TODO: get correct hotel character # self.game.player_index_for(player.user).chr
-		updated_board[self.game.piece_index(row, column)] = 'u'
-		self.board = updated_board
-		save!
+		new_board = self.board.dup
+		new_board[self.game.piece_index(row, column)] = 'u'
+		update_attributes(:board => new_board)
 	end
 end

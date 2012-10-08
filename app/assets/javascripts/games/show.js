@@ -1,3 +1,5 @@
+player_index = -1;
+
 Number.prototype.to_char = function() {
     return String.fromCharCode(this);
 }
@@ -105,6 +107,7 @@ function fetch_game_state() {
             turn_button.removeAttr('disabled');
         else turn_button.attr('disabled', 'disabled');
 
+        player_index = game_state.current_player_index.toString()
         current_turn_type.render();
         render_board(game_state.current_turn.board, game_state.template.width, game_state.template.height);
         render_players(game_state.current_turn);
@@ -121,9 +124,9 @@ function send_game_update(action) {
         data: JSON.stringify(json_update), 
         contentType: 'application/json',                  
         dataType: 'json',                                  
-        success: function(response) {                          
-            console.log('game update');
-            console.log(repsonse);
+        success: function(response)
+        {
+            fetch_game_state();
         }
     });     
 }
@@ -195,7 +198,13 @@ function render_merge_order_turn() {
 
 }
 
+function reset_game() {
+    send_game_update({ 'turn_type' : 'reset' });
+}
+
 function render_board(board, num_columns, num_rows) {
+    $('.debug_string').text(board);
+
     var row = 0, column = 0;
     for(var cell_index=0 ; cell_index < board.length ; cell_index++) {    
         var cell_id = '#cell_' + row + '_' + column;
@@ -208,24 +217,28 @@ function render_board(board, num_columns, num_rows) {
 }
 
 function render_cell(cell, cell_type, row, column) {
-    var player_index = $('#game').attr('player_index');
+    cell.removeClass('empty');
+    cell.removeClass('enabled');
+    cell.removeClass('no_hotel');
+    cell.removeClass('selected');
+    cell.text((65 + row).to_char() + (column+1));
     switch(cell_type) {
         case 'e': // empty cell
-            cell.text((65 + row).to_char() + (column+1));
             cell.addClass('empty')
             break;
         case 'u':
             cell.addClass('no_hotel');
-
+            break;
         case player_index:
-            cell.text(cell_type);
             cell.addClass('enabled');
+            break;
         default:
             cell.text(cell_type);
     }
 }
 
 function render_players(current_turn) {
+    $('.player').removeClass('current_player');
     $('.player[player_id=' + current_turn.player_id + ']').addClass('current_player');
 }
 

@@ -34,7 +34,7 @@ class GamesController < ApplicationController
   def update
     @game = Game.find(params[:id])
     if(params[:game][:turn])
-      Engine.interpret_turn(@game, params[:game][:turn])
+      Engine.interpret_turn(@game, params[:game][:turn], self)
     else
       @game.update_attributes(params[:game])
     end
@@ -60,7 +60,7 @@ class GamesController < ApplicationController
       format.json do
         render :json => @game.to_json(
           :include => :template, 
-          :methods => [ :current_turn, :valid_action, :debug_mode ]
+          :methods => [ :current_turn, :valid_action, :debug_mode, :current_player_index ]
         )
       end
     end
