@@ -17,7 +17,8 @@
     font-family: Pixel, cursive;
     font-size: 20px;
     color: #a66c5a;
-    background: #464646; }
+    background: #464646;
+    padding: 0.5em; }
   .wrapper .board {
     display: table;
     margin: 0 auto; }
@@ -54,6 +55,24 @@
         .wrapper .board .row .selected:hover {
           border-color: #fff;
           background: #f09b46; }
+  .wrapper .message {
+    position: absolute;
+    margin-top: 1em;
+    padding: 0.5em;
+    right: 0em;
+    left: 0em;
+    background: #464646;
+    font-family: Pixel, cursive;
+    font-size: 12px;
+    color: black;
+    text-align: center;
+    vertical-align: middle;
+    border: 1em dotted #707070;
+    color: white; }
+    .wrapper .message .buttons {
+      position: absolute;
+      top: 0em;
+      right: 1em; }
   .wrapper .players {
     position: absolute;
     top: 10px;

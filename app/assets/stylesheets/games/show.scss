@@ -16,6 +16,7 @@ $cell_height: 50px;
 	.turn_label {
 		@include pixel_font($font_size_title, $font_color_title);
 		background: $dark_background;
+		padding: 0.5em;
 	}
 
 	.board {
@@ -68,6 +69,27 @@ $cell_height: 50px;
 				}
 			}
 		}
+
+	}
+
+	.message {
+		position: absolute;
+		margin-top: 1em;
+		padding: 0.5em;
+		right: 0em;
+		left: 0em;
+		background: $dark_background;
+		@include pixel_font($font_size_std, $font_color_cell_border);
+		text-align:center;
+		vertical-align:middle;
+		border: 1em dotted $light_background;
+		color: white;
+
+		.buttons {
+			position: absolute;
+			top:0em;
+			right:1em;
+		}
 	}
 
 	.players {
@@ -88,10 +110,7 @@ $cell_height: 50px;
 		.current_player {
 			color: $font_color_link;
 		}
-
 	}
-
-
 }
 
 
