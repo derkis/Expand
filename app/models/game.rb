@@ -17,7 +17,7 @@ class Game < ActiveRecord::Base
 
   # ACCESSORS
   attr_accessor :current_user # wat
-  attr_accessible :players, :players_attributes, :status, :proposing_player, :template
+  attr_accessible :players, :players_attributes, :status, :proposing_player, :template, :turn_id
   accepts_nested_attributes_for :players, :allow_destroy => true
 
   # VALIDATIONS
@@ -50,12 +50,16 @@ class Game < ActiveRecord::Base
   end
   
   def next_turn
-     turn = current_turn.clone_next_turn
-     nextPlayerIX = (current_turn.player.index + 1) % self.players.count
-     current_turn.update_attributes(:player_id => self.players.find_by_index(nextPlayerIX).id)
-     turn_id = turn.id
-     save!
-     turn
+    nextPlayerIX = (current_turn.player.index + 1) % self.players.count
+
+    turn = current_turn.clone_next_turn
+
+    # Update ourself to the next turn
+    self.update_attributes(:turn_id => turn.id)
+
+    # Update the new current_turn to the latest player id
+    current_turn.update_attributes(:player_id => self.players.find_by_index(nextPlayerIX).id)
+    turn
   end
 
   def set_proposing_player

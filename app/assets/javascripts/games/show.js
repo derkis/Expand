@@ -111,6 +111,7 @@ function fetch_game_state() {
         current_turn_type.render();
         render_board(game_state.current_turn.board, game_state.template.width, game_state.template.height);
         render_players(game_state.current_turn);
+        render_metadata(game_state);
     });
 }
 
@@ -200,6 +201,10 @@ function render_merge_order_turn() {
 
 function reset_game() {
     send_game_update({ 'turn_type' : 'reset' });
+}
+
+function render_metadata(game_state) {
+    $('.turn_label').text("Turn: " + game_state.current_turn.number);
 }
 
 function render_board(board, num_columns, num_rows) {
