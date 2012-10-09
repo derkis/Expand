@@ -1,7 +1,11 @@
-module GamesWebservices
+require 'games_queries'
+
+module GamesServices
   
+  include GamesQueries
+
   def proposed_games
-    proposed_games = Game.get_proposed_games_for(current_user)
+    proposed_games = GamesQueries.get_proposed_games_for(current_user)
     respond_to do |format|
       format.json { render :json => proposed_games.to_json }
       format.all { not_found() }
@@ -9,7 +13,7 @@ module GamesWebservices
   end
 
   def ready_games
-    ready_game = Game.get_ready_game_for(current_user)
+    ready_game = GamesQueries.get_ready_game_for(current_user)
     respond_to do |format|
       format.json { render :json => ready_game.to_json }
       format.all { not_found() }
@@ -17,7 +21,7 @@ module GamesWebservices
   end
   
   def started_games
-    started_game = Game.get_started_game_for(current_user)
+    started_game = GamesQueries.get_started_game_for(current_user)
     respond_to do |format|
       format.json { render :json => (started_game) ? started_game.id.to_json : nil.to_json }
       format.all { not_found() }

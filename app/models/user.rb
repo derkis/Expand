@@ -20,36 +20,37 @@
 
 class User < ActiveRecord::Base
   
-  before_create :create_defaults
-  
+  # ACTIVE RECORD CALLBACKS
+  before_create :set_create_defaults
+
+  # RELATIONSHIPS
   has_many :players
   has_many :games, :through => :players
   
+  # DEVISE OPTIONS
   # :token_authenticatable, :encryptable, :confirmable, :lockable, :timeoutable and :omniauthable
   devise :database_authenticatable, :registerable, :recoverable, 
     :trackable, :validatable, :timeoutable
 
+  # PUBLIC PROPERTIES
   attr_accessible :email, :password, :password_confirmation, :remember_me
   
-  def create_defaults
+  def set_create_defaults
     self.last_request_at ||= Time.now
   end
-  
-  # convenience methods
+
   def can_create_game?
     ActiveRecord::Base.connection.execute(
-      "SELECT g.id AS game_id FROM games g, players p 
+      "SELECT g.id AS game_id 
+        FROM games g, players p 
         WHERE g.id = p.game_id AND g.proposing_player = p.id AND g.status = #{Game::PROPOSED} AND p.user_id = #{self.id}"
     ).empty?
   end
   
   def can_view_game?(game_id)
-    !Player.includes([:game]).first(:conditions => ['game_id = ? AND user_id = ?', game_id, self.id]).nil?
-  end
-  
-  # queries
-  def get_other_users_since(time)
-    User.all(:conditions => [ "last_request_at > ? AND NOT email = ?", time, self.email ], :order => :id)
+    !Player.includes([:game]).first(
+      :conditions => ['game_id = ? AND user_id = ?', game_id, self.id]
+    ).nil?
   end
   
 end

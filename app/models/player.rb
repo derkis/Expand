@@ -13,7 +13,7 @@
 
 class Player < ActiveRecord::Base
   
-  after_create :create_defaults
+  after_create :set_create_defaults
 
   belongs_to :user
   belongs_to :game
@@ -25,7 +25,7 @@ class Player < ActiveRecord::Base
     game.current_turn.player_id == id
   end
   
-  def create_defaults
+  def set_create_defaults
     self.accepted ||= false
   end
 

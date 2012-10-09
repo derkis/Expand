@@ -1,8 +1,8 @@
-require 'sessions_webservices'
+require 'users_services'
 
 class SessionsController < Devise::SessionsController
   
-  include SessionsWebservices
+  include UsersServices
   
   prepend_before_filter :min_last_request_at, :only => :destroy
 

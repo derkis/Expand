@@ -1,11 +1,11 @@
-require 'games_webservices'
+require 'games_services'
 require 'games_tests'
 require 'games_helper'
 require 'engine'
 
 class GamesController < ApplicationController
   
-  include GamesWebservices
+  include GamesServices
   include GamesHelper
   include GamesTests
   
@@ -18,7 +18,7 @@ class GamesController < ApplicationController
     @title = 'portal'
     @game = Game.new
     @game.players.build
-    @online_users = current_user.get_other_users_since(15.minutes.ago)
+    @online_users = UsersQueries.users_online_for_current_user_since(15.minutes.ago, current_user)
   end
   
   def create
