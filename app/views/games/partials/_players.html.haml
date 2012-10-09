@@ -2,7 +2,3 @@
 	- @game.players.each_with_index do |player, i|
 		.player{ :player_id => player.id }
 			= player.user[:email]
-			.player_info
-				- tiles = find_tiles_for i, @game.current_turn.board
-				- tiles.each do |t|
-					= tile_ix_to_name(t, @game.template)

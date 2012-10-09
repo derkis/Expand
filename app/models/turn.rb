@@ -62,14 +62,18 @@ class Turn < ActiveRecord::Base
 
 		unused_tiles = find_unused_tile_indices.shuffle!
 
+		newBoard = self.board.dup;
+
 		self.game.players.each_with_index do |p, pid|
 			while tile_counts[pid] < game.template.tile_count  
 				ix = unused_tiles.pop
 				puts ix.to_s
-				self.board[ix] = pid.to_s
+				newBoard[ix] = pid.to_s
 				tile_counts[pid] += 1
 			end
 		end
+
+		self.board = newBoard;
 	end
 
 	# returns a single random unused tile index

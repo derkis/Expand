@@ -32,6 +32,8 @@ module Engine
 			return lambda do |current_turn, turn_action, controller|
 				row, column = turn_action['row'], turn_action['column']
 				current_turn.place_piece_for(row, column, current_turn.player)
+				current_turn.refresh_player_tiles
+				current_turn.save
 			end 
 		
 		when :start_company

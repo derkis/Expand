@@ -232,8 +232,6 @@ function render_cell(cell, cell_type, row, column) {
         case player_index:
             cell.addClass('enabled');
             break;
-        default:
-            cell.text(cell_type);
     }
 }
 
