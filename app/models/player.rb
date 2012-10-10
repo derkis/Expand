@@ -9,6 +9,7 @@
 #  user_id    :integer
 #  accepted   :boolean
 #  tiles      :string(255)
+#  index      :integer
 #
 
 class Player < ActiveRecord::Base

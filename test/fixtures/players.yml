@@ -9,6 +9,7 @@
 #  user_id    :integer
 #  accepted   :boolean
 #  tiles      :string(255)
+#  index      :integer
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html

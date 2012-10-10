@@ -1,5 +1,23 @@
+# == Schema Information
+#
+# Table name: games
+#
+#  id               :integer         not null, primary key
+#  created_at       :datetime        not null
+#  updated_at       :datetime        not null
+#  status           :integer
+#  template_id      :integer
+#  proposing_player :integer
+#  turn_id          :integer
+#
+
+require 'expand_serialize'
+
 class Game < ActiveRecord::Base
-  
+
+  # MIXINS
+  include ExpandSerialize
+
   # ACTIVE RECORD CALLBACKS
   before_validation :set_default_status, :on => :create
   after_commit :set_proposing_player, :on => :create
@@ -15,7 +33,6 @@ class Game < ActiveRecord::Base
   belongs_to :template
 
   # ACCESSORS
-  attr_accessor :current_user # wat
   attr_accessible :players, :players_attributes, :status, :proposing_player, :template, :turn_id
   accepts_nested_attributes_for :players, :allow_destroy => true
 
@@ -30,6 +47,10 @@ class Game < ActiveRecord::Base
   # METHODS
   def current_turn
     Turn.find(self.turn_id)
+  end
+
+  def current_turn=(turn)
+    self.update_attributes(:turn_id => turn.id)
   end
 
   def current_player_index
@@ -54,7 +75,8 @@ class Game < ActiveRecord::Base
     turn = current_turn.clone_next_turn
 
     # Update ourself to the next turn
-    self.update_attributes(:turn_id => turn.id)
+    current_turn = turn
+    # self.update_attributes(:turn_id => turn.id)
 
     # Update the new current_turn to the latest player id
     current_turn.update_attributes(:player_id => self.players.find_by_index(nextPlayerIX).id)
@@ -101,15 +123,25 @@ class Game < ActiveRecord::Base
     self.players.shuffle.first.id
   end
 
-  def valid_action
+  def valid_action(user)
     return :code => Turn::Type[:place_piece][:code] if debug_mode
-    return :code => Turn::Type[:place_piece][:code] if current_user.id == current_turn.player.user.id
+    return :code => Turn::Type[:place_piece][:code] if user.id == current_turn.player.user.id
     return :code => Turn::Type[:no_action][:code]
   end
 
   def player_index_for(current_user)
     self.players.each_with_index do |player, index|
       return index if player.user_id == current_user.id
+    end
+  end
+
+  def board_array
+    linear_index = 0
+    Array.new(self.template.height){ Array.new }.each do |row_array|
+      self.template.width.times do |column|
+        row_array[column] = self.current_turn.board[linear_index]
+        linear_index += 1
+      end
     end
   end
 

@@ -16,7 +16,7 @@ module Expand
     # -- all .rb files in that directory are automatically loaded.
 
     # Custom directories with classes and modules you want to be autoloadable.
-    config.autoload_paths += %W(#{config.root}/app/services #{config.root}/app/services/queries #{config.root}/app/controllers/tests #{config.root}/lib/engine)
+    config.autoload_paths += %W(#{config.root}/app/services #{config.root}/app/services/queries #{config.root}/app/controllers/tests #{config.root}/lib/engine #{config.root}/lib)
 
     # Only load the plugins named here, in the order given (default is alphabetical).
     # :all can be used as a placeholder for all plugins not explicitly named.

@@ -48,21 +48,24 @@ class GamesController < ApplicationController
   def show
     @game = Game.find(params[:id])
     @player_index = @game.player_index_for(current_user)
-    @game.current_user = current_user
 
     respond_to do |format|
       
       format.html do
         @title = 'game'
-        @board = get_board_array_from_game(@game)
+        @board = @game.board_array
       end
 
       format.json do
-        render :json => @game.to_json(
+        render :json => @game.build_json({
           :include => :template, 
-          :methods => [ :current_turn, :valid_action, :debug_mode, :current_player_index ]
-        )
+          :methods => [ 
+            :current_turn, :debug_mode, :current_player_index, 
+            { :name => :valid_action, :arguments => [current_user] }
+          ]
+        })
       end
+      
     end
   end
 end

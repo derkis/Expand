@@ -9,6 +9,7 @@
 #  user_id    :integer
 #  accepted   :boolean
 #  tiles      :string(255)
+#  index      :integer
 #
 
 require 'test_helper'
