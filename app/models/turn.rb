@@ -15,7 +15,7 @@
 
 class Turn < ActiveRecord::Base
 
-	# ASSOSCIATIONS
+	# ASSOCIATIONS
 	belongs_to :game
 	belongs_to :player
 
@@ -39,8 +39,21 @@ class Turn < ActiveRecord::Base
 		turn.number = 0,
 		turn.board = 'e' * game.board_area
 		turn.refresh_player_tiles
+
+		# Setup money and companies
+		data = Hash.new({})
+
+		game.players.each_with_index do |p, i|
+	      data[i] = {:stock_count => [0,0,0,0,0,0], :money => 1500}
+	    end
+
+	    turn.data = ActiveSupport::JSON.encode(data)
 		turn.save!
 		turn
+	end
+
+	def data_object
+		ActiveSupport::JSON.decode(data)
 	end
 
 	def clone_next_turn()

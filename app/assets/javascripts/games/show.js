@@ -226,11 +226,6 @@ function reset_game()
     send_game_update({ 'turn_type' : 'reset' });
 }
 
-function render_metadata(game_state)
-{
-    $('.turn_label').text("Turn: " + game_state.current_turn.number);
-}
-
 function render_board(board, num_columns, num_rows)
 {
     $('.debug_string').text(board);
@@ -264,6 +259,12 @@ function render_cell(cell, cell_type, row, column)
             cell.addClass('enabled');
             break;
     }
+}
+
+function render_status(game_state)
+{
+    $('.turn_label').text("Turn: " + game_state.current_turn.number);
+    $('.money').text("$" + game_state.data_for_user["money"]);
 }
 
 function render_players(current_turn)
@@ -365,7 +366,7 @@ function fetch_game_state_resultHandler(game_state)
     current_turn_type.render();
     render_board(game_state.current_turn.board, game_state.template.width, game_state.template.height);
     render_players(game_state.current_turn);
-    render_metadata(game_state);
+    render_status(game_state);
 }
 
 function document_readyHandler()

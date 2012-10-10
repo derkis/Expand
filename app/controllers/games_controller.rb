@@ -60,12 +60,12 @@ class GamesController < ApplicationController
         render :json => @game.build_json({
           :include => :template, 
           :methods => [ 
-            :current_turn, :debug_mode, :current_player_index, 
+            :current_turn, :debug_mode, :current_player_index,
+            { :name => :data_for_user, :arguments => [current_user] },
             { :name => :valid_action, :arguments => [current_user] }
           ]
         })
       end
-      
     end
   end
 end

@@ -69,6 +69,11 @@ class Game < ActiveRecord::Base
     self.status ||= PROPOSED
   end
   
+  def data_for_user(current_user)
+    datasan = current_turn.data_object
+    datasan[player_index_for(current_user).to_s]
+  end
+
   def next_turn
     nextPlayerIX = (current_turn.player.index + 1) % self.players.count
 
