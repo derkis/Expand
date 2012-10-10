@@ -32,21 +32,28 @@ class Turn < ActiveRecord::Base
 		:merge_order    => { :code => 500 }
 	}
 
- 	# METHODS
+ 	# CREATION
 	# creates the first turn given a game and a starting player id.
 	def self.create_first_turn_for(game, starting_player_id)
-		turn = Turn.new({ :game_id => game.id, :player_id => starting_player_id })
-		turn.number = 0,
-		turn.board = 'e' * game.board_area
+		turn = Turn.new({
+			:number => 0,
+			:game_id => game.id, 
+			:player_id => starting_player_id,  
+			:board => 'e' * game.board_area 
+		})
+
 		turn.refresh_player_tiles
-		turn.save!
-		turn
+		turn if turn.save!
 	end
 
-	def clone_next_turn()
-		turn = Turn.new({ :game_id => game_id, :player_id => player_id, :number => number + 1, :board => board })
-		turn.save!
-		turn
+	# creates subsequent turn from the this turn
+	def create_next_turn_with_player(player)
+		Turn.create({ 
+			:number => number + 1, 
+			:game_id => self.game_id, 
+			:player_id => player.id, 
+			:board => self.board 
+		})
 	end
 
 	# redistributes all the player tiles until each player has the game allotted amount
@@ -76,7 +83,6 @@ class Turn < ActiveRecord::Base
 		self.board = newBoard;
 	end
 
-	# returns a single random unused tile index
 	def get_random_unused_tile
 		find_unused_tile_indices.shuffle!.pop
 	end

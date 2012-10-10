@@ -11,12 +11,14 @@
 #  turn_id          :integer
 #
 
-require 'expand_serialize'
+require 'expand_serializer'
+require 'game_serialization'
 
 class Game < ActiveRecord::Base
 
   # MIXINS
-  include ExpandSerialize
+  include ExpandSerializer
+  include GameSerialization
 
   # ACTIVE RECORD CALLBACKS
   before_validation :set_default_status, :on => :create
@@ -54,7 +56,7 @@ class Game < ActiveRecord::Base
   end
 
   def current_player_index
-    current_turn.player.index
+    self.current_turn.player.index
   end
 
   def debug_mode
@@ -69,18 +71,10 @@ class Game < ActiveRecord::Base
     self.status ||= PROPOSED
   end
   
-  def next_turn
-    nextPlayerIX = (current_turn.player.index + 1) % self.players.count
-
-    turn = current_turn.clone_next_turn
-
-    # Update ourself to the next turn
-    current_turn = turn
-    # self.update_attributes(:turn_id => turn.id)
-
-    # Update the new current_turn to the latest player id
-    current_turn.update_attributes(:player_id => self.players.find_by_index(nextPlayerIX).id)
-    turn
+  def advance_turn
+    next_player_index = (self.current_turn.player.index + 1) % self.players.count
+    next_player = self.players.find_by_index(next_player_index)
+    self.current_turn = self.current_turn.create_next_turn_with_player(next_player)
   end
 
   def set_proposing_player
@@ -105,8 +99,10 @@ class Game < ActiveRecord::Base
 
     self.status ||= STARTED
     self.template_id ||= 1
-    self.template.save
+    self.template.save # ?
     self.save
+
+    binding.pry
     self.turn_id ||= Turn.create_first_turn_for(self, random_player_id).id
     self.save
   end
@@ -121,18 +117,6 @@ class Game < ActiveRecord::Base
 
   def random_player_id
     self.players.shuffle.first.id
-  end
-
-  def valid_action(user)
-    return :code => Turn::Type[:place_piece][:code] if debug_mode
-    return :code => Turn::Type[:place_piece][:code] if user.id == current_turn.player.user.id
-    return :code => Turn::Type[:no_action][:code]
-  end
-
-  def player_index_for(current_user)
-    self.players.each_with_index do |player, index|
-      return index if player.user_id == current_user.id
-    end
   end
 
   def board_array

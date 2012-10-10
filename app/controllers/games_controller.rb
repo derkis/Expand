@@ -53,7 +53,7 @@ class GamesController < ApplicationController
       
       format.html do
         @title = 'game'
-        @board = @game.board_array
+        @board = @game.board_array # this should happen client side
       end
 
       format.json do
@@ -61,11 +61,12 @@ class GamesController < ApplicationController
           :include => :template, 
           :methods => [ 
             :current_turn, :debug_mode, :current_player_index, 
-            { :name => :valid_action, :arguments => [current_user] }
+            { :name => :valid_action, :arguments => [current_user] },
+            { :name => :player_index_for, :arguments => [current_user] }
           ]
         })
       end
-      
+
     end
   end
 end

@@ -7,7 +7,7 @@ module Engine
 		game.current_turn.save!
 
 		# 2) Shift game to new turn, which will update current_turn to the new one
-		game.next_turn
+		game.advance_turn
 
 		# 3) Now modify the current_turn
 		operation = Engine.operation_for_turn_type(turn_action['turn_type'].intern)
