@@ -49,6 +49,8 @@
         .wrapper .board .row .enabled:hover {
           border-color: #fff;
           background: #db7556; }
+      .wrapper .board .row .adjacent {
+        background: #db7556; }
       .wrapper .board .row .selected {
         background: #f09b46;
         color: white; }

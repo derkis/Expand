@@ -60,6 +60,10 @@ $cell_height: 50px;
 				}
 			}
 
+			.adjacent {
+				background: $primary_color_highlight;
+			}
+
 			.selected {
 				background: $primary_color_selection;
 				color: $font_color_cell_enabled;
