@@ -6,11 +6,10 @@ module Engine
 		game.current_turn.action = turn_action
 		game.current_turn.save!
 
-		# 2) Get the operation that needs to be run based upon the action that was received
 		operation = Engine.operation_for_turn_type(turn_action['turn_type'].intern)
 
 		# 3) Run the operation and Shift game to new turn, if the operation returns true
-		game.next_turn if operation.call(game.current_turn, turn_action, controller)
+		game.advance_turn if operation.call(game.current_turn, turn_action, controller)
 	end
 
 	def self.operation_for_turn_type(key)
@@ -33,7 +32,6 @@ module Engine
 				ret = current_turn.place_piece_for(row, column, current_turn.player)
 
 				if ret == "CREATE_COMPANY"
-					binding.pry
 					current_turn.updateAttributes(:action => ActiveSupport::JSON.encode(
 						{:place => {:row => row, :column => column},
 						 :start_company => true}))

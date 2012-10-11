@@ -1,4 +1,4 @@
-module ExpandSerialize
+module ExpandSerializer
 
 	def build_json(options = {})
 		methods_with_arguments = Array.new

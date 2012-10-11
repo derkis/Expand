@@ -23,8 +23,7 @@ class GamesController < ApplicationController
   
   def create
     if(current_user.can_create_game?)
-      @game = Game.new(params[:game])
-      @game.save
+      @game = Game.create(params[:game])
     else
       logger.debug("You've already proposed a game") # TODO: this needs to be handled somehow
     end
@@ -53,15 +52,16 @@ class GamesController < ApplicationController
       
       format.html do
         @title = 'game'
-        @board = @game.board_array
+        @board = @game.board_array # this should happen client side
       end
 
       format.json do
         render :json => @game.build_json({
           :include => :template, 
-          :methods => [ 
+          :methods => [
             :current_turn, :debug_mode, :current_player_index, :last_action,
             { :name => :cur_data, :arguments => [current_user] },
+            { :name => :player_index_for, :arguments => [current_user] },
             { :name => :valid_action, :arguments => [current_user] }
           ]
         })
