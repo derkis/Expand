@@ -13,10 +13,14 @@ $cell_height: 50px;
 	width: 70em; height: 35em;
 	margin: 0 auto;
 
-	.turn_label {
+	.turn_label, .money {
 		@include pixel_font($font_size_title, $font_color_title);
 		background: $dark_background;
 		padding: 0.5em;
+	}
+
+	.turn_label {
+		float: left;
 	}
 
 	.board {
@@ -72,11 +76,20 @@ $cell_height: 50px;
 					background: $primary_color_selection;
 				}
 			}
+
+			.highlighted {
+				background: $primary_color_highlight;
+				color: $font_color_cell_enabled;
+				&:hover {
+					border-color: #fff;
+					background: $primary_color_highlight;
+				}
+			}
 		}
 
 	}
 
-	.message {
+	.footer {
 		position: absolute;
 		margin-top: 1em;
 		padding: 0.5em;

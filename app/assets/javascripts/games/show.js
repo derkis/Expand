@@ -33,6 +33,7 @@ var player_index = -1;
 var current_turn_type;
 var selected_cell;
 var cur_game_state;
+var message_temp = null;
 
 //------------------------------------------------------------------------------------------
 //
@@ -65,14 +66,13 @@ var TURN_TYPES = {
     
     NO_ACTION: { 
         code: 000,
-        name: 'no_action',
-        render: render_no_action_turn 
+        name: 'no_action'
     },
     
     PLACE_PIECE: { 
         code: 100,
         name: 'place_piece',
-        render: render_place_piece_turn, 
+        message: "Please choose where to place your tile and then click Input",
         build_action: function() {
             return { 
                 'row': selected_cell.attr('row').to_int(), 
@@ -84,29 +84,22 @@ var TURN_TYPES = {
     START_COMPANY: { 
         code: 200, 
         name: 'start_company',
-        render: render_start_company_turn, 
-        build_action: build_start_company_action 
+        message: "Please choose a company to start"
     },
     
     PURCHASE_STOCK: { 
         code: 300,
-        name: 'purchase_stock', 
-        render: render_purchase_stock_turn, 
-        build_action: build_purchase_stock_action 
+        name: 'purchase_stock'
     },
     
     TRADE_STOCK: { 
         code: 400,
-        name: 'trade_stock', 
-        render: render_trade_stock_turn, 
-        action_builder: build_trade_stock_action 
+        name: 'trade_stock'
     },
     
     MERGE_ORDER: { 
         code: 500,
-        name: 'merge_order', 
-        render: render_merge_order_turn, 
-        action_builder: build_merge_order_action 
+        name: 'merge_order'
     }
 };
 
@@ -153,77 +146,22 @@ function create_action_and_send_game_update()
     send_game_update(action)
 }
 
-function build_start_company_action()
-{
-    // create_action_and_send_game_update(
-    //     TURN_TYPES.CHOOSE_COMPANY,
-    //     { 'company': company }
-    // );
-}
-
-function build_purchase_stock_action()
-{
-    // create_action_and_send_game_update(
-    //     TURN_TYPES.PURCHASE_STOCK,
-    //     { 'purchases': purchases }
-    // );
-}
-
-function build_trade_stock_action()
-{
-    // create_action_and_send_game_update(
-    //     TURN_TYPES.TRADE_STOCK,
-    //     { 'trades': trades }
-    // );
-}
-
-function build_merge_order_action()
-{
-    // create_action_and_send_game_update(
-    //     TURN_TYPES.MERGE_ORDER,
-    //     { 'merge_order': merge_order }
-    // );
-}
-
-// board rendering helpers
-
-function render_no_action_turn()
-{
-    console.log('render no action');
-}
-
-function render_place_piece_turn()
-{
-    console.log('render place piece');
-    // send_place_piece_action(
-    //     parseInt(cell.attr('row')), 
-    //     parseInt(cell.attr('column'))
-    // );
-}
-
-function render_start_company_turn()
-{
-
-}
-
-function render_purchase_stock_turn()
-{
-
-}
-
-function render_trade_stock_turn()
-{
-
-}
-
-function render_merge_order_turn()
-{
-
-}
-
 function reset_game()
 {
     send_game_update({ 'turn_type' : 'reset' });
+}
+
+function render_all(game_state)
+{
+    render_board(game_state.current_turn.board, game_state.template.width, game_state.template.height);
+    render_players(game_state.current_turn);
+    render_status(game_state);
+    render_message();
+
+    if (current_turn_type == TYPE.START_COMPANY)
+    {
+        current_turn_type.render
+    }
 }
 
 function render_board(board, num_columns, num_rows)
@@ -264,7 +202,7 @@ function render_cell(cell, cell_type, row, column)
 function render_status(game_state)
 {
     $('.turn_label').text("Turn: " + game_state.current_turn.number);
-    $('.money').text("$" + game_state.data_for_user["money"]);
+    $('.money').text("$" + game_state.cur_data["money"]);
 }
 
 function render_players(current_turn)
@@ -273,12 +211,38 @@ function render_players(current_turn)
     $('.player[player_id=' + current_turn.player_id + ']').addClass('current_player');
 }
 
+function render_message()
+{
+    var msg = current_turn_type.message;
+
+    if (message_temp)
+    {
+        msg = message_temp;
+    }
+
+    $(".message").text(msg);
+}
+
+function render_start_company_at(row, column)
+{
+    var cell = get_call_at(row, column);
+
+    adjacents = get_adjacent_cells(cell, ["no_hotel"]);
+
+    for (key in adjacent_cells)
+    {
+        can_create_company = true;
+
+        adjacent_cells[key].addClass('highlighted');
+    }
+}
+
 function player_can_act()
 {
     return current_turn_type != TURN_TYPES.NO_ACTION;
 }
 
-function get_cell_at(row, column)
+function get_cell_char_at(row, column)
 {
     return cur_game_state.current_turn.board.chartAt(row * cur_game_state.template.width + column)
 }
@@ -362,11 +326,14 @@ function fetch_game_state_resultHandler(game_state)
         turn_button.attr('disabled', 'disabled');
     }
 
-    player_index = game_state.current_player_index.toString()
-    current_turn_type.render();
-    render_board(game_state.current_turn.board, game_state.template.width, game_state.template.height);
-    render_players(game_state.current_turn);
-    render_status(game_state);
+    player_index = game_state.current_player_index.toString();
+
+    render_all(game_state);
+
+    if (game_state.current_turn.action.start_company)
+    {
+        render_start_company_at(game_state.current_turn.place.row, game_state.current_turn.place.column);
+    }
 }
 
 function document_readyHandler()
@@ -403,18 +370,30 @@ function cell_hoverOverHandler(click_event)
 {
     var cell = click_event.currentTarget;
 
-    if(!player_can_act() || !hasClass(cell, "enabled"))
+    if (current_turn_type == TURN_TYPES.PLACE_PIECE)
     {
-        return;
-    }
+        var can_create_company = false;
 
-    adjacent_cells = get_adjacent_cells(cell, ["no_hotel"]);
+        if(!player_can_act() || !hasClass(cell, "enabled"))
+        {
+            return;
+        }
 
-    for (key in adjacent_cells)
-    {
-        var cur_cell = adjacent_cells[key];
+        adjacent_cells = get_adjacent_cells(cell, ["no_hotel"]);
 
-        cur_cell.addClass('adjacent');
+        for (key in adjacent_cells)
+        {
+            can_create_company = true;
+
+            adjacent_cells[key].addClass('adjacent');
+        }
+
+        if (can_create_company)
+        {
+            message_temp = "Place here to create a new company.";
+
+            render_message();
+        }
     }
 }
 
@@ -422,18 +401,23 @@ function cell_hoverOutHandler(click_event)
 {
     var cell = click_event.currentTarget;
 
-    if(!player_can_act() || !hasClass(cell, "enabled"))
+    if (current_turn_type == TURN_TYPES.PLACE_PIECE)
     {
-        return;
-    }
+        if(!player_can_act() || !hasClass(cell, "enabled"))
+        {
+            return;
+        }
 
-    adjacent_cells = get_adjacent_cells(cell, ["no_hotel"]);
+        adjacent_cells = get_adjacent_cells(cell, ["no_hotel"]);
 
-    for (key in adjacent_cells)
-    {
-        var cur_cell = adjacent_cells[key];
+        for (key in adjacent_cells)
+        {
+            adjacent_cells[key].removeClass('adjacent');
+        }
 
-        cur_cell.removeClass('adjacent');
+        message_temp = null;
+
+        render_message();
     }
 }
 

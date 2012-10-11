@@ -69,22 +69,28 @@ class Game < ActiveRecord::Base
     self.status ||= PROPOSED
   end
   
-  def data_for_user(current_user)
-    datasan = current_turn.data_object
+  def cur_data(current_user)
+    datasan = self.current_turn.data_object
     datasan[player_index_for(current_user).to_s]
   end
 
+  def last_action()
+    if self.current_turn.action != nil
+      return ActiveSupport::JSON.decode(self.current_turn.action)
+    end
+    return nil
+  end
+
   def next_turn
-    nextPlayerIX = (current_turn.player.index + 1) % self.players.count
+    nextPlayerIX = (self.current_turn.player.index + 1) % self.players.count
 
     turn = current_turn.clone_next_turn
 
     # Update ourself to the next turn
-    current_turn = turn
-    # self.update_attributes(:turn_id => turn.id)
+    self.update_attributes(:turn_id => turn.id)
 
     # Update the new current_turn to the latest player id
-    current_turn.update_attributes(:player_id => self.players.find_by_index(nextPlayerIX).id)
+    self.current_turn.update_attributes(:player_id => self.players.find_by_index(nextPlayerIX).id)
     turn
   end
 
@@ -128,9 +134,13 @@ class Game < ActiveRecord::Base
     self.players.shuffle.first.id
   end
 
-  def valid_action(user)
-    return :code => Turn::Type[:place_piece][:code] if debug_mode
-    return :code => Turn::Type[:place_piece][:code] if user.id == current_turn.player.user.id
+  def valid_action(current_user)
+    if current_turn.is_starting_company
+      return :code => Turn::Type[:start_company][:code] if current_user.id == current_turn.player.user.id || debug_mode
+      return :code => Turn::Type[:no_action][:code]
+    end
+
+    return :code => Turn::Type[:place_piece][:code] if current_user.id == current_turn.player.user.id || debug_mode
     return :code => Turn::Type[:no_action][:code]
   end
 

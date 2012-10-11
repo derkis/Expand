@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121007201549) do
+ActiveRecord::Schema.define(:version => 20121010232631) do
 
   create_table "games", :force => true do |t|
     t.datetime "created_at",       :null => false
@@ -33,12 +33,13 @@ ActiveRecord::Schema.define(:version => 20121007201549) do
   end
 
   create_table "templates", :force => true do |t|
-    t.datetime "created_at",  :null => false
-    t.datetime "updated_at",  :null => false
+    t.datetime "created_at",    :null => false
+    t.datetime "updated_at",    :null => false
     t.integer  "width"
     t.integer  "height"
     t.integer  "stock_count"
     t.integer  "tile_count"
+    t.integer  "company_count"
   end
 
   create_table "turns", :force => true do |t|
@@ -50,6 +51,7 @@ ActiveRecord::Schema.define(:version => 20121007201549) do
     t.text     "action"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
+    t.integer  "state"
   end
 
   create_table "users", :force => true do |t|

@@ -11,6 +11,7 @@
 #  action     :text
 #  created_at :datetime        not null
 #  updated_at :datetime        not null
+#  state      :integer
 #
 
 require 'test_helper'

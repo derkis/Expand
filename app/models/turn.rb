@@ -14,13 +14,12 @@
 #
 
 class Turn < ActiveRecord::Base
-
 	# ASSOCIATIONS
 	belongs_to :game
 	belongs_to :player
 
  	# ATTRIBUTE ACCESSORS
-	attr_accessible :game_id, :player_id, :number, :board, :tiles
+	attr_accessible :game_id, :player_id, :number, :board, :tiles, :data
 
 	# CONSTANTS
 	Type = { 
@@ -40,6 +39,8 @@ class Turn < ActiveRecord::Base
 		turn.board = 'e' * game.board_area
 		turn.refresh_player_tiles
 
+		state = 
+
 		# Setup money and companies
 		data = Hash.new({})
 
@@ -57,7 +58,7 @@ class Turn < ActiveRecord::Base
 	end
 
 	def clone_next_turn()
-		turn = Turn.new({ :game_id => game_id, :player_id => player_id, :number => number + 1, :board => board })
+		turn = Turn.new({ :game_id => game_id, :player_id => player_id, :number => number + 1, :board => board, :data => data })
 		turn.save!
 		turn
 	end
@@ -101,9 +102,70 @@ class Turn < ActiveRecord::Base
 	  	tiles
 	end
 
+	# -----------------------------------------------------------------	
+	# Returns true if a player is starting a company this turn
+	# -----------------------------------------------------------------
+	def is_starting_company
+		if self.action != nil
+			act = ActiveSupport::JSON.decode(self.action)
+			return act["start_company"]
+		end
+		return nil
+	end
+
+	# -----------------------------------------------------------------
+	# Returns a Hash of the characters of the pieces adjacent to the 
+	# provided piece index. If a piece is next to the edge, that 
+	# location in the Hash is nil.
+	#
+	# Returns {0: LEFT, 1: RIGHT, 2: TOP, 3: BOTTOM}
+	# -----------------------------------------------------------------
+	def get_adjacent_pieces(piece_index)
+		pieces = Hash.new("e");
+
+		# Left
+		pieces[0] = piece_index % self.game.template.width != 0 ? board[piece_index - 1] : nil
+		# Right
+		pieces[1] = piece_index % self.game.template.width != self.game.template.width - 1 ? board[piece_index + 1] : nil
+		# Top
+		pieces[2] = piece_index >= self.game.template.width ? board[piece_index - self.game.template.width] : nil
+		# Bottom
+		pieces[3] = piece_index / self.game.template.width < self.game.template.height - 1 ? board[piece_index + - self.game.template.width] : nil
+
+		pieces
+	end
+
+	# -----------------------------------------------------------------
+	# Returns true if the tile has an adjacent tile that has been
+	# placed but is not part of a hotel chain.
+	# -----------------------------------------------------------------
+	def has_adjacent_no_hotel_tile(adjacent_pieces)
+		return true if adjacent_pieces[0] == "u"
+		return true if adjacent_pieces[1] == "u"
+		return true if adjacent_pieces[2] == "u"
+		return true if adjacent_pieces[3] == "u"
+		return false
+	end
+
+	# -----------------------------------------------------------------
+	# Places a piece on the board for this turn only.
+	#
+	# Returns "CREATE_COMPANY" if possible given the placed piece.
+	# -----------------------------------------------------------------
 	def place_piece_for (row, column, player)
+		ret = "NOTHING SPECIAL"
+
 		new_board = self.board.dup
-		new_board[self.game.piece_index(row, column)] = 'u'
-		update_attributes(:board => new_board)
+		piece_index = self.game.piece_index(row, column);
+		new_board[piece_index] = 'u'
+
+	 	# Check for new company creation
+	 	adjacents = get_adjacent_pieces(piece_index);
+
+	 	ret = "CREATE_COMPANY" if has_adjacent_no_hotel_tile(adjacents)
+
+	 	update_attributes(:board => new_board)
+
+	 	return ret
 	end
 end
