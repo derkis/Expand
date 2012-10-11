@@ -39,7 +39,7 @@ class Turn < ActiveRecord::Base
 			:number => 0,
 			:game_id => game.id, 
 			:player_id => starting_player_id,  
-			:board => 'e' * game.board_area 
+			:board => 'e' * game.template.board_area 
 		})
 
 		turn.refresh_player_tiles
@@ -94,7 +94,7 @@ class Turn < ActiveRecord::Base
 	  	tiles
 	end
 
-	def place_piece_for (row, column, player)
+	def place_piece_for(row, column, player)
 		new_board = self.board.dup
 		new_board[self.game.piece_index(row, column)] = 'u'
 		update_attributes(:board => new_board)

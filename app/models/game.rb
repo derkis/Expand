@@ -23,11 +23,17 @@ class Game < ActiveRecord::Base
   # ACTIVE RECORD CALLBACKS
   before_validation :set_default_status, :on => :create
   after_commit :set_proposing_player, :on => :create
-  before_update :before_update_handler
+  after_update :start_game_if_necessary
   
   # CONSTANTS
-  PROPOSED = 0; STARTED = 1; FINISHED = 2
-  
+  module State
+    Proposed = 0; Starting = 1; Started = 2; Finished = 3
+
+    def self.all
+      return [ Proposed, Starting, Started, Finished ]
+    end
+  end
+
   # ASSOSCIATIONS
   has_many :players, :dependent => :destroy
   has_many :users, :through => :players
@@ -39,14 +45,53 @@ class Game < ActiveRecord::Base
   accepts_nested_attributes_for :players, :allow_destroy => true
 
   # VALIDATIONS
-  validates :status, :numericality => :true, :inclusion => { :in => [ PROPOSED, STARTED, FINISHED ] }
+  validates :status, :numericality => :true, :inclusion => { :in => State.all }
   validate :validate_number_of_players
-  
+
+  # VALIDATORS  
   def validate_number_of_players
     self.errors.add(:base, 'Game must have at least 2 players') if self.players.reject(&:marked_for_destruction?).length < 2
   end
-     
-  # METHODS
+
+  # INITIALIZATION
+  def set_default_status
+    self.status ||= State::Proposed
+  end
+
+  def set_proposing_player
+    player = self.players.object_passing_test do |player|
+      self.proposing_player == player.user_id
+    end
+    self.proposing_player = player.id
+    self.save
+  end
+    
+  # GAME STATE MANAGEMENT
+  def start_game_if_necessary
+    start if self.status == State::Starting
+  end
+
+  def start
+    self.players.each_with_index do |p, i|
+      p.index = i
+    end
+
+    self.status = State::Started
+    self.template_id ||= 1
+    self.template.save # ?
+    self.save
+
+    self.turn_id ||= Turn.create_first_turn_for(self, random_player_id).id
+    self.save
+  end
+
+  def advance_turn
+    next_player_index = (self.current_turn.player.index + 1) % self.players.count
+    next_player = self.players.find_by_index(next_player_index)
+    self.current_turn = self.current_turn.create_next_turn_with_player(next_player)
+  end
+
+  # SETTERS & GETTERS
   def current_turn
     Turn.find(self.turn_id)
   end
@@ -55,62 +100,7 @@ class Game < ActiveRecord::Base
     self.update_attributes(:turn_id => turn.id)
   end
 
-  def current_player_index
-    self.current_turn.player.index
-  end
-
-  def debug_mode
-    self.players.each do |p|
-      return true if p.user_id == 1
-    end
-
-    return false
-  end
-
-  def set_default_status
-    self.status ||= PROPOSED
-  end
-  
-  def advance_turn
-    next_player_index = (self.current_turn.player.index + 1) % self.players.count
-    next_player = self.players.find_by_index(next_player_index)
-    self.current_turn = self.current_turn.create_next_turn_with_player(next_player)
-  end
-
-  def set_proposing_player
-    self.players.each do |player|
-      if self.proposing_player == player.user_id
-        self.proposing_player = player.id
-        self.save
-        break
-      end
-    end
-  end
-  
-  def before_update_handler
-    start if self.status_was == PROPOSED
-  end
-  
-  def start
-    # Assign player indexes
-    self.players.each_with_index do |p, i|
-      p.index = i
-    end
-
-    self.status ||= STARTED
-    self.template_id ||= 1
-    self.template.save # ?
-    self.save
-
-    binding.pry
-    self.turn_id ||= Turn.create_first_turn_for(self, random_player_id).id
-    self.save
-  end
-
-  def board_area
-    template.height * template.width
-  end
-
+  # CONVENIENCE METHODS
   def piece_index(row, column)
     row * template.width + column
   end
@@ -119,6 +109,7 @@ class Game < ActiveRecord::Base
     self.players.shuffle.first.id
   end
 
+  # NOT SURE WHAT TO DO ABOUT THIS ONE
   def board_array
     linear_index = 0
     Array.new(self.template.height){ Array.new }.each do |row_array|

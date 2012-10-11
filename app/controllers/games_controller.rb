@@ -23,8 +23,7 @@ class GamesController < ApplicationController
   
   def create
     if(current_user.can_create_game?)
-      @game = Game.new(params[:game])
-      @game.save
+      @game = Game.create(params[:game])
     else
       logger.debug("You've already proposed a game") # TODO: this needs to be handled somehow
     end

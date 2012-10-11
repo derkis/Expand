@@ -20,4 +20,8 @@ class Template < ActiveRecord::Base
 		self.tile_count ||= 6
 	end
 
+	def board_area
+		self.width * self.height
+	end
+
 end

@@ -2,7 +2,7 @@ module GamesQueries
 
   def self.get_proposed_games_for(current_user)
     players_array = Player.includes([:game]).all(
-    	:conditions => ['user_id = ? AND games.status = ?', current_user.id, Game::PROPOSED]
+    	:conditions => ['user_id = ? AND games.status = ?', current_user.id, Game::State::Proposed]
     )
 
     games_string = players_array.inject(' AND (') do
@@ -25,12 +25,16 @@ module GamesQueries
 
   def self.get_ready_game_for(current_user)
     game = Game.includes([:players]).first(
-    	:conditions => ['game_id = players.game_id AND proposing_player = players.id AND status = ? AND players.user_id = ?', Game::PROPOSED, current_user.id]
+    	:conditions => [
+        'game_id = players.game_id AND proposing_player = players.id 
+          AND status = ? AND players.user_id = ?', 
+          Game::State::Proposed, current_user.id
+      ]
     )
     return nil unless game
 
-    players_are_ready = game.players.inject(true) do
-    	|is_ready, player| is_ready &&= player.accepted
+    players_are_ready = game.players.inject(true) do |is_ready, player| 
+      is_ready &&= player.accepted
     end
 
     other_player_emails = User.includes([:players]).all(
@@ -44,7 +48,10 @@ module GamesQueries
   def self.get_started_game_for(current_user)
     Game.includes([:players]).first(
     	:select => :game_id, 
-    	:conditions => ['status = ? AND game_id = players.game_id AND players.user_id = ?', Game::STARTED, current_user.id]
+    	:conditions => [
+        'status = ? AND game_id = players.game_id 
+          AND players.user_id = ?', Game::State::Started, current_user.id
+      ]
     )
   end
 
