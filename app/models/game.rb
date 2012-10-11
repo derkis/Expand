@@ -57,7 +57,7 @@ class Game < ActiveRecord::Base
   def set_default_status
     self.status ||= State::Proposed
   end
-
+  
   def set_proposing_player
     player = self.players.object_passing_test do |player|
       self.proposing_player == player.user_id
@@ -98,6 +98,11 @@ class Game < ActiveRecord::Base
 
   def current_turn=(turn)
     self.update_attributes(:turn_id => turn.id)
+  end
+
+  def data_for_user(current_user)
+    datasan = current_turn.data_object
+    datasan[player_index_for(current_user).to_s]
   end
 
   # CONVENIENCE METHODS

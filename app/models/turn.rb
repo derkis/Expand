@@ -15,12 +15,12 @@
 
 class Turn < ActiveRecord::Base
 
-	# ASSOSCIATIONS
+	# ASSOCIATIONS
 	belongs_to :game
 	belongs_to :player
 
  	# ATTRIBUTE ACCESSORS
-	attr_accessible :game_id, :player_id, :number, :board, :tiles
+	attr_accessible :game_id, :player_id, :number, :board, :tiles, :data
 
 	# CONSTANTS
 	Type = { 
@@ -43,6 +43,13 @@ class Turn < ActiveRecord::Base
 		})
 
 		turn.refresh_player_tiles
+
+		data = Hash.new({})
+		game.players.each_with_index do |p, i|
+	      data[i] = {:stock_count => [0,0,0,0,0,0], :money => 1500}
+	    end
+	    turn.data = ActiveSupport::JSON.encode(data)
+
 		turn if turn.save!
 	end
 
@@ -52,8 +59,13 @@ class Turn < ActiveRecord::Base
 			:number => number + 1, 
 			:game_id => self.game_id, 
 			:player_id => player.id, 
-			:board => self.board 
+			:board => self.board, 
+			:data => data
 		})
+	end
+
+	def data_object
+		ActiveSupport::JSON.decode(data)
 	end
 
 	# redistributes all the player tiles until each player has the game allotted amount
