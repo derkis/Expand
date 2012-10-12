@@ -84,7 +84,23 @@ var TURN_TYPES = {
     START_COMPANY: { 
         code: 200, 
         name: 'start_company',
-        message: "Please choose a company to start"
+        message: "Please choose a company to start",
+        build_action: function() {
+            // Find the selected company
+            company_radios = $("input[name=company_group]");
+            selected_radio_value = null;
+            for (i = 0; i < company_radios.length; i++)
+            {
+                if (company_radios[i].checked)
+                {
+                    selected_radio_value = company_radios[i].value;
+                }
+            }
+
+            return { 
+                'company_index': selected_radio_value
+            };
+        }
     },
     
     PURCHASE_STOCK: { 
@@ -157,11 +173,6 @@ function render_all(game_state)
     render_players(game_state.current_turn);
     render_status(game_state);
     render_message();
-
-    if (current_turn_type == TYPE.START_COMPANY)
-    {
-        current_turn_type.render
-    }
 }
 
 function render_board(board, num_columns, num_rows)
@@ -223,18 +234,20 @@ function render_message()
     $(".message").text(msg);
 }
 
-function render_start_company_at(row, column)
+function render_start_company_at(row, column, game_state)
 {
-    var cell = get_call_at(row, column);
+    var cell = get_cell_at(row, column)[0];
 
     adjacents = get_adjacent_cells(cell, ["no_hotel"]);
 
-    for (key in adjacent_cells)
+    for (key in adjacents)
     {
         can_create_company = true;
 
-        adjacent_cells[key].addClass('highlighted');
+        adjacents[key].addClass('highlighted');
     }
+
+    $("#start_company_popup").bPopup({modalClose: false});
 }
 
 function player_can_act()
@@ -330,9 +343,9 @@ function fetch_game_state_resultHandler(game_state)
 
     render_all(game_state);
 
-    if (game_state.current_turn.action.start_company)
+    if (game_state.last_action && game_state.last_action.start_company)
     {
-        render_start_company_at(game_state.current_turn.place.row, game_state.current_turn.place.column);
+        render_start_company_at(game_state.last_action.place.row, game_state.last_action.place.column, game_state);
     }
 }
 
@@ -340,7 +353,6 @@ function document_readyHandler()
 {
     polling_wrapper();
 
-    $("#start_company_popup").bPopup({modalClose: false});
     $('.enabled').live('click', enabled_clickHandler);
     $('.cell').hover(cell_hoverOverHandler, cell_hoverOutHandler);
 }
@@ -425,4 +437,14 @@ function cell_hoverOutHandler(click_event)
 function send_game_update_successHandler()
 {
     fetch_game_state();
+}
+
+function input_handler()
+{
+    create_action_and_send_game_update();
+}
+
+function start_company_click_handler()
+{
+    create_action_and_send_game_update();
 }

@@ -32,7 +32,7 @@ module Engine
 				ret = current_turn.place_piece_for(row, column, current_turn.player)
 
 				if ret == "CREATE_COMPANY"
-					current_turn.updateAttributes(:action => ActiveSupport::JSON.encode(
+					current_turn.update_attributes(:action => ActiveSupport::JSON.encode(
 						{:place => {:row => row, :column => column},
 						 :start_company => true}))
 					ret = false

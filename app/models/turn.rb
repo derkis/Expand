@@ -19,7 +19,7 @@ class Turn < ActiveRecord::Base
 	belongs_to :player
 
  	# ATTRIBUTE ACCESSORS
-	attr_accessible :game_id, :player_id, :number, :board, :tiles, :data
+	attr_accessible :game_id, :player_id, :number, :board, :tiles, :data, :action
 
 	# CONSTANTS
 	Type = { 
@@ -79,13 +79,13 @@ class Turn < ActiveRecord::Base
 	    			{:size => 31, :cost => 1100, :bonus_maj => 11000, :bonus_min => 5500},
 	    			{:size => 41, :cost => 1200, :bonus_maj => 12000, :bonus_min => 6000}]
 
-	    data["companies"] = [	{:abbr => "l", :name => "Luxor", :stock_count => 25, :value => level1, :color => "#DE5D35"},
-	    						{:abbr => "t", :name => "Tower", :stock_count => 25, :value => level1, :color => "#D9E043"},
-	    						{:abbr => "a", :name => "American", :stock_count => 25, :value => level2, :color => "#3838F2"},
-	    						{:abbr => "w", :name => "Worldwide", :stock_count => 25, :value => level2, :color => "#5E3436"},
-	    						{:abbr => "f", :name => "Festival", :stock_count => 25, :value => level2, :color => "#44AB41"},
-	    						{:abbr => "i", :name => "Imperial", :stock_count => 25, :value => level3, :color => "#ED47C4"},
-	    						{:abbr => "c", :name => "Continental", :stock_count => 25, :value => level3, :color => "#24BFA5"}]
+	    data["companies"] = [	{:abbr => "l", :name => "Luxor", :stock_count => 25, :value => level1, :color => "#DE5D35", :size =>0},
+	    						{:abbr => "t", :name => "Tower", :stock_count => 25, :value => level1, :color => "#D9E043", :size =>0},
+	    						{:abbr => "a", :name => "American", :stock_count => 25, :value => level2, :color => "#3838F2", :size =>0},
+	    						{:abbr => "w", :name => "Worldwide", :stock_count => 25, :value => level2, :color => "#5E3436", :size =>0},
+	    						{:abbr => "f", :name => "Festival", :stock_count => 25, :value => level2, :color => "#44AB41", :size =>0},
+	    						{:abbr => "i", :name => "Imperial", :stock_count => 25, :value => level3, :color => "#ED47C4", :size =>0},
+	    						{:abbr => "c", :name => "Continental", :stock_count => 25, :value => level3, :color => "#24BFA5", :size =>0}]
 	    						
 	    turn.data = ActiveSupport::JSON.encode(data)
 
@@ -111,6 +111,18 @@ class Turn < ActiveRecord::Base
 
 	def data_object
 		ActiveSupport::JSON.decode(data)
+	end
+
+	def get_company(company_abbr)
+		companies = data_object["companies"]
+		companies.each do |company|
+			return company if company["abbr"] == company_abbr
+		end
+	end
+
+	def company_started(company_abbr)		
+		return true if get_company(company_abbr)["size"] > 0
+		return false
 	end
 
 	# redistributes all the player tiles until each player has the game allotted amount
@@ -179,20 +191,20 @@ class Turn < ActiveRecord::Base
 		# Top
 		pieces[2] = piece_index >= self.game.template.width ? board[piece_index - self.game.template.width] : nil
 		# Bottom
-		pieces[3] = piece_index / self.game.template.width < self.game.template.height - 1 ? board[piece_index + - self.game.template.width] : nil
+		pieces[3] = piece_index / self.game.template.width < self.game.template.height - 1 ? board[piece_index + self.game.template.width] : nil
 
 		pieces
 	end
 
 	# -----------------------------------------------------------------
-	# Returns true if the tile has an adjacent tile that has been
-	# placed but is not part of a hotel chain.
+	# Returns true if the tile has an adjacent tile that exists in the 
+	# provided hash
 	# -----------------------------------------------------------------
-	def has_adjacent_no_hotel_tile(adjacent_pieces)
-		return true if adjacent_pieces[0] == "u"
-		return true if adjacent_pieces[1] == "u"
-		return true if adjacent_pieces[2] == "u"
-		return true if adjacent_pieces[3] == "u"
+	def has_adjacent(piece_index, types)
+		pieces = get_adjacent_pieces(piece_index)
+		[0,1,2,3].each do |i|
+			return true if types[pieces[i]] == true
+		end
 		return false
 	end
 
@@ -208,12 +220,9 @@ class Turn < ActiveRecord::Base
 		piece_index = self.game.piece_index(row, column);
 		new_board[piece_index] = 'u'
 
-	 	# Check for new company creation
-	 	adjacents = get_adjacent_pieces(piece_index);
+	 	ret = "CREATE_COMPANY" if has_adjacent(piece_index, {"u"=>true})
 
-	 	ret = "CREATE_COMPANY" if has_adjacent_no_hotel_tile(adjacents)
-
-	 	update_attributes(:board => new_board)
+	 	self.update_attributes(:board => new_board)
 
 	 	return ret
 	end
