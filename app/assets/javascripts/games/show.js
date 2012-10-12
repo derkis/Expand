@@ -340,6 +340,7 @@ function document_readyHandler()
 {
     polling_wrapper();
 
+    $("#start_company_popup").bPopup({modalClose: false});
     $('.enabled').live('click', enabled_clickHandler);
     $('.cell').hover(cell_hoverOverHandler, cell_hoverOutHandler);
 }

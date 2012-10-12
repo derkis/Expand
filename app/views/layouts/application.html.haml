@@ -4,6 +4,7 @@
 		%title= @title
 		= render 'layouts/stylesheets'
 		= javascript_include_tag 'application', "#{controller_name}/#{controller_name}", "#{controller_name}/#{action_name}"
+		= javascript_include_tag 'jquery.bpopup-0.7.0.min.js'
 		= csrf_meta_tags
 %body
 	= render 'layouts/header'

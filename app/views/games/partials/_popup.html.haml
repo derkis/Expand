@@ -1,0 +1,17 @@
+#start_company_popup
+	.title{:style=>"padding-bottom:10px;"}
+		Start a New Company
+	- @current_turn.data_object["companies"].each_with_index do |company, i|
+		.company{:style=>"padding-top:5px;"}
+			%input{ :type=>"radio", :value=>"company_#{i}", :name=>"company_group" }
+			%label
+				= company["name"]
+			.color{ :style=>"background-color:#{company['color']}; width:20px; height:13px; float:right;"}
+	.title{:style=>"padding-bottom:10px;"}
+		Purchase Stock
+		- [1,2,3].each do |i|
+			.purchase_stock
+				%input{ :type=>"radio", :value=>"1", :name=>"stock_purchase_group" }
+				%label
+					= "+" + i.to_s()
+	= button_to_function 'go', 'start_company_click_handler()', :id => 'start_company_button', :class => 'image_button'

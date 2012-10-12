@@ -47,6 +47,46 @@ class Turn < ActiveRecord::Base
 		game.players.each_with_index do |p, i|
 	      data[i] = {:stock_count => [0,0,0,0,0,0], :money => 1500}
 	    end
+
+	    # Setup pricing / value levels for the 3 types of companies
+	    level1 = [	{:size => 2, :cost => 200, :bonus_maj => 2000, :bonus_min => 1000},
+	    			{:size => 3, :cost => 300, :bonus_maj => 3000, :bonus_min => 1500},
+	    			{:size => 4, :cost => 400, :bonus_maj => 4000, :bonus_min => 2000},
+	    			{:size => 5, :cost => 500, :bonus_maj => 5000, :bonus_min => 2500},
+	    			{:size => 6, :cost => 600, :bonus_maj => 6000, :bonus_min => 3000},
+	    			{:size => 11, :cost => 700, :bonus_maj => 7000, :bonus_min => 3500},
+	    			{:size => 21, :cost => 800, :bonus_maj => 8000, :bonus_min => 4000},
+	    			{:size => 31, :cost => 900, :bonus_maj => 9000, :bonus_min => 4500},
+	    			{:size => 41, :cost => 1000, :bonus_maj => 10000, :bonus_min => 5000}]
+
+	    level2 = [	{:size => 2, :cost => 300, :bonus_maj => 3000, :bonus_min => 1500},
+	    			{:size => 3, :cost => 400, :bonus_maj => 4000, :bonus_min => 2000},
+	    			{:size => 4, :cost => 500, :bonus_maj => 5000, :bonus_min => 2500},
+	    			{:size => 5, :cost => 600, :bonus_maj => 6000, :bonus_min => 3000},
+	    			{:size => 6, :cost => 700, :bonus_maj => 7000, :bonus_min => 3500},
+	    			{:size => 11, :cost => 800, :bonus_maj => 8000, :bonus_min => 4000},
+	    			{:size => 21, :cost => 900, :bonus_maj => 9000, :bonus_min => 4500},
+	    			{:size => 31, :cost => 1000, :bonus_maj => 10000, :bonus_min => 5000},
+	    			{:size => 41, :cost => 1100, :bonus_maj => 11000, :bonus_min => 5500}]
+
+	    level3 = [	{:size => 2, :cost => 400, :bonus_maj => 4000, :bonus_min => 2000},
+	    			{:size => 3, :cost => 500, :bonus_maj => 5000, :bonus_min => 2500},
+	    			{:size => 4, :cost => 600, :bonus_maj => 6000, :bonus_min => 3000},
+	    			{:size => 5, :cost => 700, :bonus_maj => 7000, :bonus_min => 3500},
+	    			{:size => 6, :cost => 800, :bonus_maj => 8000, :bonus_min => 4000},
+	    			{:size => 11, :cost => 900, :bonus_maj => 9000, :bonus_min => 4500},
+	    			{:size => 21, :cost => 1000, :bonus_maj => 10000, :bonus_min => 5000},
+	    			{:size => 31, :cost => 1100, :bonus_maj => 11000, :bonus_min => 5500},
+	    			{:size => 41, :cost => 1200, :bonus_maj => 12000, :bonus_min => 6000}]
+
+	    data["companies"] = [	{:abbr => "l", :name => "Luxor", :stock_count => 25, :value => level1, :color => "#DE5D35"},
+	    						{:abbr => "t", :name => "Tower", :stock_count => 25, :value => level1, :color => "#D9E043"},
+	    						{:abbr => "a", :name => "American", :stock_count => 25, :value => level2, :color => "#3838F2"},
+	    						{:abbr => "w", :name => "Worldwide", :stock_count => 25, :value => level2, :color => "#5E3436"},
+	    						{:abbr => "f", :name => "Festival", :stock_count => 25, :value => level2, :color => "#44AB41"},
+	    						{:abbr => "i", :name => "Imperial", :stock_count => 25, :value => level3, :color => "#ED47C4"},
+	    						{:abbr => "c", :name => "Continental", :stock_count => 25, :value => level3, :color => "#24BFA5"}]
+	    						
 	    turn.data = ActiveSupport::JSON.encode(data)
 
 		turn if turn.save!

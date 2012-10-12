@@ -103,7 +103,6 @@ class Game < ActiveRecord::Base
 
     self.status = State::Started
     self.template_id ||= 1
-    self.template.save # ?
     self.save
 
     self.turn_id ||= Turn.create_first_turn_for(self, random_player_id).id

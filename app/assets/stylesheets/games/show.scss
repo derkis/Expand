@@ -7,6 +7,14 @@ $cell_height: 50px;
 	@include pixel_font($font_size_std, $font_color_std);
 }
 
+#start_company_popup {
+	background-color: #ffffff;
+	border: 2px dashed gray;
+	padding: 1em;
+	display:none;
+	@include pixel_font($font_size_std, $font_color_cell_border);
+}
+
 .wrapper {
 	position: relative;
 	background: $dark_background;

@@ -49,10 +49,10 @@ class GamesController < ApplicationController
     @player_index = @game.player_index_for(current_user)
 
     respond_to do |format|
-      
       format.html do
         @title = 'game'
-        @board = @game.board_array # this should happen client side
+        @board = @game.board_array # Board layout occurs on server side, but board population occurs on 
+        @current_turn = @game.current_turn
       end
 
       format.json do
