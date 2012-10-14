@@ -135,7 +135,7 @@ function load_game_state()
 function send_game_update()
 {
     var json_update =
-        { 'action': cur_turn_type.get_action() };
+        { 'actions': cur_turn_type.get_action() };
 
     $.ajax(
         {

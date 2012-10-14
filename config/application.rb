@@ -24,7 +24,7 @@ module Expand
       #{config.root}/app/controllers/tests 
       #{config.root}/app/models/serialization
       #{config.root}/lib
-      #{config.root}/lib/engine 
+      #{config.root}/lib/engine
       #{config.root}/lib/extensions
     )
 

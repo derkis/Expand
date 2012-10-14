@@ -194,7 +194,7 @@ class Turn < ActiveRecord::Base
 	end
 
 	def piece_index(row, column)
-		row * template.width + column
+		row * game.template.width + column
 	end
 
 	# -----------------------------------------------------------------	
@@ -249,7 +249,7 @@ class Turn < ActiveRecord::Base
 	# -----------------------------------------------------------------
 	def place_piece (row, column)
 		new_board = self.board.dup
-		piece_index = self.game.piece_index(row, column);
+		piece_index = self.piece_index(row, column);
 		new_board[piece_index] = "u"
 
 		self.update_attributes(:board => new_board)

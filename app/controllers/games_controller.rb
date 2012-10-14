@@ -32,8 +32,8 @@ class GamesController < ApplicationController
   
   def update
     @game = Game.find(params[:id])
-    if(params[:action])
-      Engine.run_action(@game, params[:action], self)
+    if(params[:actions])
+      Engine.run_action(@game, params[:actions], self)
     else
       @game.update_attributes(params[:game])
     end

@@ -140,6 +140,10 @@ class Game < ActiveRecord::Base
     Turn.find(self.turn_id)
   end
 
+  def cur_turn=(turn)
+    self.update_attributes(:turn_id => turn.id)
+  end
+
   def board
     cur_turn.board
   end
@@ -154,10 +158,6 @@ class Game < ActiveRecord::Base
 
   def index_for_player (player)
 
-  end
-
-  def cur_turn=(turn)
-    self.update_attributes(:turn_id => turn.id)
   end
 
   def valid_action(current_user)
