@@ -59,28 +59,48 @@ class Game < ActiveRecord::Base
   end
   
   def cur_data(current_user)
-    datasan = self.current_turn.data_object
-    datasan[player_index_for(current_user).to_s]
+    datasan = self.cur_turn.data_object
+
+    # Here we sanitize the game data so the current_user cannot see the other player data
+    datasan["players"].each_with_index do |p, i|
+      datasan["players"][i].clear() if i != player_index_for(current_user)
+    end
+
+    datasan
   end
 
   def last_action()
-    if self.current_turn.action != nil
-      return ActiveSupport::JSON.decode(self.current_turn.action)
+    if self.cur_turn.action != nil
+      return ActiveSupport::JSON.decode(self.cur_turn.action)
     end
     return nil
   end
 
   def next_turn
-    nextPlayerIX = (self.current_turn.player.index + 1) % self.players.count
+    nextPlayerIX = (self.cur_turn.player.index + 1) % self.players.count
 
-    turn = current_turn.clone_next_turn
+    turn = cur_turn.clone_next_turn
 
     # Update ourself to the next turn
     self.update_attributes(:turn_id => turn.id)
 
-    # Update the new current_turn to the latest player id
-    self.current_turn.update_attributes(:player_id => self.players.find_by_index(nextPlayerIX).id)
+    # Update the new cur_turn to the latest player id
+    self.cur_turn.update_attributes(:player_id => self.players.find_by_index(nextPlayerIX).id)
     turn
+  end
+
+  def cur_player
+    self.cur_turn.player
+  end
+
+  def cur_player_index
+    self.cur_turn.player.index
+  end
+
+  def player_index_for(user)
+    self.players.each do |p|
+      return p.index if p.user_id = user.id
+    end
   end
 
   def set_proposing_player
@@ -110,38 +130,49 @@ class Game < ActiveRecord::Base
   end
 
   def advance_turn
-    next_player_index = (self.current_turn.player.index + 1) % self.players.count
+    next_player_index = (self.cur_turn.player.index + 1) % self.players.count
     next_player = self.players.find_by_index(next_player_index)
-    self.current_turn = self.current_turn.create_next_turn_with_player(next_player)
+    self.cur_turn = self.cur_turn.create_next_turn_with_player(next_player)
   end
 
   # SETTERS & GETTERS
-  def current_turn
+  def cur_turn
     Turn.find(self.turn_id)
   end
 
-  def current_turn=(turn)
+  def board
+    cur_turn.board
+  end
+
+  def cur_turn_number
+    cur_turn.number
+  end
+
+  def cur_player
+    {:index => cur_player_index}
+  end
+
+  def index_for_player (player)
+
+  end
+
+  def cur_turn=(turn)
     self.update_attributes(:turn_id => turn.id)
   end
 
   def valid_action(current_user)
-    if current_turn.is_starting_company
-      return :code => Turn::Type[:start_company][:code] if current_user.id == current_turn.player.user.id || debug_mode
-      return :code => Turn::Type[:no_action][:code]
+    if cur_turn.is_starting_company
+      return :code => Turn::STATE_START_COMPANY if current_user.id == cur_turn.player.user.id || debug_mode
+      return :code => Turn::STATE_NONE
     end
 
-    return :code => Turn::Type[:place_piece][:code] if current_user.id == current_turn.player.user.id || debug_mode
-    return :code => Turn::Type[:no_action][:code]
+    return :code => Turn::STATE_PLACE_PIECE if current_user.id == cur_turn.player.user.id || debug_mode
+    return :code => Turn::STATE_NONE
   end
 
   def data_for_user(current_user)
-    datasan = current_turn.data_object
+    datasan = cur_turn.data_object
     datasan[player_index_for(current_user).to_s]
-  end
-
-  # CONVENIENCE METHODS
-  def piece_index(row, column)
-    row * template.width + column
   end
 
   def random_player_id
@@ -153,7 +184,7 @@ class Game < ActiveRecord::Base
     linear_index = 0
     Array.new(self.template.height){ Array.new }.each do |row_array|
       self.template.width.times do |column|
-        row_array[column] = self.current_turn.board[linear_index]
+        row_array[column] = self.cur_turn.board[linear_index]
         linear_index += 1
       end
     end

@@ -7,7 +7,7 @@
   font-size: 12px;
   color: black; }
 
-#start_company_popup {
+#start_company_popup, #purchase_stock_popup {
   background-color: #ffffff;
   border: 2px dashed gray;
   padding: 1em;

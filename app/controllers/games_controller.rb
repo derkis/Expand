@@ -32,8 +32,8 @@ class GamesController < ApplicationController
   
   def update
     @game = Game.find(params[:id])
-    if(params[:game][:turn])
-      Engine.interpret_turn(@game, params[:game][:turn], self)
+    if(params[:action])
+      Engine.run_action(@game, params[:action], self)
     else
       @game.update_attributes(params[:game])
     end
@@ -46,23 +46,24 @@ class GamesController < ApplicationController
 
   def show
     @game = Game.find(params[:id])
-    @player_index = @game.player_index_for(current_user)
 
     respond_to do |format|
       format.html do
         @title = 'game'
         @board = @game.board_array # Board layout occurs on server side, but board population occurs on 
-        @current_turn = @game.current_turn
+        @cur_turn = @game.cur_turn
       end
 
       format.json do
         render :json => @game.build_json({
-          :include => :template, 
+          :include => [:template, :players], 
           :methods => [
-            :current_turn, :debug_mode, :current_player_index, :last_action,
-            { :name => :cur_data, :arguments => [current_user] },
-            { :name => :player_index_for, :arguments => [current_user] },
-            { :name => :valid_action, :arguments => [current_user] }
+            :debug_mode,
+            :cur_turn_number,
+            :cur_player_index,
+            :last_action,
+            :board,
+            { :name => :cur_data, :arguments => [current_user] }
           ]
         })
       end

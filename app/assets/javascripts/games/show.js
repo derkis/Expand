@@ -3,6 +3,24 @@
 // Lib
 //
 //------------------------------------------------------------------------------------------
+Number.prototype.to_char = function()
+{
+    return String.fromCharCode(this);
+}
+
+String.prototype.format = function()
+{
+    var args = arguments;
+    return this.replace(/{(\d+)}/g, function(match, number) { 
+        return typeof args[number] != 'undefined' ? args[number] : match;
+    });
+};
+
+String.prototype.to_int = function() 
+{
+    return parseInt(this);
+}
+
 function hasClass(element, cls)
 {
     var r = new RegExp('\\b' + cls + '\\b');
@@ -30,10 +48,11 @@ function hasClasses(element, classes)
 //
 //------------------------------------------------------------------------------------------
 var player_index = -1;
-var current_turn_type;
+var cur_turn_type;
 var selected_cell;
 var cur_game_state;
 var message_temp = null;
+var GAME_ID;
 
 //------------------------------------------------------------------------------------------
 //
@@ -43,78 +62,54 @@ var message_temp = null;
 $(document).ready(document_readyHandler);
 $('#game').ready(game_readyHandler);
 
-Number.prototype.to_char = function()
-{
-    return String.fromCharCode(this);
-}
-
-String.prototype.format = function()
-{
-    var args = arguments;
-    return this.replace(/{(\d+)}/g, function(match, number) { 
-        return typeof args[number] != 'undefined' ? args[number] : match;
-    });
-};
-
-String.prototype.to_int = function() 
-{
-    return parseInt(this);
-}
-
-var GAME_ID;
+//------------------------------------------------------------------------------------------
+//
+// Turn Types
+//
+//------------------------------------------------------------------------------------------
 var TURN_TYPES = {
     
-    NO_ACTION: { 
-        code: 000,
+    "000": { 
         name: 'no_action'
     },
     
-    PLACE_PIECE: { 
-        code: 100,
+    "100": { 
         name: 'place_piece',
         message: "Please choose where to place your tile and then click Input",
-        build_action: function() {
-            return { 
-                'row': selected_cell.attr('row').to_int(), 
-                'column': selected_cell.attr('column').to_int()
+        get_action: function() {
+            return {
+                row: selected_cell.attr('row').to_int(),
+                column: selected_cell.attr('column').to_int()
             };
         }
     },
     
-    START_COMPANY: { 
-        code: 200, 
+    "200": {
         name: 'start_company',
         message: "Please choose a company to start",
-        build_action: function() {
-            // Find the selected company
-            company_radios = $("input[name=company_group]");
-            selected_radio_value = null;
-            for (i = 0; i < company_radios.length; i++)
-            {
-                if (company_radios[i].checked)
-                {
-                    selected_radio_value = company_radios[i].value;
-                }
-            }
-
-            return { 
-                'company_index': selected_radio_value
-            };
+        get_action: function() {
+            // Return the selected company value
+            return  {
+                        "company_index": $("input[name=company_group]").filter(':checked').val()
+                    };
         }
     },
     
-    PURCHASE_STOCK: { 
-        code: 300,
-        name: 'purchase_stock'
+    "300": {
+        name: 'purchase_stock',
+        message: "Choose how many stocks to purchase",
+        get_action: function() {
+            return  {
+                        "stocks_purchased": $("input[name=stock_purchase_group]").filter(':checked').val()
+                    }
+        }
     },
     
-    TRADE_STOCK: { 
-        code: 400,
+    "400": {
         name: 'trade_stock'
     },
     
-    MERGE_ORDER: { 
-        code: 500,
+    "500": {
         name: 'merge_order'
     }
 };
@@ -124,42 +119,33 @@ var TURN_TYPES = {
 // Methods
 //
 //------------------------------------------------------------------------------------------
-// polling functions
 function polling_wrapper()
 {
-    fetch_game_state();
+    load_game_state();
 
     setTimeout(polling_wrapper, 15000);
 }
 
-function fetch_game_state()
+function load_game_state()
 {
-    $.getJSON(document.URL + '.json', fetch_game_state_resultHandler);
+    $.getJSON(document.URL + '.json', load_game_state_resultHandler);
 }
 
 // server calls
-function send_game_update(action)
+function send_game_update()
 {
-    var json_update = { 'game': { 'turn': { 'action': action } } };
+    var json_update =
+        { 'action': cur_turn_type.get_action() };
 
-    $.ajax({
-        type: 'PUT',
-        url: GAME_ID + '.json',
-        data: JSON.stringify(json_update), 
-        contentType: 'application/json',                  
-        dataType: 'json',                                  
-        success: send_game_update_successHandler
-    });     
-}
-
-function create_action_and_send_game_update()
-{
-    var action = { 'turn_type' : current_turn_type.name };
-    var action_data = current_turn_type.build_action();
-
-    for(action_attribute in action_data)
-        action[action_attribute] = action_data[action_attribute];
-    send_game_update(action)
+    $.ajax(
+        {
+            type: 'PUT',
+            url: GAME_ID + '.json',
+            data: JSON.stringify(json_update), 
+            contentType: 'application/json',                  
+            dataType: 'json',                                  
+            success: send_game_update_successHandler
+        });     
 }
 
 function reset_game()
@@ -169,15 +155,30 @@ function reset_game()
 
 function render_all(game_state)
 {
-    render_board(game_state.current_turn.board, game_state.template.width, game_state.template.height);
-    render_players(game_state.current_turn);
+    render_board(cur_game_state.board, game_state.template.width, game_state.template.height);
+    render_players(game_state.cur_data.players);
     render_status(game_state);
     render_message();
+    render_turn_button();
+}
+
+function render_turn_button()
+{
+    var turn_button = $('#turn_button');
+
+    if(player_can_act()) 
+    {
+        turn_button.removeAttr('disabled');
+    }
+    else
+    { 
+        turn_button.attr('disabled', 'disabled');
+    }
 }
 
 function render_board(board, num_columns, num_rows)
 {
-    $('.debug_string').text(board);
+    $(".debug_string").text(board);
 
     var row = 0, column = 0;
     for(var cell_index=0 ; cell_index < board.length ; cell_index++) {    
@@ -192,10 +193,7 @@ function render_board(board, num_columns, num_rows)
 
 function render_cell(cell, cell_type, row, column)
 {
-    cell.removeClass('empty');
-    cell.removeClass('enabled');
-    cell.removeClass('no_hotel');
-    cell.removeClass('selected');
+    cell.removeClass('empty enabled no_hotel selected');
     cell.text((65 + row).to_char() + (column+1));
     switch(cell_type) {
         case 'e': // empty cell
@@ -210,21 +208,21 @@ function render_cell(cell, cell_type, row, column)
     }
 }
 
-function render_status(game_state)
+function render_status()
 {
-    $('.turn_label').text("Turn: " + game_state.current_turn.number);
-    $('.money').text("$" + game_state.cur_data["money"]);
+    $('.turn_label').text("Turn: " + cur_game_state.cur_turn_number);
+    $('.money').text("$" + cur_game_state.cur_data.players[cur_game_state.cur_player_index]["money"]);
 }
 
-function render_players(current_turn)
+function render_players()
 {
     $('.player').removeClass('current_player');
-    $('.player[player_id=' + current_turn.player_id + ']').addClass('current_player');
+    $('.player[player_id=' + cur_game_state.player_id + ']').addClass('current_player');
 }
 
 function render_message()
 {
-    var msg = current_turn_type.message;
+    var msg = cur_turn_type.message;
 
     if (message_temp)
     {
@@ -238,7 +236,7 @@ function render_start_company_at(row, column, game_state)
 {
     var cell = get_cell_at(row, column)[0];
 
-    adjacents = get_adjacent_cells(cell, ["no_hotel"]);
+    adjacents = get_connected_cells(cell, ["no_hotel"]);
 
     for (key in adjacents)
     {
@@ -252,12 +250,12 @@ function render_start_company_at(row, column, game_state)
 
 function player_can_act()
 {
-    return current_turn_type != TURN_TYPES.NO_ACTION;
+    return cur_turn_type != TURN_TYPES.NO_ACTION;
 }
 
 function get_cell_char_at(row, column)
 {
-    return cur_game_state.current_turn.board.chartAt(row * cur_game_state.template.width + column)
+    return cur_game_state.board.chartAt(row * cur_game_state.template.width + column)
 }
 
 function get_cell_at(row, column)
@@ -281,14 +279,14 @@ function get_column(cell)
     return parseInt(cell.attributes.column.value)
 }
 
-function get_adjacent_cells(cell, classes)
+function get_connected_cells(cell, classes)
 {
     var map = {};
-    get_adjacent_cells_recurse(cell, classes, map);
+    get_connected_cells_recurse(cell, classes, map);
     return map;
 }
 
-function get_adjacent_cells_recurse(cell, classes, map)
+function get_connected_cells_recurse(cell, classes, map)
 {
     var row = get_row(cell);
     var column = get_column(cell);
@@ -306,7 +304,7 @@ function get_adjacent_cells_recurse(cell, classes, map)
         if (cur_cell && !map[get_key(cur_cell[0])] && hasClasses(cur_cell[0], classes))
         {
             map[get_key(cur_cell[0])] = cur_cell;
-            get_adjacent_cells_recurse(cur_cell[0], classes, map);
+            get_connected_cells_recurse(cur_cell[0], classes, map);
         }
     }
 }
@@ -316,30 +314,14 @@ function get_adjacent_cells_recurse(cell, classes, map)
 // Events
 //
 //------------------------------------------------------------------------------------------
-function fetch_game_state_resultHandler(game_state)
+function load_game_state_resultHandler(game_state)
 {
     console.log(game_state);
 
     cur_game_state = game_state;
+    cur_turn_type = TURN_TYPES[cur_game_state.cur_data.state.toString()];
 
-    current_turn_type = (function(turn_code) { 
-        for(var type_key in TURN_TYPES)
-            if(TURN_TYPES[type_key].code == turn_code)
-                return TURN_TYPES[type_key];
-    })(game_state.valid_action.code);
-
-    var turn_button = $('#turn_button');
-
-    if(player_can_act()) 
-    {
-        turn_button.removeAttr('disabled');
-    }
-    else
-    { 
-        turn_button.attr('disabled', 'disabled');
-    }
-
-    player_index = game_state.current_player_index.toString();
+    player_index = game_state.cur_player_index.toString();
 
     render_all(game_state);
 
@@ -383,7 +365,7 @@ function cell_hoverOverHandler(click_event)
 {
     var cell = click_event.currentTarget;
 
-    if (current_turn_type == TURN_TYPES.PLACE_PIECE)
+    if (cur_turn_type == TURN_TYPES.PLACE_PIECE)
     {
         var can_create_company = false;
 
@@ -392,7 +374,7 @@ function cell_hoverOverHandler(click_event)
             return;
         }
 
-        adjacent_cells = get_adjacent_cells(cell, ["no_hotel"]);
+        adjacent_cells = get_connected_cells(cell, ["no_hotel"]);
 
         for (key in adjacent_cells)
         {
@@ -414,14 +396,14 @@ function cell_hoverOutHandler(click_event)
 {
     var cell = click_event.currentTarget;
 
-    if (current_turn_type == TURN_TYPES.PLACE_PIECE)
+    if (cur_turn_type == TURN_TYPES.PLACE_PIECE)
     {
         if(!player_can_act() || !hasClass(cell, "enabled"))
         {
             return;
         }
 
-        adjacent_cells = get_adjacent_cells(cell, ["no_hotel"]);
+        adjacent_cells = get_connected_cells(cell, ["no_hotel"]);
 
         for (key in adjacent_cells)
         {
@@ -436,15 +418,15 @@ function cell_hoverOutHandler(click_event)
 
 function send_game_update_successHandler()
 {
-    fetch_game_state();
+    load_game_state();
 }
 
 function input_handler()
 {
-    create_action_and_send_game_update();
+    send_game_update();
 }
 
 function start_company_click_handler()
 {
-    create_action_and_send_game_update();
+    send_game_update();
 }

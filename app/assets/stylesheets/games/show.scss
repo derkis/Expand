@@ -7,7 +7,7 @@ $cell_height: 50px;
 	@include pixel_font($font_size_std, $font_color_std);
 }
 
-#start_company_popup {
+#start_company_popup, #purchase_stock_popup {
 	background-color: #ffffff;
 	border: 2px dashed gray;
 	padding: 1em;

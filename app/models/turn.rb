@@ -22,14 +22,16 @@ class Turn < ActiveRecord::Base
 	attr_accessible :game_id, :player_id, :number, :board, :tiles, :data, :action
 
 	# CONSTANTS
-	Type = { 
-		:no_action 		=> { :code => 000 },
-		:place_piece    => { :code => 100 },
-		:start_company	=> { :code => 200 },
-		:purchase_stock => { :code => 300 },
-		:trade_stock    => { :code => 400 },
-		:merge_order    => { :code => 500 }
-	}
+	STATE_NONE = 0
+	STATE_PLACE_PIECE = 100
+	STATE_START_COMPANY = 200
+	STATE_PURCHASE_STOCK = 300
+	STATE_TRADE_STOCK = 400
+	STATE_MERGE_ORDER = 500
+
+	PIECE_PLACED = 0
+	PIECE_PLACED_COMPANY_STARTED = 1
+	PIECE_PLACED_MERGE_STARTED = 2
 
  	# CREATION
 	# creates the first turn given a game and a starting player id.
@@ -44,8 +46,11 @@ class Turn < ActiveRecord::Base
 		turn.refresh_player_tiles
 
 		data = Hash.new({})
+		
+		data["players"] = []
+
 		game.players.each_with_index do |p, i|
-	      data[i] = {:stock_count => [0,0,0,0,0,0], :money => 1500}
+	      data["players"][i] = {:stock_count => [0,0,0,0,0,0], :money => 1500}
 	    end
 
 	    # Setup pricing / value levels for the 3 types of companies
@@ -79,14 +84,25 @@ class Turn < ActiveRecord::Base
 	    			{:size => 31, :cost => 1100, :bonus_maj => 11000, :bonus_min => 5500},
 	    			{:size => 41, :cost => 1200, :bonus_maj => 12000, :bonus_min => 6000}]
 
-	    data["companies"] = [	{:abbr => "l", :name => "Luxor", :stock_count => 25, :value => level1, :color => "#DE5D35", :size =>0},
+	    data["companies"] = {:l =>
+	    						{:abbr => "l", :name => "Luxor", :stock_count => 25, :value => level1, :color => "#DE5D35", :size =>0},
+	    					 :t =>
 	    						{:abbr => "t", :name => "Tower", :stock_count => 25, :value => level1, :color => "#D9E043", :size =>0},
+	    					 :a =>
 	    						{:abbr => "a", :name => "American", :stock_count => 25, :value => level2, :color => "#3838F2", :size =>0},
+	    					 :w =>
 	    						{:abbr => "w", :name => "Worldwide", :stock_count => 25, :value => level2, :color => "#5E3436", :size =>0},
+	    					 :f =>
 	    						{:abbr => "f", :name => "Festival", :stock_count => 25, :value => level2, :color => "#44AB41", :size =>0},
+	    					 :i =>
 	    						{:abbr => "i", :name => "Imperial", :stock_count => 25, :value => level3, :color => "#ED47C4", :size =>0},
-	    						{:abbr => "c", :name => "Continental", :stock_count => 25, :value => level3, :color => "#24BFA5", :size =>0}]
-	    						
+	    					 :c =>
+	    						{:abbr => "c", :name => "Continental", :stock_count => 25, :value => level3, :color => "#24BFA5", :size =>0}
+	    					}
+	   
+	    data["state"] = STATE_PLACE_PIECE;
+	    data["active_player_id"] = starting_player_id;
+
 	    turn.data = ActiveSupport::JSON.encode(data)
 
 		turn if turn.save!
@@ -163,6 +179,24 @@ class Turn < ActiveRecord::Base
 	  	tiles
 	end
 
+	def get_tile_at(row, column)
+		{
+			:row => row,
+			:column => column,
+			:index => row * game.template.width + column,
+			:tile => board[row * game.template.width + column],
+			:key => row.to_s + "_" + column.to_s
+		}
+	end
+
+	def get_tile_at(row, column)
+		board[row * game.template.width + column]
+	end
+
+	def piece_index(row, column)
+		row * template.width + column
+	end
+
 	# -----------------------------------------------------------------	
 	# Returns true if a player is starting a company this turn
 	# -----------------------------------------------------------------
@@ -213,17 +247,50 @@ class Turn < ActiveRecord::Base
 	#
 	# Returns "CREATE_COMPANY" if possible given the placed piece.
 	# -----------------------------------------------------------------
-	def place_piece_for (row, column, player)
-		ret = "NOTHING SPECIAL"
-
+	def place_piece (row, column)
 		new_board = self.board.dup
 		piece_index = self.game.piece_index(row, column);
-		new_board[piece_index] = 'u'
+		new_board[piece_index] = "u"
 
-	 	ret = "CREATE_COMPANY" if has_adjacent(piece_index, {"u"=>true})
+		self.update_attributes(:board => new_board)
 
-	 	self.update_attributes(:board => new_board)
+	 	PIECE_PLACED_COMPANY_CREATED if has_adjacent(piece_index, {"u"=>true})
+	end
 
-	 	return ret
+	# -----------------------------------------------------------------
+	# Returns all the cells connected to row,column that are not "e" cells
+	# -----------------------------------------------------------------
+	def get_connected_tiles(row, column)
+	    get_connected_cells_recurse(row, column, {});
+	end
+
+	def get_connected_tiles_recurse(row, column, map)
+	    left = column > 0 ? get_tile_at(row, column - 1) : nil;
+	    right = column < game.template.width - 1 ? get_tile_at(row, column + 1) : nil;
+	    top = row > 0 ? get_tile_at(row - 1, column) : nil;
+	    bottom = row < game.template.height - 1 ? get_tile_at(row + 1, column) : nil;
+
+	    [left, right, top, bottom].each do |item|
+	        if item && item.tile != "e" && !map.has_key(item.key)
+	            map[item.key] = item;
+	            get_connected_tiles_recurse(item.row, item.column, map);
+	        end
+	    end
+	    map
+	end
+
+	# -----------------------------------------------------------------
+	# Starts a company of all cells connected to the provided row, column
+	# -----------------------------------------------------------------
+	def start_company(row, column, company_abbr)
+		tiles = get_connected_tiles(row, column)
+
+		tiles.each do |t|
+			board[t.index] = company_abbr
+		end
+
+		update_attributes(:board => board.dup)
+
+		data_object["companies"][company_abbr]["size"] = tiles.size
 	end
 end
