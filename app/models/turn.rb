@@ -22,16 +22,20 @@ class Turn < ActiveRecord::Base
 	attr_accessible :game_id, :player_id, :number, :board, :tiles, :data, :action
 
 	# CONSTANTS
-	STATE_NONE = 0
-	STATE_PLACE_PIECE = 100
-	STATE_START_COMPANY = 200
-	STATE_PURCHASE_STOCK = 300
-	STATE_TRADE_STOCK = 400
-	STATE_MERGE_ORDER = 500
+	module Type
+		INACTIVE			= 000
+		PLACE_PIECE 	= 100
+		START_COMPANY 	= 200
+		PURCHASE_STOCK	= 300
+		TRADE_STOCK		= 400
+		MERGE_ORDER		= 500
+	end
 
-	PIECE_PLACED = 0
-	PIECE_PLACED_COMPANY_STARTED = 1
-	PIECE_PLACED_MERGE_STARTED = 2
+	module Result
+		PIECE_PLACED 		= 0
+		COMPANY_STARTED 	= 1
+		MERGE_STARTED 		= 2
+	end
 
  	# CREATION
 	# creates the first turn given a game and a starting player id.
@@ -47,11 +51,11 @@ class Turn < ActiveRecord::Base
 
 		data = Hash.new({})
 		
-		data["players"] = []
+		data['players'] = []
 
 		game.players.each_with_index do |p, i|
-	      data["players"][i] = {:stock_count => [0,0,0,0,0,0], :money => 1500}
-	    end
+	  	data['players'][i] = {:stock_count => [0,0,0,0,0,0], :money => 1500}
+	  end
 
 	    # Setup pricing / value levels for the 3 types of companies
 	    level1 = [	{:size => 2, :cost => 200, :bonus_maj => 2000, :bonus_min => 1000},
@@ -100,7 +104,7 @@ class Turn < ActiveRecord::Base
 	    						{:abbr => "c", :name => "Continental", :stock_count => 25, :value => level3, :color => "#24BFA5", :size =>0}
 	    					}
 	   
-	    data["state"] = STATE_PLACE_PIECE;
+	    data["state"] = State::PLACE_PIECE;
 	    data["active_player_id"] = starting_player_id;
 
 	    turn.data = ActiveSupport::JSON.encode(data)
