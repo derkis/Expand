@@ -92,6 +92,9 @@ var TURN_TYPES = {
             return  {
                         "company_index": $("input[name=company_group]").filter(':checked').val()
                     };
+        },
+        render: function(game_state) {
+            render_start_company_at(game_state.last_action.place.row, game_state.last_action.place.column, game_state);
         }
     },
     
@@ -217,7 +220,7 @@ function render_status()
 function render_players()
 {
     $('.player').removeClass('current_player');
-    $('.player[player_id=' + cur_game_state.player_id + ']').addClass('current_player');
+    $('.player[player_index=' + cur_game_state.cur_player_index + ']').addClass('current_player');
 }
 
 function render_message()
@@ -325,10 +328,7 @@ function load_game_state_resultHandler(game_state)
 
     render_all(game_state);
 
-    if (game_state.last_action && game_state.last_action.start_company)
-    {
-        render_start_company_at(game_state.last_action.place.row, game_state.last_action.place.column, game_state);
-    }
+    TURN_TYPES[game_state.cur_data.state].render(game_state);
 }
 
 function document_readyHandler()

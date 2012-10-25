@@ -3,22 +3,31 @@ module Engine
 	def self.run_action(game, action, controller)
 		game.cur_turn.update_attributes(:action => ActiveSupport::JSON.encode(action))
 
-		case game.cur_turn.data_object["state"]
+		data_hash = game.cur_turn.data_hash
+		case data_hash['state']
 			#--------------------------------------
 			# PIECE PLACEMENT
 			#--------------------------------------
-			when Turn::State::PLACE_PIECE
+			when Turn::PLACE_PIECE
 				place_piece_result = game.cur_turn.place_piece(action["row"], action["column"])
-				
+
 				game.cur_turn.refresh_player_tiles
 				game.cur_turn.save!
 
-				game.advance_turn if place_piece_result == Turn::Result::COMPANY_STARTED
-			
+				case place_piece_result
+					when Turn::PIECE_PLACED
+						game.advance_turn
+					when Turn::COMPANY_STARTED
+						data_hash['state'] = Turn::START_COMPANY
+						game.cur_turn.serialize_data_hash(data_hash)
+					when Turn::MERGE_STARTED
+
+				end
+
 			#--------------------------------------
 			# START_COMPANY
 			#--------------------------------------
-			when Turn::State::START_COMPANY
+			when Turn::START_COMPANY
 				raise 'start_company not implemented'
 		end
 	end
