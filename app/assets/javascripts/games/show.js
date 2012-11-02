@@ -210,14 +210,14 @@ function render_cell(cell, cell_type, row, column)
 
 function render_status()
 {
-    $('.turn_label').text("Turn: " + cur_game_state.cur_turn_number);
+    $('.turn_label').text("Turn: " + (cur_game_state.cur_turn_number + 1));
     $('.money').text("$" + cur_game_state.cur_data.players[cur_game_state.cur_player_index]["money"]);
 }
 
 function render_players()
 {
     $('.player').removeClass('current_player');
-    $('.player[player_id=' + cur_game_state.player_id + ']').addClass('current_player');
+    $('.player[player_index=' + cur_game_state.cur_player_index + ']').addClass('current_player');
 }
 
 function render_message()
