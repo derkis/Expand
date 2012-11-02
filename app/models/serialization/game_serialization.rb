@@ -10,6 +10,6 @@ module GameSerialization
 		return false if self.players.each do |player|
 			return true if player.user_id == TEST_PLAYER_ID
 		end	
-  end
+	end
  
 end

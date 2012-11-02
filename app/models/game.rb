@@ -1,4 +1,4 @@
-# == Schema Information
+  # == Schema Information
 #
 # Table name: games
 #
@@ -59,7 +59,7 @@ class Game < ActiveRecord::Base
   end
   
   def cur_data(current_user)
-    datasan = self.cur_turn.data_object
+    datasan = self.cur_turn.data_hash
 
     # Here we sanitize the game data so the current_user cannot see the other player data
     datasan["players"].each_with_index do |p, i|
@@ -162,16 +162,16 @@ class Game < ActiveRecord::Base
 
   def valid_action(current_user)
     if cur_turn.is_starting_company
-      return :code => Turn::STATE_START_COMPANY if current_user.id == cur_turn.player.user.id || debug_mode
-      return :code => Turn::STATE_NONE
+      return :code => Turn::START_COMPANY if current_user.id == cur_turn.player.user.id || debug_mode
+      return :code => Turn::NONE
     end
 
-    return :code => Turn::STATE_PLACE_PIECE if current_user.id == cur_turn.player.user.id || debug_mode
-    return :code => Turn::STATE_NONE
+    return :code => Turn::PLACE_PIECE if current_user.id == cur_turn.player.user.id || debug_mode
+    return :code => Turn::NONE
   end
 
   def data_for_user(current_user)
-    datasan = cur_turn.data_object
+    datasan = cur_turn.data_hash
     datasan[player_index_for(current_user).to_s]
   end
 

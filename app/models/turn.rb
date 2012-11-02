@@ -22,16 +22,16 @@ class Turn < ActiveRecord::Base
 	attr_accessible :game_id, :player_id, :number, :board, :tiles, :data, :action
 
 	# CONSTANTS
-	STATE_NONE = 0
-	STATE_PLACE_PIECE = 100
-	STATE_START_COMPANY = 200
-	STATE_PURCHASE_STOCK = 300
-	STATE_TRADE_STOCK = 400
-	STATE_MERGE_ORDER = 500
+	INACTIVE				= 000
+	PLACE_PIECE 		= 100
+	START_COMPANY 		= 200
+	PURCHASE_STOCK		= 300
+	TRADE_STOCK			= 400
+	MERGE_ORDER			= 500
 
-	PIECE_PLACED = 0
-	PIECE_PLACED_COMPANY_STARTED = 1
-	PIECE_PLACED_MERGE_STARTED = 2
+	PIECE_PLACED 		= 0
+	COMPANY_STARTED 	= 1
+	MERGE_STARTED 		= 2
 
  	# CREATION
 	# creates the first turn given a game and a starting player id.
@@ -47,14 +47,14 @@ class Turn < ActiveRecord::Base
 
 		data = Hash.new({})
 		
-		data["players"] = []
+		data['players'] = []
 
 		game.players.each_with_index do |p, i|
-	      data["players"][i] = {:stock_count => [0,0,0,0,0,0], :money => 1500}
-	    end
+		  	data['players'][i] = {:stock_count => [0,0,0,0,0,0], :money => 1500}
+		end
 
-	    # Setup pricing / value levels for the 3 types of companies
-	    level1 = [	{:size => 2, :cost => 200, :bonus_maj => 2000, :bonus_min => 1000},
+	   # Setup pricing / value levels for the 3 types of companies
+	   level1 = [	{:size => 2, :cost => 200, :bonus_maj => 2000, :bonus_min => 1000},
 	    			{:size => 3, :cost => 300, :bonus_maj => 3000, :bonus_min => 1500},
 	    			{:size => 4, :cost => 400, :bonus_maj => 4000, :bonus_min => 2000},
 	    			{:size => 5, :cost => 500, :bonus_maj => 5000, :bonus_min => 2500},
@@ -64,7 +64,7 @@ class Turn < ActiveRecord::Base
 	    			{:size => 31, :cost => 900, :bonus_maj => 9000, :bonus_min => 4500},
 	    			{:size => 41, :cost => 1000, :bonus_maj => 10000, :bonus_min => 5000}]
 
-	    level2 = [	{:size => 2, :cost => 300, :bonus_maj => 3000, :bonus_min => 1500},
+	   level2 = [	{:size => 2, :cost => 300, :bonus_maj => 3000, :bonus_min => 1500},
 	    			{:size => 3, :cost => 400, :bonus_maj => 4000, :bonus_min => 2000},
 	    			{:size => 4, :cost => 500, :bonus_maj => 5000, :bonus_min => 2500},
 	    			{:size => 5, :cost => 600, :bonus_maj => 6000, :bonus_min => 3000},
@@ -74,7 +74,7 @@ class Turn < ActiveRecord::Base
 	    			{:size => 31, :cost => 1000, :bonus_maj => 10000, :bonus_min => 5000},
 	    			{:size => 41, :cost => 1100, :bonus_maj => 11000, :bonus_min => 5500}]
 
-	    level3 = [	{:size => 2, :cost => 400, :bonus_maj => 4000, :bonus_min => 2000},
+	   level3 = [	{:size => 2, :cost => 400, :bonus_maj => 4000, :bonus_min => 2000},
 	    			{:size => 3, :cost => 500, :bonus_maj => 5000, :bonus_min => 2500},
 	    			{:size => 4, :cost => 600, :bonus_maj => 6000, :bonus_min => 3000},
 	    			{:size => 5, :cost => 700, :bonus_maj => 7000, :bonus_min => 3500},
@@ -100,7 +100,7 @@ class Turn < ActiveRecord::Base
 	    						{:abbr => "c", :name => "Continental", :stock_count => 25, :value => level3, :color => "#24BFA5", :size =>0}
 	    					}
 	   
-	    data["state"] = STATE_PLACE_PIECE;
+	    data["state"] = PLACE_PIECE;
 	    data["active_player_id"] = starting_player_id;
 
 	    turn.data = ActiveSupport::JSON.encode(data)
@@ -125,12 +125,16 @@ class Turn < ActiveRecord::Base
 		turn
 	end
 
-	def data_object
+	def data_hash
 		ActiveSupport::JSON.decode(data)
 	end
 
+	def serialize_data_hash(new_data_hash)
+		self.update_attributes(:data => ActiveSupport::JSON.encode(new_data_hash))
+	end
+
 	def get_company(company_abbr)
-		companies = data_object["companies"]
+		companies = data_hash["companies"]
 		companies.each do |company|
 			return company if company["abbr"] == company_abbr
 		end
@@ -219,13 +223,13 @@ class Turn < ActiveRecord::Base
 		pieces = Hash.new("e");
 
 		# Left
-		pieces[0] = piece_index % self.game.template.width != 0 ? board[piece_index - 1] : nil
+		pieces[0] = (piece_index % self.game.template.width != 0) ? board[piece_index - 1] : nil
 		# Right
-		pieces[1] = piece_index % self.game.template.width != self.game.template.width - 1 ? board[piece_index + 1] : nil
+		pieces[1] = (piece_index % self.game.template.width != self.game.template.width - 1) ? board[piece_index + 1] : nil
 		# Top
-		pieces[2] = piece_index >= self.game.template.width ? board[piece_index - self.game.template.width] : nil
+		pieces[2] = (piece_index >= self.game.template.width) ? board[piece_index - self.game.template.width] : nil
 		# Bottom
-		pieces[3] = piece_index / self.game.template.width < self.game.template.height - 1 ? board[piece_index + self.game.template.width] : nil
+		pieces[3] = (piece_index / self.game.template.width < self.game.template.height - 1) ? board[piece_index + self.game.template.width] : nil
 
 		pieces
 	end
@@ -237,7 +241,7 @@ class Turn < ActiveRecord::Base
 	def has_adjacent(piece_index, types)
 		pieces = get_adjacent_pieces(piece_index)
 		[0,1,2,3].each do |i|
-			return true if types[pieces[i]] == true
+			return true if types.include?(pieces[i].to_sym)
 		end
 		return false
 	end
@@ -254,7 +258,8 @@ class Turn < ActiveRecord::Base
 
 		self.update_attributes(:board => new_board)
 
-	 	PIECE_PLACED_COMPANY_CREATED if has_adjacent(piece_index, {"u"=>true})
+	 	return COMPANY_STARTED if has_adjacent(piece_index, Set.new([:u]))
+	 	return PIECE_PLACED
 	end
 
 	# -----------------------------------------------------------------
@@ -291,6 +296,6 @@ class Turn < ActiveRecord::Base
 
 		update_attributes(:board => board.dup)
 
-		data_object["companies"][company_abbr]["size"] = tiles.size
+		data_hash["companies"][company_abbr]["size"] = tiles.size
 	end
 end
