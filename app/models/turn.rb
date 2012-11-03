@@ -13,6 +13,12 @@
 #  updated_at :datetime        not null
 #
 
+class String
+  def is_int?
+    self.to_i.to_s == self
+  end
+end
+
 class Turn < ActiveRecord::Base
 	# ASSOCIATIONS
 	belongs_to :game
@@ -108,6 +114,18 @@ class Turn < ActiveRecord::Base
 		turn if turn.save!
 	end
 
+	def stock_value_for(company_abbr)
+		company_size = data_hash["companies"][company_abbr]["size"]
+		value_table = data_hash["companies"][company_abbr]["value"]
+
+		value_table.each_with_index do |row, i|
+			break if row["size"] > size
+		end
+
+		# At this point, i - 1 in the table holds the row that contains the cost
+		return value_table[i - 1]["cost"]
+	end
+
 	# creates subsequent turn from the this turn
 	def create_next_turn_with_player(player)
 		Turn.create({ 
@@ -185,16 +203,12 @@ class Turn < ActiveRecord::Base
 
 	def get_tile_at(row, column)
 		{
-			:row => row,
-			:column => column,
-			:index => row * game.template.width + column,
-			:tile => board[row * game.template.width + column],
-			:key => row.to_s + "_" + column.to_s
+			"row" => row,
+			"column" => column,
+			"index" => row * game.template.width + column,
+			"tile" => board[row * game.template.width + column],
+			"key" => row.to_s + "_" + column.to_s
 		}
-	end
-
-	def get_tile_at(row, column)
-		board[row * game.template.width + column]
 	end
 
 	def piece_index(row, column)
@@ -223,15 +237,15 @@ class Turn < ActiveRecord::Base
 		pieces = Hash.new("e");
 
 		# Left
-		pieces[0] = (piece_index % self.game.template.width != 0) ? board[piece_index - 1] : nil
+		pieces[0] = (piece_index % self.game.template.width != 0) ? board[piece_index - 1] : "X"
 		# Right
-		pieces[1] = (piece_index % self.game.template.width != self.game.template.width - 1) ? board[piece_index + 1] : nil
+		pieces[1] = (piece_index % self.game.template.width != self.game.template.width - 1) ? board[piece_index + 1] : "X"
 		# Top
-		pieces[2] = (piece_index >= self.game.template.width) ? board[piece_index - self.game.template.width] : nil
+		pieces[2] = (piece_index >= self.game.template.width) ? board[piece_index - self.game.template.width] : "X"
 		# Bottom
-		pieces[3] = (piece_index / self.game.template.width < self.game.template.height - 1) ? board[piece_index + self.game.template.width] : nil
+		pieces[3] = (piece_index / self.game.template.width < self.game.template.height - 1) ? board[piece_index + self.game.template.width] : "X"
 
-		pieces
+		return pieces
 	end
 
 	# -----------------------------------------------------------------
@@ -266,7 +280,7 @@ class Turn < ActiveRecord::Base
 	# Returns all the cells connected to row,column that are not "e" cells
 	# -----------------------------------------------------------------
 	def get_connected_tiles(row, column)
-	    get_connected_cells_recurse(row, column, {});
+	    get_connected_tiles_recurse(row, column, {});
 	end
 
 	def get_connected_tiles_recurse(row, column, map)
@@ -276,26 +290,27 @@ class Turn < ActiveRecord::Base
 	    bottom = row < game.template.height - 1 ? get_tile_at(row + 1, column) : nil;
 
 	    [left, right, top, bottom].each do |item|
-	        if item && item.tile != "e" && !map.has_key(item.key)
-	            map[item.key] = item;
-	            get_connected_tiles_recurse(item.row, item.column, map);
+	        if item && item["row"] && item["column"] && item["tile"] != "e" && !item["tile"].is_int? && !map.has_key?(item["key"])
+	            map[item["key"]] = item;
+	            get_connected_tiles_recurse(item["row"], item["column"], map);
 	        end
 	    end
-	    map
+	    return map
 	end
 
 	# -----------------------------------------------------------------
 	# Starts a company of all cells connected to the provided row, column
 	# -----------------------------------------------------------------
-	def start_company(row, column, company_abbr)
+	def start_company_at(row, column, company_abbr)
+		binding.pry
 		tiles = get_connected_tiles(row, column)
 
-		tiles.each do |t|
-			board[t.index] = company_abbr
+		tiles.each do |key, value|
+			board[value["index"]] = company_abbr
 		end
 
 		update_attributes(:board => board.dup)
 
-		data_hash["companies"][company_abbr]["size"] = tiles.size
+		return tiles.size
 	end
 end

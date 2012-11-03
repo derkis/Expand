@@ -10,9 +10,15 @@
 	= button_to_function 'go', 'start_company_click_handler()', :id => 'start_company_button', :class => 'image_button'
 #purchase_stock_popup
 	.title{:style=>"padding-bottom:10px;"}
-		Purchase Stock
-		- [1,2,3].each do |i|
-			.purchase_stock
-				%input{ :type=>"radio", :value=>"1", :name=>"stock_purchase_group" }
-				%label
-					= "+" + i.to_s()
+		.purchaseStock
+			Purchase Stock
+		- @cur_turn.data_hash["companies"].each do |key, value|
+			.company{:style=>"padding-top:5px;"}
+				%label{:style=>"float:left; width:120px;"}
+					= value["name"]
+				- [1,2,3].each do |i|
+					.purchase_stock{:style=>"width:60px; float:left;"}
+						%input{ :type=>"radio", :value=>"#{i}", :name=>"stock_purchase_group_#{key}" }
+						%label{ :name=>"stock_radio_#{key}_#{i}"}
+							= i.to_s()
+	= button_to_function 'Purchase', 'purchase_stock_click_handler()', :id => 'start_company_button', :class => 'image_button'

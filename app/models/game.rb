@@ -97,6 +97,10 @@ class Game < ActiveRecord::Base
     self.cur_turn.player.index
   end
 
+  def user_player_index(user)
+    player_index_for(user)
+  end
+
   def player_index_for(user)
     self.players.each do |p|
       return p.index if p.user_id = user.id

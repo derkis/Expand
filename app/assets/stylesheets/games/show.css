@@ -92,10 +92,13 @@
       position: absolute;
       top: 0em;
       right: 1em; }
-  .wrapper .players {
+  .wrapper .rightNav {
     position: absolute;
     top: 10px;
-    right: -30px;
+    right: -30px; }
+  .wrapper .players {
+    padding: 0.5em;
+    margin: 0.5em;
     background-color: #464646;
     border: 1em dotted #707070; }
     .wrapper .players .player {
@@ -108,3 +111,22 @@
         color: white; }
     .wrapper .players .current_player {
       color: #78dabb; }
+  .wrapper .companies {
+    padding: 0.5em;
+    margin: 0.5em;
+    background-color: #464646;
+    border: 1em dotted #707070; }
+    .wrapper .companies .company {
+      height: 25px;
+      font-family: Pixel, cursive;
+      font-size: 14px;
+      color: #a66c5a; }
+      .wrapper .companies .company .name {
+        float: left;
+        width: 120px; }
+      .wrapper .companies .company .stock_count {
+        float: left; }
+      .wrapper .companies .company .divider {
+        float: left; }
+      .wrapper .companies .company .size {
+        float: left; }

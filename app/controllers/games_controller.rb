@@ -61,6 +61,7 @@ class GamesController < ApplicationController
             :debug_mode,
             :cur_turn_number,
             :cur_player_index,
+            { :name => :user_player_index, :arguments => [current_user] },
             :last_action,
             :board,
             { :name => :cur_data, :arguments => [current_user] }

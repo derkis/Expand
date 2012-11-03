@@ -88,13 +88,18 @@ var TURN_TYPES = {
         name: 'start_company',
         message: "Please choose a company to start",
         get_action: function() {
+            // Close the start company popup if it is open
+            $("#start_company_popup").bPopup().close();
+            
             // Return the selected company value
             return  {
-                        "company_index": $("input[name=company_group]").filter(':checked').val()
+                        company_abbr: $("input[name=company_group]").filter(':checked').val(),
+                        row: cur_game_state.last_action.row,
+                        column: cur_game_state.last_action.column
                     };
         },
         render: function(game_state) {
-            render_start_company_at(game_state.last_action.place.row, game_state.last_action.place.column, game_state);
+            render_start_company_at(game_state.last_action.row, game_state.last_action.column, game_state);
         }
     },
     
@@ -102,9 +107,22 @@ var TURN_TYPES = {
         name: 'purchase_stock',
         message: "Choose how many stocks to purchase",
         get_action: function() {
-            return  {
-                        "stocks_purchased": $("input[name=stock_purchase_group]").filter(':checked').val()
-                    }
+            ret =  {"stocks_purchased": {}}
+
+            for (var key in cur_game_state.cur_data.companies)
+            {
+                var count = parseInt($("input[name=stock_purchase_group_" + key + "]").filter(':checked').val());
+
+                if (count)
+                {
+                    ret["stocks_purchased"][key] = count;
+                }
+            }
+
+            return ret;
+        },
+        render: function(game_state) {
+            render_purchase_stock(game_state);
         }
     },
     
@@ -162,9 +180,25 @@ function render_all(game_state)
     render_players(game_state.cur_data.players);
     render_status(game_state);
     render_message();
+    render_popups();
     render_turn_button();
 }
 
+function render_popups()
+{
+    // Here we pouplate the values of the companies in the radio buttons for
+    // purchase stock popup (e.g. Luxor for 1 stock at size 2 is $200)
+    for (var key in cur_game_state.cur_data.companies)
+    {
+        var company = cur_game_state.cur_data.companies[key];
+
+        for (i = 1; i < 4; i++)
+        {
+            var label = $("label[name='stock_radio_" + key + "_" + i + "']");
+            label.text(i.toString() + "(" + (i * get_cost_for(key)));
+        }
+    }
+}
 function render_turn_button()
 {
     var turn_button = $('#turn_button');
@@ -214,7 +248,7 @@ function render_cell(cell, cell_type, row, column)
 function render_status()
 {
     $('.turn_label').text("Turn: " + (cur_game_state.cur_turn_number + 1));
-    $('.money').text("$" + cur_game_state.cur_data.players[cur_game_state.cur_player_index]["money"]);
+    $('.money').text("$" + cur_game_state.cur_data.players[cur_game_state.user_player_index]["money"]);
 }
 
 function render_players()
@@ -249,6 +283,11 @@ function render_start_company_at(row, column, game_state)
     }
 
     $("#start_company_popup").bPopup({modalClose: false});
+}
+
+function render_purchase_stock(game_state)
+{
+    $("#purchase_stock_popup").bPopup({modalClose: false});
 }
 
 function player_can_act()
@@ -312,6 +351,38 @@ function get_connected_cells_recurse(cell, classes, map)
     }
 }
 
+function get_company(company_abbr)
+{
+    for (var key in cur_game_state.cur_data.companies)
+    {
+        if (key == company_abbr)
+        {
+            return cur_game_state.cur_data.companies[key]
+        }
+    }
+}
+
+function get_cost_for(company_abbr)
+{
+    // 1) Find the company
+    var company = get_company(company_abbr);
+
+    // 2) Loop through value rows (cost / size)
+    for (var i = 0; i < company.value.length; i++)
+    {
+        var row = company.value[i];
+
+        // 3) Return the previous row when we find a row that has a coung
+        //    greater than the current company size.
+        if (row.size > company.size)
+        {
+            return company.value[i - 1];
+        }
+    }
+
+    return -1;
+}
+
 //------------------------------------------------------------------------------------------
 //
 // Events
@@ -328,7 +399,7 @@ function load_game_state_resultHandler(game_state)
 
     render_all(game_state);
 
-    TURN_TYPES[game_state.cur_data.state].render(game_state);
+    TURN_TYPES[game_state.cur_data.state.toString()].render(game_state);
 }
 
 function document_readyHandler()
@@ -427,6 +498,11 @@ function input_handler()
 }
 
 function start_company_click_handler()
+{
+    send_game_update();
+}
+
+function purchase_stock_click_handler()
 {
     send_game_update();
 }

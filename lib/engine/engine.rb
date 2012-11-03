@@ -28,7 +28,11 @@ module Engine
 			# START_COMPANY
 			#--------------------------------------
 			when Turn::START_COMPANY
-				raise 'start_company not implemented'
+				size = game.cur_turn.start_company_at(action["row"], action["column"], action["company_abbr"])
+				binding.pry
+				data_hash['state'] = Turn::PURCHASE_STOCK
+				data_hash["companies"][action["company_abbr"]]["size"] = size
+				game.cur_turn.serialize_data_hash(data_hash)
 		end
 	end
 end
