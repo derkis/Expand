@@ -139,6 +139,10 @@ class Game < ActiveRecord::Base
     self.cur_turn = self.cur_turn.create_next_turn_with_player(next_player)
   end
 
+  def advance_turn_step
+    self.cur_turn = self.cur_turn.create_next_turn_step()
+  end
+
   # SETTERS & GETTERS
   def cur_turn
     Turn.find(self.turn_id)

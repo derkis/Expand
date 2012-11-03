@@ -32,94 +32,165 @@ $cell_height: 50px;
 	}
 }
 
-.wrapper {
-	position: relative;
-	background: $dark_background;
-	width: 70em; height: 35em;
+.wrapper
+{
+	width: 70em;
 	margin: 0 auto;
+	background: $dark_background;
 
-	.turn_label, .money {
-		@include pixel_font($font_size_title, $font_color_title);
-		background: $dark_background;
-		padding: 0.5em;
-	}
-
-	.turn_label {
-		float: left;
-	}
-
-	.board {
-		display:table;
+	.main {
+		position: relative;
 		margin: 0 auto;
 
-		.row {
-			display:table-row;
-			height: $cell_height;
+		.status
+		{
+			position: absolute;
+			top: 0px; left: 30px;
+			background: $dark_background;
+			padding: 0.5em;
 
-			.cell {
-				@include pixel_font($font_size_std, $font_color_cell_border);
-				display:table-cell;
-				background: $light-background;
-				width: $cell_height;
-				text-align:center;
-				vertical-align:middle;
-				border: 2px dashed gray;
+			.turn_label {
+				float: left;
+				@include pixel_font($font_size_title, $font_color_title);
 			}
 
-			.game_cell {
-				background: $dark_background;
-				color: $font_color_cell;
-				border: 3px dotted #000;
-
-				&:hover {
-					border-color: $light-background;
-				}
+			.money {
+				float: left;
+				@include pixel_font($font_size_title, $font_color_title);
 			}
+			
+			.stocks {
+				float: left;
+				@include pixel_font($font_size_subtitle, $primary_color);
 
-			.no_hotel {
-				background: #000;
-			}
-
-			.enabled {
-				background: $primary_color;
-				color: $font_color_cell_enabled;
-				&:hover {
-					border-color: #fff;
-					background: $primary_color_highlight;
-				}
-			}
-
-			.adjacent {
-				background: $primary_color_highlight;
-			}
-
-			.selected {
-				background: $primary_color_selection;
-				color: $font_color_cell_enabled;
-				&:hover {
-					border-color: #fff;
-					background: $primary_color_selection;
-				}
-			}
-
-			.highlighted {
-				background: $primary_color_highlight;
-				color: $font_color_cell_enabled;
-				&:hover {
-					border-color: #fff;
-					background: $primary_color_highlight;
+				.player_stock_in_company {
+					padding-left: 1em;
 				}
 			}
 		}
 
+		.board {
+
+			display:table;
+			margin: 0 auto;
+			padding-top:5em;
+			padding-bottom:2em;
+			.row {
+				display:table-row;
+				height: $cell_height;
+
+				.cell {
+					@include pixel_font($font_size_std, $font_color_cell_border);
+					display:table-cell;
+					background: $light-background;
+					width: $cell_height;
+					text-align:center;
+					vertical-align:middle;
+					border: 2px dashed gray;
+				}
+
+				.game_cell {
+					background: $dark_background;
+					color: $font_color_cell;
+					border: 3px dotted #000;
+
+					&:hover {
+						border-color: $light-background;
+					}
+				}
+
+				.no_hotel {
+					background: #000;
+				}
+
+				.enabled {
+					background: $primary_color;
+					color: $font_color_cell_enabled;
+					&:hover {
+						border-color: #fff;
+						background: $primary_color_highlight;
+					}
+				}
+
+				.adjacent {
+					background: $primary_color_highlight;
+				}
+
+				.selected {
+					background: $primary_color_selection;
+					color: $font_color_cell_enabled;
+					&:hover {
+						border-color: #fff;
+						background: $primary_color_selection;
+					}
+				}
+
+				.highlighted {
+					background: $primary_color_highlight;
+					color: $font_color_cell_enabled;
+					&:hover {
+						border-color: #fff;
+						background: $primary_color_highlight;
+					}
+				}
+			}
+
+		}
+
+		.rightNav {
+			position: absolute;
+			top: 10px; right: -30px;
+		}
+
+		.players {
+			padding: 0.5em;
+			margin: 0.5em;
+			background-color: $dark_background;
+			border: 1em dotted $light_background;
+
+			.player {
+				@include pixel_font($font_size_subtitle, $primary_color);
+
+				.player_info {
+					@include pixel_font($font_size_small, $font_color_user);
+				}
+
+			}
+
+			.current_player {
+				color: $font_color_link;
+			}
+		}
+
+		.companies {
+			padding: 0.5em;
+			margin: 0.5em;
+			background-color: $dark_background;
+			border: 1em dotted $light_background;
+
+			.company {
+				height: 25px;
+				@include pixel_font($font_size_subtitle, $primary_color);
+				.name {
+					float:left; width:120px;
+				}
+				.stock_count {
+					float:left;
+				}
+				.divider {
+					float:left;
+				}
+				.size {
+					float:left;
+				}
+			}
+		}
 	}
 
 	.footer {
-		position: absolute;
-		margin-top: 1em;
-		padding: 0.5em;
-		right: 0em;
-		left: 0em;
+		position: relative;
+		margin: 0 auto;
+
 		background: $dark_background;
 		@include pixel_font($font_size_std, $font_color_cell_border);
 		text-align:center;
@@ -131,55 +202,6 @@ $cell_height: 50px;
 			position: absolute;
 			top:0em;
 			right:1em;
-		}
-	}
-
-	.rightNav {
-		position: absolute;
-		top: 10px; right: -30px;
-	}
-
-	.players {
-		padding: 0.5em;
-		margin: 0.5em;
-		background-color: $dark_background;
-		border: 1em dotted $light_background;
-
-		.player {
-			@include pixel_font($font_size_subtitle, $primary_color);
-
-			.player_info {
-				@include pixel_font($font_size_small, $font_color_user);
-			}
-
-		}
-
-		.current_player {
-			color: $font_color_link;
-		}
-	}
-
-	.companies {
-		padding: 0.5em;
-		margin: 0.5em;
-		background-color: $dark_background;
-		border: 1em dotted $light_background;
-
-		.company {
-			height: 25px;
-			@include pixel_font($font_size_subtitle, $primary_color);
-			.name {
-				float:left; width:120px;
-			}
-			.stock_count {
-				float:left;
-			}
-			.divider {
-				float:left;
-			}
-			.size {
-				float:left;
-			}
 		}
 	}
 }

@@ -30,69 +30,122 @@
     padding: 2em; }
 
 .wrapper {
-  position: relative;
-  background: #464646;
   width: 70em;
-  height: 35em;
-  margin: 0 auto; }
-  .wrapper .turn_label, .wrapper .money {
-    font-family: Pixel, cursive;
-    font-size: 20px;
-    color: #a66c5a;
-    background: #464646;
-    padding: 0.5em; }
-  .wrapper .turn_label {
-    float: left; }
-  .wrapper .board {
-    display: table;
+  margin: 0 auto;
+  background: #464646; }
+  .wrapper .main {
+    position: relative;
     margin: 0 auto; }
-    .wrapper .board .row {
-      display: table-row;
-      height: 50px; }
-      .wrapper .board .row .cell {
+    .wrapper .main .status {
+      position: absolute;
+      top: 0px;
+      left: 30px;
+      background: #464646;
+      padding: 0.5em; }
+      .wrapper .main .status .turn_label {
+        float: left;
         font-family: Pixel, cursive;
-        font-size: 12px;
-        color: black;
-        display: table-cell;
-        background: #707070;
-        width: 50px;
-        text-align: center;
-        vertical-align: middle;
-        border: 2px dashed gray; }
-      .wrapper .board .row .game_cell {
-        background: #464646;
-        color: #707070;
-        border: 3px dotted #000; }
-        .wrapper .board .row .game_cell:hover {
-          border-color: #707070; }
-      .wrapper .board .row .no_hotel {
-        background: #000; }
-      .wrapper .board .row .enabled {
-        background: #a66c5a;
-        color: white; }
-        .wrapper .board .row .enabled:hover {
-          border-color: #fff;
+        font-size: 20px;
+        color: #a66c5a; }
+      .wrapper .main .status .money {
+        float: left;
+        font-family: Pixel, cursive;
+        font-size: 20px;
+        color: #a66c5a; }
+      .wrapper .main .status .stocks {
+        float: left;
+        font-family: Pixel, cursive;
+        font-size: 14px;
+        color: #a66c5a; }
+        .wrapper .main .status .stocks .player_stock_in_company {
+          padding-left: 1em; }
+    .wrapper .main .board {
+      display: table;
+      margin: 0 auto;
+      padding-top: 5em;
+      padding-bottom: 2em; }
+      .wrapper .main .board .row {
+        display: table-row;
+        height: 50px; }
+        .wrapper .main .board .row .cell {
+          font-family: Pixel, cursive;
+          font-size: 12px;
+          color: black;
+          display: table-cell;
+          background: #707070;
+          width: 50px;
+          text-align: center;
+          vertical-align: middle;
+          border: 2px dashed gray; }
+        .wrapper .main .board .row .game_cell {
+          background: #464646;
+          color: #707070;
+          border: 3px dotted #000; }
+          .wrapper .main .board .row .game_cell:hover {
+            border-color: #707070; }
+        .wrapper .main .board .row .no_hotel {
+          background: #000; }
+        .wrapper .main .board .row .enabled {
+          background: #a66c5a;
+          color: white; }
+          .wrapper .main .board .row .enabled:hover {
+            border-color: #fff;
+            background: #db7556; }
+        .wrapper .main .board .row .adjacent {
           background: #db7556; }
-      .wrapper .board .row .adjacent {
-        background: #db7556; }
-      .wrapper .board .row .selected {
-        background: #f09b46;
-        color: white; }
-        .wrapper .board .row .selected:hover {
-          border-color: #fff;
-          background: #f09b46; }
-      .wrapper .board .row .highlighted {
-        background: #db7556;
-        color: white; }
-        .wrapper .board .row .highlighted:hover {
-          border-color: #fff;
-          background: #db7556; }
+        .wrapper .main .board .row .selected {
+          background: #f09b46;
+          color: white; }
+          .wrapper .main .board .row .selected:hover {
+            border-color: #fff;
+            background: #f09b46; }
+        .wrapper .main .board .row .highlighted {
+          background: #db7556;
+          color: white; }
+          .wrapper .main .board .row .highlighted:hover {
+            border-color: #fff;
+            background: #db7556; }
+    .wrapper .main .rightNav {
+      position: absolute;
+      top: 10px;
+      right: -30px; }
+    .wrapper .main .players {
+      padding: 0.5em;
+      margin: 0.5em;
+      background-color: #464646;
+      border: 1em dotted #707070; }
+      .wrapper .main .players .player {
+        font-family: Pixel, cursive;
+        font-size: 14px;
+        color: #a66c5a; }
+        .wrapper .main .players .player .player_info {
+          font-family: Pixel, cursive;
+          font-size: 10px;
+          color: white; }
+      .wrapper .main .players .current_player {
+        color: #78dabb; }
+    .wrapper .main .companies {
+      padding: 0.5em;
+      margin: 0.5em;
+      background-color: #464646;
+      border: 1em dotted #707070; }
+      .wrapper .main .companies .company {
+        height: 25px;
+        font-family: Pixel, cursive;
+        font-size: 14px;
+        color: #a66c5a; }
+        .wrapper .main .companies .company .name {
+          float: left;
+          width: 120px; }
+        .wrapper .main .companies .company .stock_count {
+          float: left; }
+        .wrapper .main .companies .company .divider {
+          float: left; }
+        .wrapper .main .companies .company .size {
+          float: left; }
   .wrapper .footer {
-    position: absolute;
-    margin-top: 1em;
-    padding: 0.5em;
-    right: 0em;
-    left: 0em;
+    position: relative;
+    margin: 0 auto;
     background: #464646;
     font-family: Pixel, cursive;
     font-size: 12px;
@@ -105,41 +158,3 @@
       position: absolute;
       top: 0em;
       right: 1em; }
-  .wrapper .rightNav {
-    position: absolute;
-    top: 10px;
-    right: -30px; }
-  .wrapper .players {
-    padding: 0.5em;
-    margin: 0.5em;
-    background-color: #464646;
-    border: 1em dotted #707070; }
-    .wrapper .players .player {
-      font-family: Pixel, cursive;
-      font-size: 14px;
-      color: #a66c5a; }
-      .wrapper .players .player .player_info {
-        font-family: Pixel, cursive;
-        font-size: 10px;
-        color: white; }
-    .wrapper .players .current_player {
-      color: #78dabb; }
-  .wrapper .companies {
-    padding: 0.5em;
-    margin: 0.5em;
-    background-color: #464646;
-    border: 1em dotted #707070; }
-    .wrapper .companies .company {
-      height: 25px;
-      font-family: Pixel, cursive;
-      font-size: 14px;
-      color: #a66c5a; }
-      .wrapper .companies .company .name {
-        float: left;
-        width: 120px; }
-      .wrapper .companies .company .stock_count {
-        float: left; }
-      .wrapper .companies .company .divider {
-        float: left; }
-      .wrapper .companies .company .size {
-        float: left; }

@@ -77,7 +77,7 @@ $('#game').ready(game_readyHandler);
 //------------------------------------------------------------------------------------------
 var TURN_TYPES = {
     
-    "000": { 
+    "0": { 
         name: 'no_action'
     },
     
@@ -89,6 +89,8 @@ var TURN_TYPES = {
                 row: selected_cell.attr('row').to_int(),
                 column: selected_cell.attr('column').to_int()
             };
+        },
+        render: function(game_state) {
         }
     },
     
@@ -115,19 +117,10 @@ var TURN_TYPES = {
         name: 'purchase_stock',
         message: "Choose how many stocks to purchase",
         get_action: function() {
-            ret =  {"stocks_purchased": {}}
+            // Close the purchase stock popup if it is open
+            $("#purchase_stock_popup").bPopup().close();
 
-            for (var key in cur_game_state.cur_data.companies)
-            {
-                var count = parseInt($("input[name=stock_purchase_group_" + key + "]").filter(':checked').val());
-
-                if (count)
-                {
-                    ret["stocks_purchased"][key] = count;
-                }
-            }
-
-            return ret;
+            return {"stocks_purchased": stock_purchased_by_abbr};
         },
         render: function(game_state) {
             render_purchase_stock(game_state);

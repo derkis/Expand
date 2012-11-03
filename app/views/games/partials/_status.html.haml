@@ -1,3 +1,10 @@
-.turn_label
-.money
-.stock
+.status
+	.turn_label
+	.money
+	.stocks
+		- @cur_turn.data_hash["companies"].each do |key, value|
+			.player_stock_in_company{:abbr=>"#{key}", :style=>"float:left; color: #{value['color'];}"}
+				.player_stock_in_company_lbl
+					= value["name"]
+				.player_stock_in_company_value
+					0

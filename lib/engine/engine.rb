@@ -16,7 +16,13 @@ module Engine
 
 				case place_piece_result
 					when Turn::PIECE_PLACED
-						game.advance_turn
+						if game.cur_turn.can_purchase_stock(game.cur_turn.player)
+							game.advance_turn
+						else
+							game.advance_turn_step
+							data_hash['state'] = Turn::PURCHASE_STOCK
+							game.cur_turn.serialize_data_hash(data_hash)
+						end
 					when Turn::COMPANY_STARTED
 						data_hash['state'] = Turn::START_COMPANY
 						game.cur_turn.serialize_data_hash(data_hash)
@@ -32,6 +38,20 @@ module Engine
 				data_hash['state'] = Turn::PURCHASE_STOCK
 				data_hash["companies"][action["company_abbr"]]["size"] = size
 				game.cur_turn.serialize_data_hash(data_hash)
+
+			#--------------------------------------
+			# PURCHASE_STOCK
+			#--------------------------------------
+			when Turn::PURCHASE_STOCK
+				action["stocks_purchased"].each do |key, value|
+					data_hash["companies"][key]["stock_count"] = data_hash["companies"][key]["stock_count"] - value
+					if data_hash["players"][game.cur_turn.player.index]["stock_count"].has_key?(key)
+						data_hash["players"][game.cur_turn.player.index]["stock_count"][key] = data_hash["players"][game.cur_turn.player.index]["stock_count"][key] + value
+					else
+						data_hash["players"][game.cur_turn.player.index]["stock_count"][key] = value
+					end
+					game.advance_turn
+				end
 		end
 	end
 end

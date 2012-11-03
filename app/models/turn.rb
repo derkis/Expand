@@ -11,6 +11,7 @@
 #  action     :text
 #  created_at :datetime        not null
 #  updated_at :datetime        not null
+#  step       :integer
 #
 
 class String
@@ -25,7 +26,7 @@ class Turn < ActiveRecord::Base
 	belongs_to :player
 
  	# ATTRIBUTE ACCESSORS
-	attr_accessible :game_id, :player_id, :number, :board, :tiles, :data, :action
+	attr_accessible :game_id, :player_id, :number, :board, :tiles, :data, :action, :step
 
 	# CONSTANTS
 	INACTIVE				= 000
@@ -44,6 +45,7 @@ class Turn < ActiveRecord::Base
 	def self.create_first_turn_for(game, starting_player_id)
 		turn = Turn.new({
 			:number => 0,
+			:step => 0,
 			:game_id => game.id, 
 			:player_id => starting_player_id,  
 			:board => 'e' * game.template.board_area 
@@ -56,7 +58,7 @@ class Turn < ActiveRecord::Base
 		data['players'] = []
 
 		game.players.each_with_index do |p, i|
-		  	data['players'][i] = {:stock_count => [0,0,0,0,0,0], :money => 1500}
+		  	data['players'][i] = {:stock_count => {}, :money => 1500}
 		end
 
 	   # Setup pricing / value levels for the 3 types of companies
@@ -129,12 +131,26 @@ class Turn < ActiveRecord::Base
 
 	# creates subsequent turn from the this turn
 	def create_next_turn_with_player(player)
-		Turn.create({ 
+		new_data = data_hash
+		new_data["state"] = PLACE_PIECE
+
+		return Turn.create({ 
 			:number => number + 1, 
 			:game_id => self.game_id, 
 			:player_id => player.id, 
 			:board => self.board, 
-			:data => data
+			:data => ActiveSupport::JSON.encode(new_data)
+		})
+	end
+
+	# creates subsequent step from the this turn
+	def create_next_turn_step()
+		return Turn.create({ 
+			:step => step + 1, 
+			:game_id => self.game_id, 
+			:player_id => player_id, 
+			:board => self.board.dup, 
+			:data => data.dup
 		})
 	end
 
@@ -314,5 +330,24 @@ class Turn < ActiveRecord::Base
 		update_attributes(:board => new_board)
 
 		return tiles.size
+	end
+
+	# -----------------------------------------------------------------
+	# Returns the number of established companies (companies with size > 0)
+	# -----------------------------------------------------------------
+	def num_established_companies
+		num = 0
+		companies = data_hash["companies"]
+		companies.each do |company|
+			num = num + 1 if company.size > 0
+		end
+		return num
+	end
+
+	# -----------------------------------------------------------------
+	# Returns true if the player can purchase stock
+	# -----------------------------------------------------------------
+	def can_purchase_stock(player)
+		return num_established_companies > 0
 	end
 end
