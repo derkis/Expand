@@ -12,13 +12,28 @@
 	.title{:style=>"padding-bottom:10px;"}
 		.purchaseStock
 			Purchase Stock
+	.companies
 		- @cur_turn.data_hash["companies"].each do |key, value|
-			.company{:style=>"padding-top:5px;"}
+			.company_stock_purchased{:company_abbr=>"#{key}", :style=>"padding-top:5px; color: #{value['color'];}"}
 				%label{:style=>"float:left; width:120px;"}
 					= value["name"]
-				- [1,2,3].each do |i|
-					.purchase_stock{:style=>"width:60px; float:left;"}
-						%input{ :type=>"radio", :value=>"#{i}", :name=>"stock_purchase_group_#{key}" }
-						%label{ :name=>"stock_radio_#{key}_#{i}"}
-							= i.to_s()
+				= button_to_function '-', 'sub_stock_for(\'' + key + '\')', :style=>"float:left;"
+				= button_to_function '+', 'add_stock_for(\'' + key + '\')', :style=>"float:left;"
+				.company_stock_purchased_total{:style=>"float:left;padding-left:2em;", :company_abbr=>"#{key}"}
+					0
+				.company_stock_purchased_cost{:style=>"float:left;padding-left:2em;", :company_abbr=>"#{key}"}
+					$0
+	.stock_purchased_totals
+		.lbl_stock_purchased_total{:style=>"height:25px;"}
+			.lbl{:style=>"float:left; width:200px;"}
+				Total:
+			.stock_purchased_total{:style=>"float:left;"}
+		.lbl_stock_purchased_cost{:style=>"height:25px;"}
+			.lbl{:style=>"float:left; width:200px;"}
+				Cost:
+			.stock_purchased_cost{:style=>"float:left;"}
+		.lbl_stock_purchased_money_after{:style=>"height:25px;"}
+			.lbl{:style=>"float:left; width:200px;"}
+				Money After:
+			.stock_purchased_money_after{:style=>"float:left;"}
 	= button_to_function 'Purchase', 'purchase_stock_click_handler()', :id => 'start_company_button', :class => 'image_button'

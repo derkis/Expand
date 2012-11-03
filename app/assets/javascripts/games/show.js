@@ -21,6 +21,11 @@ String.prototype.to_int = function()
     return parseInt(this);
 }
 
+String.prototype.is_int = function() 
+{
+    return !isNaN(parseInt(this));
+}
+
 function hasClass(element, cls)
 {
     var r = new RegExp('\\b' + cls + '\\b');
@@ -53,6 +58,9 @@ var selected_cell;
 var cur_game_state;
 var message_temp = null;
 var GAME_ID;
+
+var stock_purchased_by_abbr = {};
+var stock_purchased_total = 0;
 
 //------------------------------------------------------------------------------------------
 //
@@ -190,12 +198,16 @@ function render_popups()
     // purchase stock popup (e.g. Luxor for 1 stock at size 2 is $200)
     for (var key in cur_game_state.cur_data.companies)
     {
-        var company = cur_game_state.cur_data.companies[key];
+        var company = get_company(key);
+        var div_company_stock_purchase = $(".company_stock_purchased[company_abbr='" + key + "']");
 
-        for (i = 1; i < 4; i++)
+        if (company.size)
         {
-            var label = $("label[name='stock_radio_" + key + "_" + i + "']");
-            label.text(i.toString() + "(" + (i * get_cost_for(key)));
+            div_company_stock_purchase.show();
+        }
+        else
+        {
+            div_company_stock_purchase.hide();
         }
     }
 }
@@ -242,13 +254,24 @@ function render_cell(cell, cell_type, row, column)
         case player_index:
             cell.addClass('enabled');
             break;
+        default:
+            if (cell_type.is_int())
+            {
+                // This is someone else's tile! Don't show it.
+            }
+            else
+            {
+                // This needs to be the color of the chain it belongs to:
+                cell.css("background-color", get_company(cell_type)["color"]);
+                cell.text(get_company(cell_type)["abbr"].toUpperCase());
+            }
     }
 }
 
 function render_status()
 {
     $('.turn_label').text("Turn: " + (cur_game_state.cur_turn_number + 1));
-    $('.money').text("$" + cur_game_state.cur_data.players[cur_game_state.user_player_index]["money"]);
+    $('.money').text("$" + get_cur_money());
 }
 
 function render_players()
@@ -288,6 +311,49 @@ function render_start_company_at(row, column, game_state)
 function render_purchase_stock(game_state)
 {
     $("#purchase_stock_popup").bPopup({modalClose: false});
+}
+
+function render_stock_purchase_selection()
+{
+    var stock_purchased_cost = 0;
+
+    // Clear out all to zeros unless there is something specified to be 
+    // purchased for a particular company.
+    for (var key in cur_game_state.cur_data.companies)
+    {
+        var div_company_stock_purchased_total = $(".company_stock_purchased_total[company_abbr='" + key + "']");
+        var div_company_stock_purchased_cost = $(".company_stock_purchased_cost[company_abbr='" + key + "']");
+
+        if (stock_purchased_by_abbr[key])
+        {
+            div_company_stock_purchased_total.text(stock_purchased_by_abbr[key]);
+
+            var cost = (get_company_stock_cost_for(key) * stock_purchased_by_abbr[key]);
+            var cost_string = "- $" + cost.toString();
+            div_company_stock_purchased_cost.text(cost_string);
+
+            stock_purchased_cost += cost;
+        }
+        else
+        {
+            div_company_stock_purchased_total.text("0");
+            div_company_stock_purchased_cost.text("$0");
+        }
+    }
+
+    var div_stock_purchased_total = $(".stock_purchased_total");
+    div_stock_purchased_total.text(stock_purchased_total);
+
+    var div_stock_purchased_cost = $(".stock_purchased_cost");
+    div_stock_purchased_cost.text("$" + stock_purchased_cost);
+
+    var div_stock_purchased_money_after = $(".stock_purchased_money_after");
+    div_stock_purchased_money_after.text("$" + (get_cur_money() - stock_purchased_cost));
+}
+
+function get_cur_money()
+{
+    return cur_game_state.cur_data.players[cur_game_state.user_player_index]["money"];
 }
 
 function player_can_act()
@@ -362,7 +428,7 @@ function get_company(company_abbr)
     }
 }
 
-function get_cost_for(company_abbr)
+function get_company_value_for(company_abbr)
 {
     // 1) Find the company
     var company = get_company(company_abbr);
@@ -372,15 +438,66 @@ function get_cost_for(company_abbr)
     {
         var row = company.value[i];
 
-        // 3) Return the previous row when we find a row that has a coung
+        // 3) Return the previous row when we find a row that has a count
         //    greater than the current company size.
-        if (row.size > company.size)
+        if (row.size > company.size && i > 0)
         {
             return company.value[i - 1];
         }
     }
 
-    return -1;
+    return company.value[0];
+}
+
+function get_company_stock_cost_for(company_abbr)
+{
+    return get_company_value_for(company_abbr)["cost"];
+}
+
+function calc_stock_purchased_total()
+{
+    stock_purchased_total = 0;
+
+    for (var key in stock_purchased_by_abbr)
+    {
+        stock_purchased_total += stock_purchased_by_abbr[key];
+    }
+}
+
+function add_stock_for(company_abbr)
+{
+    if (stock_purchased_by_abbr[company_abbr] != null)
+    {
+        if (stock_purchased_by_abbr[company_abbr] < cur_game_state.cur_data.stock_purchase_limit)
+        {
+            stock_purchased_by_abbr[company_abbr]++;
+        }
+    }
+    else
+    {
+        stock_purchased_by_abbr[company_abbr] = 1;
+    }
+
+    calc_stock_purchased_total();
+
+    render_stock_purchase_selection();
+}
+
+function sub_stock_for(company_abbr)
+{
+    if (stock_purchased_by_abbr[company_abbr] != null)
+    {
+        stock_purchased_by_abbr[company_abbr]--;
+    }
+
+    if (stock_purchased_by_abbr[company_abbr] <= 0)
+    {
+        delete stock_purchased_by_abbr[company_abbr];
+    }
+
+    calc_stock_purchased_total();  
+
+    render_stock_purchase_selection();
 }
 
 //------------------------------------------------------------------------------------------

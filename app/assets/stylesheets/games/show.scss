@@ -7,12 +7,29 @@ $cell_height: 50px;
 	@include pixel_font($font_size_std, $font_color_std);
 }
 
-#start_company_popup, #purchase_stock_popup {
+#start_company_popup {
 	background-color: #ffffff;
 	border: 2px dashed gray;
 	padding: 1em;
 	display:none;
 	@include pixel_font($font_size_std, $font_color_cell_border);
+}
+
+#purchase_stock_popup {
+	background-color: #ffffff;
+	border: 2px dashed gray;
+	padding: 1em;
+	display:none;
+	@include pixel_font($font_size_std, $font_color_cell_border);
+
+	.companies
+	{
+		padding: 1em;
+	}
+	.stock_purchased_totals
+	{
+		padding: 2em;
+	}
 }
 
 .wrapper {

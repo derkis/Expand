@@ -106,6 +106,7 @@ class Turn < ActiveRecord::Base
 	    						{:abbr => "c", :name => "Continental", :stock_count => 25, :value => level3, :color => "#24BFA5", :size =>0}
 	    					}
 	   
+	    data["stock_purchase_limit"] = 3;
 	    data["state"] = PLACE_PIECE;
 	    data["active_player_id"] = starting_player_id;
 
@@ -302,14 +303,15 @@ class Turn < ActiveRecord::Base
 	# Starts a company of all cells connected to the provided row, column
 	# -----------------------------------------------------------------
 	def start_company_at(row, column, company_abbr)
-		binding.pry
 		tiles = get_connected_tiles(row, column)
 
+		new_board = board.dup
+
 		tiles.each do |key, value|
-			board[value["index"]] = company_abbr
+			new_board[value["index"]] = company_abbr
 		end
 
-		update_attributes(:board => board.dup)
+		update_attributes(:board => new_board)
 
 		return tiles.size
 	end

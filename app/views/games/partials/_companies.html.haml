@@ -1,6 +1,6 @@
 .companies
 	- @cur_turn.data_hash["companies"].each do |key, value|
-		.company{:abbr=>"#{key}"}
+		.company{:abbr=>"#{key}", :style=>"color: #{value['color'];}"}
 			.name
 				= value["name"]
 			.stock_count

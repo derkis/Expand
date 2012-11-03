@@ -29,7 +29,6 @@ module Engine
 			#--------------------------------------
 			when Turn::START_COMPANY
 				size = game.cur_turn.start_company_at(action["row"], action["column"], action["company_abbr"])
-				binding.pry
 				data_hash['state'] = Turn::PURCHASE_STOCK
 				data_hash["companies"][action["company_abbr"]]["size"] = size
 				game.cur_turn.serialize_data_hash(data_hash)
