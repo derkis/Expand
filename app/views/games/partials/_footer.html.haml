@@ -2,4 +2,6 @@
 	.message
 		= "Loading Game Data..."
 	.buttons
+		= button_to_function 'back', 'back_handler()', :id => 'back_button', :class => 'image_button'
+		= button_to_function 'next', 'next_handler()', :id => 'next_button', :class => 'image_button'
 		= button_to_function 'input', 'input_handler()', :id => 'turn_button', :class => 'image_button'

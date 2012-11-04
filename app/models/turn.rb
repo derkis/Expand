@@ -138,9 +138,15 @@ class Turn < ActiveRecord::Base
 		new_data = data_hash
 		new_data["state"] = PLACE_PIECE
 
+		# We want to WIPE OUT any turn that has our destination turn number and greater. This is possible
+		# because when debugging we could have stepped back through previous turns and if we play from that
+		# point we want to erase any game data from that point forward.
+		Turn.where("number >= ? AND game_id = ?", game.cur_turn.number + 1, game.id).destroy_all
+
 		return Turn.create({ 
 			:number => number + 1, 
-			:game_id => self.game_id, 
+			:game_id => self.game_id,
+			:step => 0, 
 			:player_id => player.id, 
 			:board => self.board, 
 			:data => ActiveSupport::JSON.encode(new_data)
@@ -150,7 +156,8 @@ class Turn < ActiveRecord::Base
 	# creates subsequent step from the this turn
 	def create_next_turn_step()
 		return Turn.create({ 
-			:step => step + 1, 
+			:number => self.number,
+			:step => self.step + 1, 
 			:game_id => self.game_id, 
 			:player_id => player_id, 
 			:board => self.board.dup, 
@@ -197,18 +204,18 @@ class Turn < ActiveRecord::Base
 
 		unused_tiles = find_unused_tile_indices.shuffle!
 
-		newBoard = self.board.dup;
+		new_board = self.board.dup;
 
 		self.game.players.each_with_index do |p, pid|
 			while tile_counts[pid] < game.template.tile_count  
 				ix = unused_tiles.pop
 				puts ix.to_s
-				newBoard[ix] = pid.to_s
+				new_board[ix] = pid.to_s
 				tile_counts[pid] += 1
 			end
 		end
 
-		self.board = newBoard;
+		self.update_attributes(:board => new_board)
 	end
 
 	def get_random_unused_tile
@@ -286,6 +293,26 @@ class Turn < ActiveRecord::Base
 	#
 	# Returns "CREATE_COMPANY" if possible given the placed piece.
 	# -----------------------------------------------------------------
+	def test_place_piece (row, column)
+		piece_index = self.piece_index(row, column);
+
+		# Is this piece connected to another company that is already started?
+		companies = data_hash["companies"]
+		companies.each do |key, company|
+			if has_adjacent(piece_index, Set.new([company["abbr"].to_sym]))
+				return PIECE_PLACED
+			end
+		end
+
+	 	return COMPANY_STARTED if has_adjacent(piece_index, Set.new([:u]))
+	 	return PIECE_PLACED
+	end
+
+	# -----------------------------------------------------------------
+	# Places a piece on the board for this turn only.
+	#
+	# Returns "CREATE_COMPANY" if possible given the placed piece.
+	# -----------------------------------------------------------------
 	def place_piece (row, column)
 		new_board = self.board.dup
 		piece_index = self.piece_index(row, column);		
@@ -307,16 +334,13 @@ class Turn < ActiveRecord::Base
 
 				# save the board again.
 				self.update_attributes(:board => new_board)
-				return PIECE_PLACED
+				return
 			end
 		end
 
 		# Is this a piece not connected to any other already placed pieces?
 		new_board[piece_index] = "u"
 		self.update_attributes(:board => new_board)
-
-	 	return COMPANY_STARTED if has_adjacent(piece_index, Set.new([:u]))
-	 	return PIECE_PLACED
 	end
 
 	# -----------------------------------------------------------------
@@ -364,8 +388,8 @@ class Turn < ActiveRecord::Base
 	def num_established_companies
 		num = 0
 		companies = data_hash["companies"]
-		companies.each do |company|
-			num = num + 1 if company.size > 0
+		companies.each do |key, company|
+			num = num + 1 if company["size"] > 0
 		end
 		return num
 	end
@@ -374,6 +398,6 @@ class Turn < ActiveRecord::Base
 	# Returns true if the player can purchase stock
 	# -----------------------------------------------------------------
 	def can_purchase_stock(player)
-		return num_established_companies > 0
+		return num_established_companies() > 0
 	end
 end

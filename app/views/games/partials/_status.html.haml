@@ -2,8 +2,8 @@
 	.player_companies
 		- @cur_turn.data_hash["companies"].each do |key, value|
 			%br
-			.player_stock_in_company{:abbr=>"#{key}", :style=>"color: #{value['color']};height:10px;"}
-				.player_stock_in_company_lbl{:style=>"float: left; width:120px;"}
+			.player_stock_in_company{:abbr=>"#{key}", :style=>"color: #{value['color']};"}
+				.player_stock_in_company_lbl{:style=>"float: left; width:120px; height:25px;"}
 					= value["name"]
 				.player_stock_in_company{:company_abbr=>"#{key}", :style=>"float: left;"}
 					0

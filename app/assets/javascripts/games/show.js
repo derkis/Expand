@@ -163,10 +163,9 @@ function load_game_state()
 }
 
 // server calls
-function send_game_update()
+function send_game_update(custom)
 {
-    var json_update =
-        { 'actions': cur_turn_type.get_action() };
+    var json_update = custom ? {'actions': custom} : { 'actions': cur_turn_type.get_action() };
 
     $.ajax(
         {
@@ -295,11 +294,14 @@ function render_board(board, num_columns, num_rows)
 
 function render_cell(cell, cell_type, row, column)
 {
-    cell.removeClass('empty enabled no_hotel selected');
+    // Clear out all the cell's current styling
+    cell.removeClass('empty enabled no_hotel selected highlighted');
+    cell.css("background-color", "");
     cell.text((65 + row).to_char() + (column+1));
+
     switch(cell_type) {
         case 'e': // empty cell
-            cell.addClass('empty')
+            cell.addClass('empty');
             break;
         case 'u':
             cell.addClass('no_hotel');
@@ -310,7 +312,7 @@ function render_cell(cell, cell_type, row, column)
         default:
             if (cell_type.is_int())
             {
-                // This is someone else's tile! Don't show it.
+                // This is someone else's tile! Don't show that it is their tile
             }
             else
             {
@@ -324,15 +326,7 @@ function render_cell(cell, cell_type, row, column)
 function render_status()
 {
     $('.turn_label').text("Turn: " + (cur_game_state.cur_turn_number + 1));
-
-    if (cur_game_state.debug_mode)
-    {
-        $('.money').text("$" + (cur_game_state.cur_data.players[cur_game_state.cur_player_index]["money"] - stock_purchased_cost));
-    }
-    else
-    {
-        $('.money').text("$" + (get_cur_money() - stock_purchased_cost));
-    }
+    $('.money').text("$" + (get_cur_money() - stock_purchased_cost));
 }
 
 function render_players()
@@ -387,6 +381,11 @@ function get_cur_stock_in(company_abbr)
 
 function get_cur_money()
 {
+    if (cur_game_state.debug_mode)
+    {
+        return cur_game_state.cur_data.players[cur_game_state.cur_player_index]["money"];
+    }
+
     return cur_game_state.cur_data.players[cur_game_state.user_player_index]["money"];
 }
 
@@ -502,7 +501,14 @@ function calc_stock_purchased_total()
 
 function add_stock_for(company_abbr)
 {
+    // Will this exceed the limit of stocks purchasable in a turn?
     if (stock_purchased_total == cur_game_state.cur_data.stock_purchase_limit)
+    {
+        return;
+    }
+
+    // Will this bankrupt the player?
+    if (get_cur_money() - stock_purchased_cost - get_company_stock_cost_for(company_abbr) < 0)
     {
         return;
     }
@@ -652,6 +658,16 @@ function send_game_update_successHandler()
 function input_handler()
 {
     send_game_update();
+}
+
+function back_handler()
+{
+    send_game_update({previous_turn: true});
+}
+
+function next_handler()
+{
+    send_game_update({next_turn: true});
 }
 
 function start_company_click_handler()
