@@ -15,23 +15,6 @@ $cell_height: 50px;
 	@include pixel_font($font_size_std, $font_color_cell_border);
 }
 
-#purchase_stock_popup {
-	background-color: #ffffff;
-	border: 2px dashed gray;
-	padding: 1em;
-	display:none;
-	@include pixel_font($font_size_std, $font_color_cell_border);
-
-	.companies
-	{
-		padding: 1em;
-	}
-	.stock_purchased_totals
-	{
-		padding: 2em;
-	}
-}
-
 .wrapper
 {
 	width: 70em;
@@ -42,30 +25,29 @@ $cell_height: 50px;
 		position: relative;
 		margin: 0 auto;
 
+		.turn_label
+		{
+			text-align:center;
+			margin-left: auto;
+			margin-right: auto;
+			@include pixel_font($font_size_title, $font_color_title);
+		}
+
 		.status
 		{
 			position: absolute;
-			top: 0px; left: 30px;
-			background: $dark_background;
-			padding: 0.5em;
-
-			.turn_label {
-				float: left;
-				@include pixel_font($font_size_title, $font_color_title);
-			}
+			top: 2em; left: -30px;
+			background: $light_background;
+			border: 0.5em dotted $dark_background;
 
 			.money {
-				float: left;
+				float: right;
+
 				@include pixel_font($font_size_title, $font_color_title);
 			}
-			
-			.stocks {
-				float: left;
-				@include pixel_font($font_size_subtitle, $primary_color);
 
-				.player_stock_in_company {
-					padding-left: 1em;
-				}
+			.player_companies {
+				@include pixel_font($font_size_subtitle, $primary_color);
 			}
 		}
 
@@ -73,7 +55,7 @@ $cell_height: 50px;
 
 			display:table;
 			margin: 0 auto;
-			padding-top:5em;
+			padding-top:2em;
 			padding-bottom:2em;
 			.row {
 				display:table-row;
@@ -139,63 +121,59 @@ $cell_height: 50px;
 
 		.rightNav {
 			position: absolute;
-			top: 10px; right: -30px;
-		}
+			top: 2em; right: -30px;
 
-		.players {
-			padding: 0.5em;
-			margin: 0.5em;
-			background-color: $dark_background;
-			border: 1em dotted $light_background;
+			.players {
+				background-color: $light_background;
+				border: 0.5em dotted $dark_background;
 
-			.player {
-				@include pixel_font($font_size_subtitle, $primary_color);
+				.player {
+					@include pixel_font($font_size_subtitle, $primary_color);
 
-				.player_info {
-					@include pixel_font($font_size_small, $font_color_user);
+					.player_info {
+						@include pixel_font($font_size_small, $font_color_user);
+					}
+
 				}
 
-			}
-
-			.current_player {
-				color: $font_color_link;
-			}
-		}
-
-		.companies {
-			padding: 0.5em;
-			margin: 0.5em;
-			background-color: $dark_background;
-			border: 1em dotted $light_background;
-
-			.company {
-				height: 25px;
-				@include pixel_font($font_size_subtitle, $primary_color);
-				.name {
-					float:left; width:120px;
-				}
-				.stock_count {
-					float:left;
-				}
-				.divider {
-					float:left;
-				}
-				.size {
-					float:left;
+				.current_player {
+					color: $font_color_link;
 				}
 			}
-		}
+
+			.companies {
+				background-color: $light_background;
+				border: 0.5em dotted $dark_background;
+
+				.company {
+					height: 25px;
+					@include pixel_font($font_size_subtitle, $primary_color);
+					.name {
+						float:left; width:120px;
+					}
+					.stock_count {
+						float:left;
+					}
+					.divider {
+						float:left;
+					}
+					.size {
+						float:left;
+					}
+				}
+			}
+		}		
 	}
 
 	.footer {
 		position: relative;
 		margin: 0 auto;
 
-		background: $dark_background;
+		background: $light_background;
 		@include pixel_font($font_size_std, $font_color_cell_border);
 		text-align:center;
 		vertical-align:middle;
-		border: 1em dotted $light_background;
+		border: 0.5em dotted $dark_background;
 		color: white;
 
 		.buttons {

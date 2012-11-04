@@ -90,6 +90,9 @@ var TURN_TYPES = {
                 column: selected_cell.attr('column').to_int()
             };
         },
+        after_action: function() {
+
+        },
         render: function(game_state) {
         }
     },
@@ -98,15 +101,16 @@ var TURN_TYPES = {
         name: 'start_company',
         message: "Please choose a company to start",
         get_action: function() {
-            // Close the start company popup if it is open
-            $("#start_company_popup").bPopup().close();
-            
             // Return the selected company value
             return  {
                         company_abbr: $("input[name=company_group]").filter(':checked').val(),
                         row: cur_game_state.last_action.row,
                         column: cur_game_state.last_action.column
                     };
+        },
+        after_action: function() {
+            // Close the start company popup if it is open
+            $("#start_company_popup").bPopup().close();
         },
         render: function(game_state) {
             render_start_company_at(game_state.last_action.row, game_state.last_action.column, game_state);
@@ -117,13 +121,13 @@ var TURN_TYPES = {
         name: 'purchase_stock',
         message: "Choose how many stocks to purchase",
         get_action: function() {
-            // Close the purchase stock popup if it is open
-            $("#purchase_stock_popup").bPopup().close();
-
             return {"stocks_purchased": stock_purchased_by_abbr};
         },
+        after_action: function() {
+            // Close the purchase stock popup if it is open
+            $("#purchase_stock_popup").bPopup().close();
+        },
         render: function(game_state) {
-            render_purchase_stock(game_state);
         }
     },
     
@@ -167,7 +171,9 @@ function send_game_update()
             contentType: 'application/json',                  
             dataType: 'json',                                  
             success: send_game_update_successHandler
-        });     
+        });
+
+     cur_turn_type.after_action();
 }
 
 function reset_game()
@@ -181,29 +187,40 @@ function render_all(game_state)
     render_players(game_state.cur_data.players);
     render_status(game_state);
     render_message();
-    render_popups();
+    render_stock();
+    render_stock_purchasing();
     render_turn_button();
 }
 
-function render_popups()
+function render_stock() 
+{
+    for (var key in cur_game_state.cur_data.companies)
+    {
+        var div_player_stock_in_company = $(".player_stock_in_company[company_abbr='" + key + "']");
+        div_player_stock_in_company.text(get_cur_stock_in(key) + (!isNaN(stock_purchased_by_abbr[key]) ? stock_purchased_by_abbr[key] : 0) );
+    }
+}
+
+function render_stock_purchasing()
 {
     // Here we pouplate the values of the companies in the radio buttons for
     // purchase stock popup (e.g. Luxor for 1 stock at size 2 is $200)
     for (var key in cur_game_state.cur_data.companies)
     {
         var company = get_company(key);
-        var div_company_stock_purchase = $(".company_stock_purchased[company_abbr='" + key + "']");
+        var div_company_stock_purchased = $(".company_stock_purchased[company_abbr='" + key + "']");
 
-        if (company.size)
+        if (company.size && cur_game_state.cur_data.state == 300)
         {
-            div_company_stock_purchase.show();
+            div_company_stock_purchased.show();
         }
         else
         {
-            div_company_stock_purchase.hide();
+            div_company_stock_purchased.hide();
         }
     }
 }
+
 function render_turn_button()
 {
     var turn_button = $('#turn_button');
@@ -301,47 +318,10 @@ function render_start_company_at(row, column, game_state)
     $("#start_company_popup").bPopup({modalClose: false});
 }
 
-function render_purchase_stock(game_state)
+function get_cur_stock_in(company_abbr)
 {
-    $("#purchase_stock_popup").bPopup({modalClose: false});
-}
-
-function render_stock_purchase_selection()
-{
-    var stock_purchased_cost = 0;
-
-    // Clear out all to zeros unless there is something specified to be 
-    // purchased for a particular company.
-    for (var key in cur_game_state.cur_data.companies)
-    {
-        var div_company_stock_purchased_total = $(".company_stock_purchased_total[company_abbr='" + key + "']");
-        var div_company_stock_purchased_cost = $(".company_stock_purchased_cost[company_abbr='" + key + "']");
-
-        if (stock_purchased_by_abbr[key])
-        {
-            div_company_stock_purchased_total.text(stock_purchased_by_abbr[key]);
-
-            var cost = (get_company_stock_cost_for(key) * stock_purchased_by_abbr[key]);
-            var cost_string = "- $" + cost.toString();
-            div_company_stock_purchased_cost.text(cost_string);
-
-            stock_purchased_cost += cost;
-        }
-        else
-        {
-            div_company_stock_purchased_total.text("0");
-            div_company_stock_purchased_cost.text("$0");
-        }
-    }
-
-    var div_stock_purchased_total = $(".stock_purchased_total");
-    div_stock_purchased_total.text(stock_purchased_total);
-
-    var div_stock_purchased_cost = $(".stock_purchased_cost");
-    div_stock_purchased_cost.text("$" + stock_purchased_cost);
-
-    var div_stock_purchased_money_after = $(".stock_purchased_money_after");
-    div_stock_purchased_money_after.text("$" + (get_cur_money() - stock_purchased_cost));
+    var val = cur_game_state.cur_data.players[cur_game_state.user_player_index]["stock_count"][company_abbr];
+    return isNaN(val) ? 0 : val;
 }
 
 function get_cur_money()
@@ -473,7 +453,7 @@ function add_stock_for(company_abbr)
 
     calc_stock_purchased_total();
 
-    render_stock_purchase_selection();
+    render_stock();
 }
 
 function sub_stock_for(company_abbr)
@@ -488,9 +468,9 @@ function sub_stock_for(company_abbr)
         delete stock_purchased_by_abbr[company_abbr];
     }
 
-    calc_stock_purchased_total();  
+    calc_stock_purchased_total();
 
-    render_stock_purchase_selection();
+    render_stock();
 }
 
 //------------------------------------------------------------------------------------------

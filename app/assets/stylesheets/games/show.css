@@ -16,19 +16,6 @@
   font-size: 12px;
   color: black; }
 
-#purchase_stock_popup {
-  background-color: #ffffff;
-  border: 2px dashed gray;
-  padding: 1em;
-  display: none;
-  font-family: Pixel, cursive;
-  font-size: 12px;
-  color: black; }
-  #purchase_stock_popup .companies {
-    padding: 1em; }
-  #purchase_stock_popup .stock_purchased_totals {
-    padding: 2em; }
-
 .wrapper {
   width: 70em;
   margin: 0 auto;
@@ -36,33 +23,32 @@
   .wrapper .main {
     position: relative;
     margin: 0 auto; }
+    .wrapper .main .turn_label {
+      text-align: center;
+      margin-left: auto;
+      margin-right: auto;
+      font-family: Pixel, cursive;
+      font-size: 20px;
+      color: #a66c5a; }
     .wrapper .main .status {
       position: absolute;
-      top: 0px;
-      left: 30px;
-      background: #464646;
-      padding: 0.5em; }
-      .wrapper .main .status .turn_label {
-        float: left;
-        font-family: Pixel, cursive;
-        font-size: 20px;
-        color: #a66c5a; }
+      top: 2em;
+      left: -30px;
+      background: #707070;
+      border: 0.5em dotted #464646; }
       .wrapper .main .status .money {
-        float: left;
+        float: right;
         font-family: Pixel, cursive;
         font-size: 20px;
         color: #a66c5a; }
-      .wrapper .main .status .stocks {
-        float: left;
+      .wrapper .main .status .player_companies {
         font-family: Pixel, cursive;
         font-size: 14px;
         color: #a66c5a; }
-        .wrapper .main .status .stocks .player_stock_in_company {
-          padding-left: 1em; }
     .wrapper .main .board {
       display: table;
       margin: 0 auto;
-      padding-top: 5em;
+      padding-top: 2em;
       padding-bottom: 2em; }
       .wrapper .main .board .row {
         display: table-row;
@@ -107,52 +93,48 @@
             background: #db7556; }
     .wrapper .main .rightNav {
       position: absolute;
-      top: 10px;
+      top: 2em;
       right: -30px; }
-    .wrapper .main .players {
-      padding: 0.5em;
-      margin: 0.5em;
-      background-color: #464646;
-      border: 1em dotted #707070; }
-      .wrapper .main .players .player {
-        font-family: Pixel, cursive;
-        font-size: 14px;
-        color: #a66c5a; }
-        .wrapper .main .players .player .player_info {
+      .wrapper .main .rightNav .players {
+        background-color: #707070;
+        border: 0.5em dotted #464646; }
+        .wrapper .main .rightNav .players .player {
           font-family: Pixel, cursive;
-          font-size: 10px;
-          color: white; }
-      .wrapper .main .players .current_player {
-        color: #78dabb; }
-    .wrapper .main .companies {
-      padding: 0.5em;
-      margin: 0.5em;
-      background-color: #464646;
-      border: 1em dotted #707070; }
-      .wrapper .main .companies .company {
-        height: 25px;
-        font-family: Pixel, cursive;
-        font-size: 14px;
-        color: #a66c5a; }
-        .wrapper .main .companies .company .name {
-          float: left;
-          width: 120px; }
-        .wrapper .main .companies .company .stock_count {
-          float: left; }
-        .wrapper .main .companies .company .divider {
-          float: left; }
-        .wrapper .main .companies .company .size {
-          float: left; }
+          font-size: 14px;
+          color: #a66c5a; }
+          .wrapper .main .rightNav .players .player .player_info {
+            font-family: Pixel, cursive;
+            font-size: 10px;
+            color: white; }
+        .wrapper .main .rightNav .players .current_player {
+          color: #78dabb; }
+      .wrapper .main .rightNav .companies {
+        background-color: #707070;
+        border: 0.5em dotted #464646; }
+        .wrapper .main .rightNav .companies .company {
+          height: 25px;
+          font-family: Pixel, cursive;
+          font-size: 14px;
+          color: #a66c5a; }
+          .wrapper .main .rightNav .companies .company .name {
+            float: left;
+            width: 120px; }
+          .wrapper .main .rightNav .companies .company .stock_count {
+            float: left; }
+          .wrapper .main .rightNav .companies .company .divider {
+            float: left; }
+          .wrapper .main .rightNav .companies .company .size {
+            float: left; }
   .wrapper .footer {
     position: relative;
     margin: 0 auto;
-    background: #464646;
+    background: #707070;
     font-family: Pixel, cursive;
     font-size: 12px;
     color: black;
     text-align: center;
     vertical-align: middle;
-    border: 1em dotted #707070;
+    border: 0.5em dotted #464646;
     color: white; }
     .wrapper .footer .buttons {
       position: absolute;

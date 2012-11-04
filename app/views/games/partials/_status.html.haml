@@ -1,10 +1,13 @@
 .status
-	.turn_label
-	.money
-	.stocks
+	.player_companies
 		- @cur_turn.data_hash["companies"].each do |key, value|
-			.player_stock_in_company{:abbr=>"#{key}", :style=>"float:left; color: #{value['color'];}"}
-				.player_stock_in_company_lbl
+			%br
+			.player_stock_in_company{:abbr=>"#{key}", :style=>"color: #{value['color']};height:10px;"}
+				.player_stock_in_company_lbl{:style=>"float: left; width:120px;"}
 					= value["name"]
-				.player_stock_in_company_value
+				.player_stock_in_company{:company_abbr=>"#{key}", :style=>"float: left;"}
 					0
+				.company_stock_purchased{:company_abbr=>"#{key}", :style=>"float: left;"}
+					= button_to_function '-', 'sub_stock_for(\'' + key + '\')', :style=>"float:left;"
+					= button_to_function '+', 'add_stock_for(\'' + key + '\')', :style=>"float:left;"
+	.money
