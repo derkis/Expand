@@ -136,7 +136,11 @@
     vertical-align: middle;
     border: 0.5em dotted #464646;
     color: white; }
-    .wrapper .footer .buttons {
-      position: absolute;
-      top: 0em;
-      right: 1em; }
+    .wrapper .footer .message {
+      position: relative;
+      margin: 0 auto;
+      text-align: center; }
+    .wrapper .footer #back_button {
+      float: left; }
+    .wrapper .footer #next_button {
+      float: right; }

@@ -176,10 +176,21 @@ $cell_height: 50px;
 		border: 0.5em dotted $dark_background;
 		color: white;
 
-		.buttons {
-			position: absolute;
-			top:0em;
-			right:1em;
+		.message
+		{
+			position: relative;
+			margin: 0 auto;
+			text-align:center;
+		}
+
+		#back_button
+		{
+			float: left;
+		}
+
+		#next_button
+		{
+			float: right;
 		}
 	}
 }

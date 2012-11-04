@@ -243,6 +243,21 @@ class Turn < ActiveRecord::Base
 		row * game.template.width + column
 	end
 
+	def refresh_company_sizes
+		new_data_hash = data_hash
+		new_data_hash["companies"].each do |key, company|
+			company["size"] = 0
+		end
+
+		self.board.chars.to_a.each do |t|
+			if new_data_hash["companies"].has_key? t
+				new_data_hash["companies"][t]["size"] += 1
+			end
+		end
+
+		serialize_data_hash(new_data_hash)
+	end
+
 	# -----------------------------------------------------------------	
 	# Returns true if a player is starting a company this turn
 	# -----------------------------------------------------------------
@@ -322,7 +337,7 @@ class Turn < ActiveRecord::Base
 		companies.each do |key, company|
 			if has_adjacent(piece_index, Set.new([company["abbr"].to_sym]))
 				new_board[piece_index] = company["abbr"]
-				self.update_attributes(:board => new_board)
+				self.update_attributes(:board => new_board.dup)
 
 				# Okay, we have to find all the OTHER pieces that this
 				# might have connected to as well, and update those.

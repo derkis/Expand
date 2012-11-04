@@ -63,10 +63,9 @@ module Engine
 			#--------------------------------------
 			when Turn::START_COMPANY
 				game.advance_turn_step
-				size = game.cur_turn.start_company_at(action["row"], action["column"], action["company_abbr"])
+				game.cur_turn.start_company_at(action["row"], action["column"], action["company_abbr"])
 				data_hash = game.cur_turn.data_hash
 				data_hash['state'] = Turn::PURCHASE_STOCK
-				data_hash["companies"][action["company_abbr"]]["size"] = size
 				data_hash["companies"][action["company_abbr"]]["stock_count"] -= 1
 
 				# Update stock value on the player by 1
@@ -114,6 +113,7 @@ module Engine
 				game.advance_turn
 		end
 
+		game.cur_turn.refresh_company_sizes
 		game.cur_turn.update_attributes(:action => ActiveSupport::JSON.encode(action))
 	end
 end

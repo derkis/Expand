@@ -95,7 +95,7 @@ var TURN_TYPES = {
 
         },
         render: function(game_state) {
-            render_button("Place");
+            render_button("Place", false);
         }
     },
     
@@ -115,7 +115,7 @@ var TURN_TYPES = {
             $("#start_company_popup").bPopup().close();
         },
         render: function(game_state) {
-            render_button("Start");
+            render_button("Start", false);
             render_start_company_at(game_state.last_action.row, game_state.last_action.column, game_state);
         }
     },
@@ -132,7 +132,7 @@ var TURN_TYPES = {
             stock_purchased_cost = 0;
         },
         render: function(game_state) {
-            render_button("Purchase");
+            render_button("Purchase", true);
         }
     },
     
@@ -211,17 +211,29 @@ function render_companies()
     }
 }
 
-function render_button(text)
+function render_button(text, show = true)
 {
-    $("#turn_button").attr("value", text)
+    if (!show)
+    {
+        $("#turn_button").hide();
+    }
+    else
+    {
+        $("#turn_button").show();
+        $("#turn_button").attr("value", text);
+    }
 }
 
 function render_stock() 
 {
     for (var key in cur_game_state.cur_data.companies)
     {
+        var company = cur_game_state.cur_data.companies[key];
         var div_player_stock_in_company = $(".player_stock_in_company[company_abbr='" + key + "']");
+        var div_player_stock_in_company_lbl = $(".player_stock_in_company_lbl[company_abbr='" + key + "']");
+
         div_player_stock_in_company.text(get_cur_stock_in(key) + (!isNaN(stock_purchased_by_abbr[key]) ? stock_purchased_by_abbr[key] : 0) );
+        div_player_stock_in_company_lbl.text(company.name + " ($" + get_company_stock_cost_for(key) + ")");
     }
 }
 
@@ -392,6 +404,11 @@ function get_cur_money()
 function player_can_act()
 {
     return cur_turn_type != TURN_TYPES.NO_ACTION;
+}
+
+function player_can_place_piece()
+{
+    return cur_turn_type == TURN_TYPES["100"];
 }
 
 function get_cell_char_at(row, column)
@@ -580,7 +597,7 @@ function game_readyHandler()
 
 function enabled_clickHandler(click_event)
 {
-    if(!player_can_act())
+    if(!player_can_place_piece())
     {
         return;
     }
@@ -593,17 +610,19 @@ function enabled_clickHandler(click_event)
     }
     selected_cell = cell;
     selected_cell.addClass('selected');
+
+    send_game_update();
 }
 
 function cell_hoverOverHandler(click_event)
 {
     var cell = click_event.currentTarget;
 
-    if (cur_turn_type == TURN_TYPES.PLACE_PIECE)
+    if (cur_turn_type == TURN_TYPES["100"])
     {
         var can_create_company = false;
 
-        if(!player_can_act() || !hasClass(cell, "enabled"))
+        if(!hasClass(cell, "enabled"))
         {
             return;
         }
@@ -630,9 +649,9 @@ function cell_hoverOutHandler(click_event)
 {
     var cell = click_event.currentTarget;
 
-    if (cur_turn_type == TURN_TYPES.PLACE_PIECE)
+    if (cur_turn_type == TURN_TYPES["100"])
     {
-        if(!player_can_act() || !hasClass(cell, "enabled"))
+        if(!hasClass(cell, "enabled"))
         {
             return;
         }
