@@ -1,11 +1,11 @@
 .companies
 	- @cur_turn.data_hash["companies"].each do |key, value|
-		.company{:abbr=>"#{key}", :style=>"color: #{value['color'];}"}
-			.name
+		.company_data{:abbr=>"#{key}", :style=>"color: #{value['color'];}"}
+			.company_data_name
 				= value["name"]
-			.stock_count
+			.company_data_stock_count
 				= value["stock_count"]
 			.divider
 				&nbsp;|&nbsp;
-			.size
+			.company_data_size
 				= value["size"]

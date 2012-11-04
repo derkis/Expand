@@ -61,9 +61,11 @@ class Game < ActiveRecord::Base
   def cur_data(current_user)
     datasan = self.cur_turn.data_hash
 
-    # Here we sanitize the game data so the current_user cannot see the other player data
-    datasan["players"].each_with_index do |p, i|
-      datasan["players"][i].clear() if i != player_index_for(current_user)
+    if !debug_mode
+      # Here we sanitize the game data so the current_user cannot see the other player data
+      datasan["players"].each_with_index do |p, i|
+        datasan["players"][i].clear() if i != player_index_for(current_user)
+      end
     end
 
     datasan

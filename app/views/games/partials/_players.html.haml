@@ -2,3 +2,4 @@
 	- @game.players.each_with_index do |player, i|
 		.player{ :player_id => player.id, :player_index => i }
 			= player.user[:email]
+		.player_money{:player_index => i}

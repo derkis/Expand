@@ -121,12 +121,16 @@ class Turn < ActiveRecord::Base
 		company_size = data_hash["companies"][company_abbr]["size"]
 		value_table = data_hash["companies"][company_abbr]["value"]
 
+		last = 0
+
 		value_table.each_with_index do |row, i|
-			break if row["size"] > size
+			break if row["size"] > company_size
+			last = i
 		end
 
 		# At this point, i - 1 in the table holds the row that contains the cost
-		return value_table[i - 1]["cost"]
+		val = value_table[last == 0 ? 0 : last - 1]
+		return val["cost"]
 	end
 
 	# creates subsequent turn from the this turn
@@ -170,7 +174,7 @@ class Turn < ActiveRecord::Base
 
 	def get_company(company_abbr)
 		companies = data_hash["companies"]
-		companies.each do |company|
+		companies.each do |key, company|
 			return company if company["abbr"] == company_abbr
 		end
 	end
@@ -284,9 +288,31 @@ class Turn < ActiveRecord::Base
 	# -----------------------------------------------------------------
 	def place_piece (row, column)
 		new_board = self.board.dup
-		piece_index = self.piece_index(row, column);
-		new_board[piece_index] = "u"
+		piece_index = self.piece_index(row, column);		
 
+		# Is this piece connected to another company that is already started?
+		companies = data_hash["companies"]
+		companies.each do |key, company|
+			if has_adjacent(piece_index, Set.new([company["abbr"].to_sym]))
+				new_board[piece_index] = company["abbr"]
+				self.update_attributes(:board => new_board)
+
+				# Okay, we have to find all the OTHER pieces that this
+				# might have connected to as well, and update those.
+				tiles = get_connected_tiles(row, column)
+
+				tiles.each do |key,value|
+					new_board[value["index"]] = company["abbr"]
+				end
+
+				# save the board again.
+				self.update_attributes(:board => new_board)
+				return PIECE_PLACED
+			end
+		end
+
+		# Is this a piece not connected to any other already placed pieces?
+		new_board[piece_index] = "u"
 		self.update_attributes(:board => new_board)
 
 	 	return COMPANY_STARTED if has_adjacent(piece_index, Set.new([:u]))

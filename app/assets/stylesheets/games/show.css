@@ -111,19 +111,19 @@
       .wrapper .main .rightNav .companies {
         background-color: #707070;
         border: 0.5em dotted #464646; }
-        .wrapper .main .rightNav .companies .company {
+        .wrapper .main .rightNav .companies .company_data {
           height: 25px;
           font-family: Pixel, cursive;
           font-size: 14px;
           color: #a66c5a; }
-          .wrapper .main .rightNav .companies .company .name {
+          .wrapper .main .rightNav .companies .company_data .company_data_name {
             float: left;
             width: 120px; }
-          .wrapper .main .rightNav .companies .company .stock_count {
+          .wrapper .main .rightNav .companies .company_data .company_data_stock_count {
             float: left; }
-          .wrapper .main .rightNav .companies .company .divider {
+          .wrapper .main .rightNav .companies .company_data .divider {
             float: left; }
-          .wrapper .main .rightNav .companies .company .size {
+          .wrapper .main .rightNav .companies .company_data .company_data_size {
             float: left; }
   .wrapper .footer {
     position: relative;

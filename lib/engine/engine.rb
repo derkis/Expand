@@ -43,15 +43,29 @@ module Engine
 			# PURCHASE_STOCK
 			#--------------------------------------
 			when Turn::PURCHASE_STOCK
+				cost = 0
+
 				action["stocks_purchased"].each do |key, value|
+
+					# Update stock value on the company
 					data_hash["companies"][key]["stock_count"] = data_hash["companies"][key]["stock_count"] - value
+
+					# Update stock value on the player
 					if data_hash["players"][game.cur_turn.player.index]["stock_count"].has_key?(key)
 						data_hash["players"][game.cur_turn.player.index]["stock_count"][key] = data_hash["players"][game.cur_turn.player.index]["stock_count"][key] + value
 					else
 						data_hash["players"][game.cur_turn.player.index]["stock_count"][key] = value
 					end
-					game.advance_turn
+
+					# Keep track of total cost
+					cost = cost + (game.cur_turn.stock_value_for(key) * value)
 				end
+
+				# Subtract cost from player money
+				data_hash["players"][game.cur_turn.player.index]["money"] = data_hash["players"][game.cur_turn.player.index]["money"] - cost
+				game.cur_turn.serialize_data_hash(data_hash)
+
+				game.advance_turn
 		end
 	end
 end

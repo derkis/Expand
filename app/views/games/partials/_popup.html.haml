@@ -2,7 +2,7 @@
 	.title{:style=>"padding-bottom:10px;"}
 		Start a New Company
 	- @cur_turn.data_hash["companies"].each do |key, value|
-		.company{:style=>"padding-top:5px;"}
+		.company_to_start{:company_abbr=>"#{key}", :style=>"padding-top:5px;"}
 			%input{ :type=>"radio", :value=>"#{value['abbr']}", :name=>"company_group" }
 			%label
 				= value["name"]

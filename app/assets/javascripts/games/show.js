@@ -61,6 +61,7 @@ var GAME_ID;
 
 var stock_purchased_by_abbr = {};
 var stock_purchased_total = 0;
+var stock_purchased_cost = 0;
 
 //------------------------------------------------------------------------------------------
 //
@@ -94,6 +95,7 @@ var TURN_TYPES = {
 
         },
         render: function(game_state) {
+            render_button("Place");
         }
     },
     
@@ -113,6 +115,7 @@ var TURN_TYPES = {
             $("#start_company_popup").bPopup().close();
         },
         render: function(game_state) {
+            render_button("Start");
             render_start_company_at(game_state.last_action.row, game_state.last_action.column, game_state);
         }
     },
@@ -124,10 +127,12 @@ var TURN_TYPES = {
             return {"stocks_purchased": stock_purchased_by_abbr};
         },
         after_action: function() {
-            // Close the purchase stock popup if it is open
-            $("#purchase_stock_popup").bPopup().close();
+            stock_purchased_by_abbr = {};
+            stock_purchased_total = 0;
+            stock_purchased_cost = 0;
         },
         render: function(game_state) {
+            render_button("Purchase");
         }
     },
     
@@ -185,11 +190,31 @@ function render_all(game_state)
 {
     render_board(cur_game_state.board, game_state.template.width, game_state.template.height);
     render_players(game_state.cur_data.players);
-    render_status(game_state);
+    render_status();
     render_message();
     render_stock();
     render_stock_purchasing();
+    render_company_start();
+    render_companies();
     render_turn_button();
+}
+
+function render_companies()
+{
+    for (var key in cur_game_state.cur_data.companies)
+    {
+        var company = cur_game_state.cur_data.companies[key];
+        var div_company_data_stock_count = $(".company_data_stock_count[company_abbr='" + key + "']");
+        var div_company_data_size = $(".company_data_size[company_abbr='" + key + "']");
+
+        div_company_data_stock_count.text(company["stock_count"]);
+        div_company_data_size.text(company["size"]);
+    }
+}
+
+function render_button(text)
+{
+    $("#turn_button").attr("value", text)
 }
 
 function render_stock() 
@@ -198,6 +223,24 @@ function render_stock()
     {
         var div_player_stock_in_company = $(".player_stock_in_company[company_abbr='" + key + "']");
         div_player_stock_in_company.text(get_cur_stock_in(key) + (!isNaN(stock_purchased_by_abbr[key]) ? stock_purchased_by_abbr[key] : 0) );
+    }
+}
+
+function render_company_start()
+{
+    for (var key in cur_game_state.cur_data.companies)
+    {
+        var company = cur_game_state.cur_data.companies[key];
+        var div_company_to_start = $(".company_to_start[company_abbr='" + key + "']");
+
+        if (company.size)
+        {
+            div_company_to_start.hide();
+        }
+        else
+        {
+            div_company_to_start.show();
+        }
     }
 }
 
@@ -227,11 +270,11 @@ function render_turn_button()
 
     if(player_can_act()) 
     {
-        turn_button.removeAttr('disabled');
+        turn_button.show();
     }
     else
     { 
-        turn_button.attr('disabled', 'disabled');
+        turn_button.hide();
     }
 }
 
@@ -281,7 +324,15 @@ function render_cell(cell, cell_type, row, column)
 function render_status()
 {
     $('.turn_label').text("Turn: " + (cur_game_state.cur_turn_number + 1));
-    $('.money').text("$" + get_cur_money());
+
+    if (cur_game_state.debug_mode)
+    {
+        $('.money').text("$" + (cur_game_state.cur_data.players[cur_game_state.cur_player_index]["money"] - stock_purchased_cost));
+    }
+    else
+    {
+        $('.money').text("$" + (get_cur_money() - stock_purchased_cost));
+    }
 }
 
 function render_players()
@@ -320,7 +371,17 @@ function render_start_company_at(row, column, game_state)
 
 function get_cur_stock_in(company_abbr)
 {
-    var val = cur_game_state.cur_data.players[cur_game_state.user_player_index]["stock_count"][company_abbr];
+    var val;
+
+    if (cur_game_state.debug_mode)
+    {
+        val = cur_game_state.cur_data.players[cur_game_state.cur_player_index]["stock_count"][company_abbr];
+    }
+    else
+    {
+        val = cur_game_state.cur_data.players[cur_game_state.user_player_index]["stock_count"][company_abbr];
+    }
+
     return isNaN(val) ? 0 : val;
 }
 
@@ -430,21 +491,25 @@ function get_company_stock_cost_for(company_abbr)
 function calc_stock_purchased_total()
 {
     stock_purchased_total = 0;
+    stock_purchased_cost = 0;
 
     for (var key in stock_purchased_by_abbr)
     {
         stock_purchased_total += stock_purchased_by_abbr[key];
+        stock_purchased_cost += get_company_stock_cost_for(key) * stock_purchased_by_abbr[key];
     }
 }
 
 function add_stock_for(company_abbr)
 {
+    if (stock_purchased_total == cur_game_state.cur_data.stock_purchase_limit)
+    {
+        return;
+    }
+
     if (stock_purchased_by_abbr[company_abbr] != null)
     {
-        if (stock_purchased_by_abbr[company_abbr] < cur_game_state.cur_data.stock_purchase_limit)
-        {
-            stock_purchased_by_abbr[company_abbr]++;
-        }
+        stock_purchased_by_abbr[company_abbr]++;   
     }
     else
     {
@@ -454,6 +519,7 @@ function add_stock_for(company_abbr)
     calc_stock_purchased_total();
 
     render_stock();
+    render_status();
 }
 
 function sub_stock_for(company_abbr)
@@ -471,6 +537,7 @@ function sub_stock_for(company_abbr)
     calc_stock_purchased_total();
 
     render_stock();
+    render_status();
 }
 
 //------------------------------------------------------------------------------------------

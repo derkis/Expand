@@ -145,19 +145,19 @@ $cell_height: 50px;
 				background-color: $light_background;
 				border: 0.5em dotted $dark_background;
 
-				.company {
+				.company_data {
 					height: 25px;
 					@include pixel_font($font_size_subtitle, $primary_color);
-					.name {
+					.company_data_name {
 						float:left; width:120px;
 					}
-					.stock_count {
+					.company_data_stock_count {
 						float:left;
 					}
 					.divider {
 						float:left;
 					}
-					.size {
+					.company_data_size {
 						float:left;
 					}
 				}
