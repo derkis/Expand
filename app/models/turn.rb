@@ -34,7 +34,8 @@ class Turn < ActiveRecord::Base
 	START_COMPANY 		= 200
 	PURCHASE_STOCK		= 300
 	TRADE_STOCK			= 400
-	MERGE_ORDER			= 500
+	MERGE_CHOOSE_COMPANY= 500
+	MERGE_CHOOSE_STOCK_OPTIONS	= 550
 
 	PIECE_PLACED 		= 0
 	COMPANY_STARTED 	= 1
@@ -306,27 +307,58 @@ class Turn < ActiveRecord::Base
 	# -----------------------------------------------------------------
 	# Places a piece on the board for this turn only.
 	#
-	# Returns "CREATE_COMPANY" if possible given the placed piece.
+	# Returns "CREATE_COMPANY" if this piece placement would result in the start
+	# 	of a company.
+	# Returns "MERGE_STARTED" if a merge will be triggered by this piece placement.
+	# Returns "PIECE_PLACED" if no further action will be triggered.
 	# -----------------------------------------------------------------
 	def test_place_piece (row, column)
-		piece_index = self.piece_index(row, column);
+		piece_index = self.piece_index(row, column)
 
-		# Is this piece connected to another company that is already started?
-		companies = data_hash["companies"]
-		companies.each do |key, company|
-			if has_adjacent(piece_index, Set.new([company["abbr"].to_sym]))
-				return PIECE_PLACED
-			end
-		end
+		adjacent_companies = test_merge(row, column)
 
-	 	return COMPANY_STARTED if has_adjacent(piece_index, Set.new([:u]))
+		# If we are connected to company, this tile will merge into that company
+		# and this is considered just a standard piece placement.
+		return PIECE_PLACED if adjacent_companies.size == 1
+
+		# If we are placing a piece that is connected to more than one company,
+		# then by definition this is a merger, and we need to trigger the merge
+		# process
+		return MERGE_STARTED if adjacent_companies.size >= 2
+
+		# If we are connected to no companies, but we are connected to an unspecifed
+		# piece on the board and there are still companies that can be established,
+		# then we can trigger the start of a company.
+	 	return COMPANY_STARTED if has_adjacent(piece_index, Set.new([:u])) && can_start_company
+
+	 	# By default, piece placement doesn't "do" anything if it is a loan piece.
 	 	return PIECE_PLACED
 	end
 
 	# -----------------------------------------------------------------
-	# Places a piece on the board for this turn only.
-	#
-	# Returns "CREATE_COMPANY" if possible given the placed piece.
+	# Returns a hash of the companies that would be merged if a piece
+	# was placed at row, column
+	# -----------------------------------------------------------------
+	def test_merge(row, column)
+		piece_index = self.piece_index(row, column)
+
+		# Is this piece connected to other companies that are already started?
+		adjacent_companies = {}
+		companies = data_hash["companies"]
+		companies.each do |key, company|
+			adjacent_companies[company["abbr"]] = company if has_adjacent(piece_index, Set.new([company["abbr"].to_sym]))
+		end
+		return adjacent_companies
+	end
+
+	# -----------------------------------------------------------------
+	# Places a piece on the board for this turn only. This should ONLY
+	# be called when the piece placement has been tested to either:
+	#     1) Create a new company
+	#     2) Add to a current company
+	#     3) Not do anything
+	# During merging, call place_piece_merge_companies_into which requires
+	# that you pass which company will be retained.
 	# -----------------------------------------------------------------
 	def place_piece (row, column)
 		new_board = self.board.dup
@@ -337,7 +369,6 @@ class Turn < ActiveRecord::Base
 		companies.each do |key, company|
 			if has_adjacent(piece_index, Set.new([company["abbr"].to_sym]))
 				new_board[piece_index] = company["abbr"]
-				self.update_attributes(:board => new_board.dup)
 
 				# Okay, we have to find all the OTHER pieces that this
 				# might have connected to as well, and update those.
@@ -355,6 +386,29 @@ class Turn < ActiveRecord::Base
 
 		# Is this a piece not connected to any other already placed pieces?
 		new_board[piece_index] = "u"
+		self.update_attributes(:board => new_board)
+	end
+
+	# -----------------------------------------------------------------
+	# Places a piece on the board that will cause a merger. The company
+	# passed in will be the company retained, so all other tiles will switch
+	# to this new company.
+	# -----------------------------------------------------------------
+	def place_piece_merge_companies_into (row, column, company_abbr)
+		new_board = self.board.dup
+		piece_index = self.piece_index(row, column);		
+
+		new_board[piece_index] = company_abbr
+
+		# Okay, we have to find all the OTHER pieces that this
+		# might did connect to, and update those.
+		tiles = get_connected_tiles(row, column)
+
+		tiles.each do |key,value|
+			new_board[value["index"]] = company_abbr
+		end
+
+		# save the board again.
 		self.update_attributes(:board => new_board)
 	end
 
@@ -407,6 +461,13 @@ class Turn < ActiveRecord::Base
 			num = num + 1 if company["size"] > 0
 		end
 		return num
+	end
+
+	# -----------------------------------------------------------------
+	# Returns true if a company can be started
+	# -----------------------------------------------------------------
+	def can_start_company()
+		return num_established_companies() < companies = data_hash["companies"].size
 	end
 
 	# -----------------------------------------------------------------

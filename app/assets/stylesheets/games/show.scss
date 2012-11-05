@@ -33,20 +33,33 @@ $cell_height: 50px;
 			@include pixel_font($font_size_title, $font_color_title);
 		}
 
-		.status
+		.leftnav
 		{
 			position: absolute;
 			top: 2em; left: -30px;
-			background: $light_background;
-			border: 0.5em dotted $dark_background;
 
-			.money {
-				float: right;
+			.player_status
+			{
+				background: $light_background;
+				border: 0.5em dotted $dark_background;
+				width:210px;
 
-				@include pixel_font($font_size_title, $font_color_title);
+				.money {
+					float: right;
+
+					@include pixel_font($font_size_title, $font_color_title);
+				}
+
+				.player_companies {
+					@include pixel_font($font_size_subtitle, $primary_color);
+				}
 			}
 
-			.player_companies {
+			.merge_company_chooser, .merge_company_stock_option_chooser
+			{
+				width:210px;
+				background: $light_background;
+				border: 0.5em dotted $dark_background;
 				@include pixel_font($font_size_subtitle, $primary_color);
 			}
 		}

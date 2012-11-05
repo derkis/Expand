@@ -63,6 +63,10 @@ var stock_purchased_by_abbr = {};
 var stock_purchased_total = 0;
 var stock_purchased_cost = 0;
 
+var stock_split_count = 0;
+var stock_sell_count = 0;
+var stock_sell_cost = 0;
+
 //------------------------------------------------------------------------------------------
 //
 // Initialization
@@ -95,6 +99,8 @@ var TURN_TYPES = {
 
         },
         render: function(game_state) {
+            render_stock_option_chooser(false)
+            render_merge_company_chooser(false);
             render_button("Place", false);
         }
     },
@@ -141,7 +147,44 @@ var TURN_TYPES = {
     },
     
     "500": {
-        name: 'merge_order'
+        name: 'merge_choose_company',
+        message: "Choose what company to retain in this merger",
+        get_action: function()
+        {
+            return {company_abbr: $("input[name=merge_choice]").filter(':checked').val()};
+        },
+        after_action: function()
+        {
+        },
+        render: function(game_state)
+        {
+            render_merge_company_chooser(true);
+            render_button("Purchase", false);
+        }
+    },
+
+    "550": {
+        name: 'merge_choose_stock_options',
+        message: "Choose what you wish to do with your stock for this merger",
+        get_action: function()
+        {
+            return {
+                        stock_split: stock_split_count,
+                        stock_sold: stock_sell_count
+                    };
+        },
+        after_action: function()
+        {
+            stock_split_count = 0;
+            stock_sell_count = 0;
+            stock_sell_cost = 0;
+        },
+        render: function(game_state)
+        {
+            render_stock_option_chooser(cur_game_state.cur_data.merge_state.stock_option_player_index == cur_game_state.cur_player_index || cur_game_state.debug_mode)
+            render_merge_company_chooser(false);
+            render_button("Purchase", false);
+        }
     }
 };
 
@@ -222,6 +265,90 @@ function render_button(text, show = true)
         $("#turn_button").show();
         $("#turn_button").attr("value", text);
     }
+}
+
+function render_merge_company_chooser(show)
+{
+    if (!show)
+    {
+        $(".merge_company_chooser").hide();
+    }
+    else
+    {
+        // Here we only want to show all those companies that are available
+        // for this merger, we want to hide every other one
+        companies = cur_game_state.cur_data.merge_state.companies_to_merge;
+
+        for (var key in cur_game_state.cur_data.companies)
+        {
+            var div_merge_company = $(".merge_company[company_abbr='" + key + "']");
+            div_merge_company.hide();
+        }
+
+        for (var key in companies)
+        {
+            var div_merge_company = $(".merge_company[company_abbr='" + key + "']");
+            div_merge_company.show();
+        }
+
+        $(".merge_company_chooser").show();
+    }
+}
+
+function render_stock_option_chooser(show)
+{
+    if (!show)
+    {
+        $(".merge_company_stock_option_chooser").hide();
+    }
+    else
+    {
+        // We want to show the company we are currently picking stock options for
+        var div_stock_company_from = $(".stock_company_from");
+        var div_stock_company_to = $(".stock_company_to");
+        var company_from = get_company(cur_game_state.cur_data.merge_state.cur_company_options);
+        var company_to = get_company(cur_game_state.cur_data.merge_state.company_abbr);
+
+        div_stock_company_from.text(company_from.name);
+        div_stock_company_from.css("color", company_from.color);
+
+        div_stock_company_to.text(company_to.name);
+        div_stock_company_to.css("color", company_to.color);
+
+        $(".merge_company_stock_option_chooser").show();
+
+        render_stock_option_chooser_counts();
+    }
+}
+
+function render_stock_option_chooser_counts()
+{
+    var company_from = get_company(cur_game_state.cur_data.merge_state.cur_company_options);
+    var company_to = get_company(cur_game_state.cur_data.merge_state.company_abbr);
+
+    // Get the total number of stock available for the company in question
+    var stock_count = get_player(cur_game_state.cur_data.merge_state.stock_option_player_index).stock_count[cur_game_state.cur_data.merge_state.cur_company_options];
+    
+    var stock_keep_count = stock_count - stock_split_count - stock_sell_count;
+    var stock_gain_count = stock_split_count / 2;
+
+    var div_stock_split_count = $(".stock_split_count");
+    var div_stock_sell_count = $(".stock_sell_count");
+    var div_stock_keep_count = $(".stock_keep_count");
+    var div_stock_keep_company = $(".stock_keep_company");
+    var div_stock_gain_count = $(".stock_gain_count");
+    var div_stock_gain_company = $(".stock_gain_company");
+
+    div_stock_split_count.text(stock_split_count);
+    div_stock_sell_count.text(stock_sell_count);
+    div_stock_keep_count.text(stock_keep_count);
+    div_stock_gain_count.text(stock_gain_count);
+    
+    div_stock_keep_company.text(company_from.name);
+    div_stock_keep_company.css("color", company_from.color);
+
+    div_stock_gain_company.text(company_to.name);
+    div_stock_gain_company.css("color", company_to.color);
 }
 
 function render_stock() 
@@ -338,7 +465,7 @@ function render_cell(cell, cell_type, row, column)
 function render_status()
 {
     $('.turn_label').text("Turn: " + (cur_game_state.cur_turn_number + 1));
-    $('.money').text("$" + (get_cur_money() - stock_purchased_cost));
+    $('.money').text("$" + (get_cur_money() - stock_purchased_cost + stock_sell_cost));
 }
 
 function render_players()
@@ -476,6 +603,11 @@ function get_company(company_abbr)
             return cur_game_state.cur_data.companies[key]
         }
     }
+}
+
+function get_player(player_index)
+{
+    return cur_game_state.cur_data.players[player_index]
 }
 
 function get_company_value_for(company_abbr)
@@ -697,4 +829,69 @@ function start_company_click_handler()
 function purchase_stock_click_handler()
 {
     send_game_update();
+}
+
+function sub_stock_split_handler()
+{
+    stock_split_count-=2;
+
+    if (stock_split_count < 0)
+    {
+        stock_split_count = 0
+    }
+
+    render_stock_option_chooser_counts();
+}
+
+function add_stock_split_handler()
+{
+    // Don't allow the user to split more stock than is possible
+    var company_to = get_company(cur_game_state.cur_data.merge_state.company_abbr)
+    var stock_in = get_player(cur_game_state.cur_data.merge_state.stock_option_player_index).stock_count[cur_game_state.cur_data.merge_state.cur_company_options];
+
+    if (company_to.stock_count - (stock_split_count + 2) <= 0)
+    {
+        return;
+    }
+
+    if (stock_in - stock_sell_count - stock_split_count - 2 < 0)
+    {
+        return;
+    }
+
+    stock_split_count+=2;
+
+    render_stock_option_chooser_counts();
+}
+
+function sub_stock_sell_handler()
+{
+    if (stock_sell_count - 1 < 0)
+    {
+        return;
+    }
+
+    stock_sell_count--;
+
+    stock_sell_cost = stock_sell_count * get_company_stock_cost_for(cur_game_state.cur_data.merge_state.cur_company_options);
+
+    render_status();
+    render_stock_option_chooser_counts();
+}
+
+function add_stock_sell_handler()
+{
+    var stock_in = get_player(cur_game_state.cur_data.merge_state.stock_option_player_index).stock_count[cur_game_state.cur_data.merge_state.cur_company_options];
+
+    if (stock_in - stock_sell_count - stock_split_count - 1 < 0)
+    {
+        return;
+    }
+
+    stock_sell_count++;
+
+    stock_sell_cost = stock_sell_count * get_company_stock_cost_for(cur_game_state.cur_data.merge_state.cur_company_options);
+
+    render_status();
+    render_stock_option_chooser_counts();
 }

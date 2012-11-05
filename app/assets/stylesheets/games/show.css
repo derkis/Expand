@@ -19,7 +19,7 @@
 .wrapper {
   width: 70em;
   margin: 0 auto;
-  background: #464646; }
+  background: #404040; }
   .wrapper .main {
     position: relative;
     margin: 0 auto; }
@@ -30,18 +30,27 @@
       font-family: Pixel, cursive;
       font-size: 20px;
       color: #a66c5a; }
-    .wrapper .main .status {
+    .wrapper .main .leftnav {
       position: absolute;
       top: 2em;
-      left: -30px;
-      background: #707070;
-      border: 0.5em dotted #464646; }
-      .wrapper .main .status .money {
-        float: right;
-        font-family: Pixel, cursive;
-        font-size: 20px;
-        color: #a66c5a; }
-      .wrapper .main .status .player_companies {
+      left: -30px; }
+      .wrapper .main .leftnav .player_status {
+        background: #535353;
+        border: 0.5em dotted #404040;
+        width: 210px; }
+        .wrapper .main .leftnav .player_status .money {
+          float: right;
+          font-family: Pixel, cursive;
+          font-size: 20px;
+          color: #a66c5a; }
+        .wrapper .main .leftnav .player_status .player_companies {
+          font-family: Pixel, cursive;
+          font-size: 14px;
+          color: #a66c5a; }
+      .wrapper .main .leftnav .merge_company_chooser, .wrapper .main .leftnav .merge_company_stock_option_chooser {
+        width: 210px;
+        background: #535353;
+        border: 0.5em dotted #404040;
         font-family: Pixel, cursive;
         font-size: 14px;
         color: #a66c5a; }
@@ -58,17 +67,17 @@
           font-size: 12px;
           color: black;
           display: table-cell;
-          background: #707070;
+          background: #535353;
           width: 50px;
           text-align: center;
           vertical-align: middle;
           border: 2px dashed gray; }
         .wrapper .main .board .row .game_cell {
-          background: #464646;
-          color: #707070;
+          background: #404040;
+          color: #535353;
           border: 3px dotted #000; }
           .wrapper .main .board .row .game_cell:hover {
-            border-color: #707070; }
+            border-color: #535353; }
         .wrapper .main .board .row .no_hotel {
           background: #000; }
         .wrapper .main .board .row .enabled {
@@ -96,8 +105,8 @@
       top: 2em;
       right: -30px; }
       .wrapper .main .rightNav .players {
-        background-color: #707070;
-        border: 0.5em dotted #464646; }
+        background-color: #535353;
+        border: 0.5em dotted #404040; }
         .wrapper .main .rightNav .players .player {
           font-family: Pixel, cursive;
           font-size: 14px;
@@ -109,8 +118,8 @@
         .wrapper .main .rightNav .players .current_player {
           color: #78dabb; }
       .wrapper .main .rightNav .companies {
-        background-color: #707070;
-        border: 0.5em dotted #464646; }
+        background-color: #535353;
+        border: 0.5em dotted #404040; }
         .wrapper .main .rightNav .companies .company_data {
           height: 25px;
           font-family: Pixel, cursive;
@@ -128,13 +137,13 @@
   .wrapper .footer {
     position: relative;
     margin: 0 auto;
-    background: #707070;
+    background: #535353;
     font-family: Pixel, cursive;
     font-size: 12px;
     color: black;
     text-align: center;
     vertical-align: middle;
-    border: 0.5em dotted #464646;
+    border: 0.5em dotted #404040;
     color: white; }
     .wrapper .footer .message {
       position: relative;

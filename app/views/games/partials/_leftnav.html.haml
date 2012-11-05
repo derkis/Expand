@@ -1,0 +1,60 @@
+.leftnav
+	.player_status
+		.player_companies
+			- @cur_turn.data_hash["companies"].each do |key, value|
+				%br
+				.player_stock_in_company{:abbr=>"#{key}", :style=>"color: #{value['color']};"}
+					.player_stock_in_company_lbl{:company_abbr=>"#{key}", :style=>"float: left; width:190px; height:25px;"}
+						= value["name"]
+					.player_stock_in_company{:company_abbr=>"#{key}", :style=>"float: left;"}
+						0
+					.company_stock_purchased{:company_abbr=>"#{key}", :style=>"float: left;"}
+						= button_to_function '-', 'sub_stock_for(\'' + key + '\')', :style=>"float:left;"
+						= button_to_function '+', 'add_stock_for(\'' + key + '\')', :style=>"float:left;"
+		.money
+		= button_to_function 'input', 'input_handler()', :id => 'turn_button', :class => 'image_button'
+		.clear{:style=>"clear:both;"}
+	.merge_company_chooser
+		.label
+			Which company would you like to retain during the merger?
+		.merge_companies
+			- @cur_turn.data_hash["companies"].each do |key, value|
+				.merge_company{:company_abbr=>"#{key}"}
+					%br	
+					%input{ :type=>"radio", :value=>"#{value['abbr']}", :name=>"merge_choice", :style=>"float:left;" }
+					.label{ :style=>"float:left; color: #{value['color']}"}
+						= value["name"]
+		= button_to_function 'Merge', 'input_handler()', :id => 'merge_button', :class => 'image_button'
+	.merge_company_stock_option_chooser
+		.label
+			Choose wisely whether to keep, sell, or split your current stock in
+		.stock_company_from{:style=>"float:left;"}
+		.divider{:style=>"float:left;"}
+			&nbsp;merging w/&nbsp;
+		.stock_company_to
+		.stock_split
+			.stock_split_lbl{:style=>"float:left; width:100px;"}
+				Split(2 > 1):
+			.stock_split_count{:style=>"float:left; width:30px;"}
+			.stock_split_buttons{:style=>"float:left;"}
+				= button_to_function '-', 'sub_stock_split_handler()', :id => 'sub_stock_split_button'
+				= button_to_function '+', 'add_stock_split_handler()', :id => 'add_stock_split_button'
+		.stock_sell
+			.stock_sell_lbl{:style=>"float:left; width:100px;"}
+				Sell:
+			.stock_sell_count{:style=>"float:left; width:30px;"}
+			.stock_sell_buttons{:style=>"float:left;"}
+				= button_to_function '-', 'sub_stock_sell_handler()', :id => 'sub_stock_sell_button'
+				= button_to_function '+', 'add_stock_sell_handler()', :id => 'add_stock_sell_button'
+		.stock_keep
+			.stock_keep_lbl{:style=>"float:left;"}
+				Keep:&nbsp;
+			.stock_keep_count{:style=>"float:left; width:30px;"}
+			.stock_keep_company{:style=>"float:left;"}
+		.stock_gain
+			.stock_gain_lbl{:style=>"float:left;"}
+				Gain:&nbsp;
+			.stock_gain_count{:style=>"float:left; width:30px;"}
+			.stock_gain_company{:style=>"float:left;"}
+		.stock_sell_buttons{:style=>"float:left;"}
+		= button_to_function 'Apply', 'input_handler()', :id => 'stock_option_button', :class => 'image_button'
