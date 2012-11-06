@@ -33,17 +33,18 @@
     .wrapper .main .leftnav {
       position: absolute;
       top: 2em;
-      left: -30px; }
+      left: -100px; }
       .wrapper .main .leftnav .player_status {
         background: #535353;
         border: 0.5em dotted #404040;
-        width: 210px; }
+        width: 270px; }
         .wrapper .main .leftnav .player_status .player_status_lbl {
           font-family: Pixel, cursive;
           font-size: 20px;
           color: #db7556; }
         .wrapper .main .leftnav .player_status .money {
           float: right;
+          padding-top: 2em;
           font-family: Pixel, cursive;
           font-size: 20px;
           color: #a66c5a; }
@@ -52,7 +53,7 @@
           font-size: 14px;
           color: #a66c5a; }
       .wrapper .main .leftnav .merge_company_chooser, .wrapper .main .leftnav .merge_company_stock_option_chooser {
-        width: 210px;
+        width: 270px;
         background: #535353;
         border: 0.5em dotted #404040;
         font-family: Pixel, cursive;

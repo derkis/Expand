@@ -36,13 +36,13 @@ $cell_height: 50px;
 		.leftnav
 		{
 			position: absolute;
-			top: 2em; left: -30px;
+			top: 2em; left: -100px;
 
 			.player_status
 			{
 				background: $light_background;
 				border: 0.5em dotted $dark_background;
-				width:210px;
+				width:270px;
 
 				.player_status_lbl
 				{
@@ -51,6 +51,7 @@ $cell_height: 50px;
 
 				.money {
 					float: right;
+					padding-top:2em;
 
 					@include pixel_font($font_size_title, $font_color_title);
 				}
@@ -62,7 +63,7 @@ $cell_height: 50px;
 
 			.merge_company_chooser, .merge_company_stock_option_chooser
 			{
-				width:210px;
+				width:270px;
 				background: $light_background;
 				border: 0.5em dotted $dark_background;
 				@include pixel_font($font_size_subtitle, $primary_color);

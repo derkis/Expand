@@ -88,7 +88,7 @@ var TURN_TYPES = {
     
     "100": { 
         name: 'place_piece',
-        message: "Please choose where to place your tile and then click Input",
+        message: "Choose where to place your tile...",
         get_action: function() {
             return {
                 row: selected_cell.attr('row').to_int(),
@@ -384,7 +384,7 @@ function render_stock()
         var div_player_stock_in_company_main = $(".player_stock_in_company_main[company_abbr='" + key + "']");
         var div_player_stock_in_company_lbl = $(".player_stock_in_company_lbl[company_abbr='" + key + "']");
 
-        if (company.size > 0)
+        if (company.size > 0 || get_cur_stock_in(key))
         {
             div_player_stock_in_company_main.show();
             div_player_stock_in_company.text(get_cur_stock_in(key) + (!isNaN(stock_purchased_by_abbr[key]) ? stock_purchased_by_abbr[key] : 0) );
@@ -471,7 +471,7 @@ function render_board()
 function render_cell(cell, cell_type, row, column)
 {
     // Clear out all the cell's current styling
-    cell.removeClass('empty enabled no_hotel selected highlighted');
+    cell.removeClass('empty enabled no_hotel selected highlighted adjacent');
     cell.css("background-color", "");
     cell.text((65 + row).to_char() + (column+1));
 
@@ -645,9 +645,10 @@ function get_company_value_for(company_abbr)
 {
     // 1) Find the company
     var company = get_company(company_abbr);
+    var i = 0;
 
     // 2) Loop through value rows (cost / size)
-    for (var i = 0; i < company.value.length; i++)
+    for (; i < company.value.length; i++)
     {
         var row = company.value[i];
 
@@ -659,6 +660,11 @@ function get_company_value_for(company_abbr)
         }
     }
 
+    if (i == company.value.length)
+    {
+        return company.value[company.value.length - 1];
+    }
+    
     return company.value[0];
 }
 
@@ -691,6 +697,20 @@ function add_stock_for(company_abbr)
     if (get_cur_money() - stock_purchased_cost - get_company_stock_cost_for(company_abbr) < 0)
     {
         return;
+    }
+
+    // Will this exceed the number of stock available for the company?
+    if (cur_game_state.cur_data.companies[company_abbr]["stock_count"] == 0)
+    {
+        return;
+    }
+
+    if (stock_purchased_by_abbr[company_abbr])
+    {
+        if (cur_game_state.cur_data.companies[company_abbr]["stock_count"] - stock_purchased_by_abbr[company_abbr] - 1 < 0)
+        {
+            return;
+        }
     }
 
     if (stock_purchased_by_abbr[company_abbr] != null)
@@ -897,7 +917,7 @@ function add_stock_split_handler()
     var company_to = get_company(cur_game_state.cur_data.merge_state.company_abbr)
     var stock_in = get_player(cur_game_state.cur_data.merge_state.stock_option_player_index).stock_count[cur_game_state.cur_data.merge_state.cur_company_options];
 
-    if (company_to.stock_count - (stock_split_count + 2) <= 0)
+    if (company_to.stock_count - ((stock_split_count / 2) + 1) < 0)
     {
         return;
     }

@@ -4,9 +4,9 @@
 		.player_companies
 			- @cur_turn.data_hash["companies"].each do |key, value|
 				.player_stock_in_company_main{:company_abbr=>"#{key}", :style=>"color: #{value['color']};"}
-					.player_stock_in_company_lbl{:company_abbr=>"#{key}", :style=>"float: left; width:190px; height:25px;"}
+					.player_stock_in_company_lbl{:company_abbr=>"#{key}", :style=>"float: left; width:170px; height:25px;"}
 						= value["name"]
-					.player_stock_in_company{:company_abbr=>"#{key}", :style=>"float: left;"}
+					.player_stock_in_company{:company_abbr=>"#{key}", :style=>"float: left; width:30px;"}
 						0
 					.company_stock_purchased{:company_abbr=>"#{key}", :style=>"float: left;"}
 						= button_to_function '-', 'sub_stock_for(\'' + key + '\')', :style=>"float:left;"
@@ -26,12 +26,11 @@
 						= value["name"]
 		= button_to_function 'Merge', 'input_handler()', :id => 'merge_button', :class => 'image_button'
 	.merge_company_stock_option_chooser
-		.label
-			Choose wisely whether to keep, sell, or split your current stock in
 		.stock_company_from{:style=>"float:left;"}
 		.divider{:style=>"float:left;"}
-			&nbsp;merging w/&nbsp;
+			&nbsp;merging with&nbsp;
 		.stock_company_to
+		%br
 		.stock_split
 			.stock_split_lbl{:style=>"float:left; width:100px;"}
 				Split(2 > 1):
@@ -46,14 +45,15 @@
 			.stock_sell_buttons{:style=>"float:left;"}
 				= button_to_function '-', 'sub_stock_sell_handler()', :id => 'sub_stock_sell_button'
 				= button_to_function '+', 'add_stock_sell_handler()', :id => 'add_stock_sell_button'
+			.clear{:style=>"clear:both;"}
 		.stock_keep
-			.stock_keep_lbl{:style=>"float:left;"}
+			.stock_keep_lbl{:style=>"float:left; width:100px;"}
 				Keep:&nbsp;
 			.stock_keep_count{:style=>"float:left; width:30px;"}
 			.stock_keep_company{:style=>"float:left;"}
 			.clear{:style=>"clear:both;"}
 		.stock_gain
-			.stock_gain_lbl{:style=>"float:left;"}
+			.stock_gain_lbl{:style=>"float:left; width:100px;"}
 				Gain:&nbsp;
 			.stock_gain_count{:style=>"float:left; width:30px;"}
 			.stock_gain_company{:style=>"float:left;"}

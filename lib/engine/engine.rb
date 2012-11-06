@@ -118,8 +118,6 @@ module Engine
 				game.cur_turn.start_company_at(action["row"], action["column"], action["company_abbr"])
 				data_hash = game.cur_turn.data_hash
 
-				Engine.goto_purchase_stock_or_advance_turn(game, data_hash)
-
 				data_hash["companies"][action["company_abbr"]]["stock_count"] -= 1
 
 				# Update stock value on the player by 1
@@ -129,7 +127,7 @@ module Engine
 					data_hash["players"][game.cur_turn.player.index]["stock_count"][action["company_abbr"]] = 1
 				end
 
-				game.cur_turn.serialize_data_hash(data_hash)
+				Engine.goto_purchase_stock_or_advance_turn(game, data_hash)
 
 			#--------------------------------------
 			# PURCHASE_STOCK
@@ -190,7 +188,7 @@ module Engine
 				data_hash['merge_state']["company_options_left"].delete(data_hash['merge_state']["cur_company_options"])
 
 				# Setup the first player to be making a decision
-				data_hash['merge_state']["stock_option_player_index"] = Engine.find_first_player_index_with_stock_in(game, company_abbr)
+				data_hash['merge_state']["stock_option_player_index"] = Engine.find_first_player_index_with_stock_in(game, data_hash['merge_state']["cur_company_options"])
 
 				# First we award majority and minority to every single company that has been dissolved
 				# (obviously we need to exclude the company that remains)
@@ -268,8 +266,11 @@ module Engine
 			stock_counts.push(player["stock_count"][company_abbr]) if player["stock_count"][company_abbr] != 0 && player["stock_count"][company_abbr] != nil
 		end
 
+		# Eliminate duplicates
+		stock_counts = stock_counts & stock_counts
+
 		# Sort in descending order
-		stock_counts.sort{|a,b| b <=> a}
+		stock_counts = stock_counts.sort.reverse!
 
 		# If there is only one value the majority and minority are shared by everyone involved
 		if stock_counts.size == 1
@@ -343,8 +344,10 @@ module Engine
 
 		# Update the board and flip all the tiles to the remaining company
 		game.cur_turn.place_piece_merge_companies_into(row, column, company_abbr)
-		
+
 		# Advance the turn or goto purchasing stocks for the current player
 		Engine.goto_purchase_stock_or_advance_turn(game, data_hash)
+
+		game.cur_turn.refresh_company_sizes
 	end
 end
