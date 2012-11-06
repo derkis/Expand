@@ -52,12 +52,12 @@ function hasClasses(element, classes)
 // Variables
 //
 //------------------------------------------------------------------------------------------
-var player_index = -1;
 var cur_turn_type;
 var selected_cell;
 var cur_game_state;
 var message_temp = null;
 var GAME_ID;
+var temp_player_index = -1;
 
 var stock_purchased_by_abbr = {};
 var stock_purchased_total = 0;
@@ -138,6 +138,8 @@ var TURN_TYPES = {
             stock_purchased_cost = 0;
         },
         render: function(game_state) {
+            render_stock_option_chooser(false);
+            render_merge_company_chooser(false);
             render_button("Purchase", true);
         }
     },
@@ -193,6 +195,28 @@ var TURN_TYPES = {
 // Methods
 //
 //------------------------------------------------------------------------------------------
+function get_player_index()
+{
+    if (temp_player_index != -1)
+    {
+        return temp_player_index;
+    }
+
+    if (cur_game_state.debug_mode)
+    {
+        // If we are in debug mode and we are currently choosing stock options, we want to 
+        // display the data for the current player choosing stock options.
+        if (cur_game_state.cur_data["merge_state"] && cur_game_state.cur_data["merge_state"]["stock_option_player_index"])
+        {
+            return cur_game_state.cur_data["merge_state"]["stock_option_player_index"];
+        }
+
+        return cur_game_state.cur_player_index;
+    }
+
+    return cur_game_state.user_player_index;
+}
+
 function polling_wrapper()
 {
     load_game_state();
@@ -230,7 +254,7 @@ function reset_game()
 
 function render_all(game_state)
 {
-    render_board(cur_game_state.board, game_state.template.width, game_state.template.height);
+    render_board();
     render_players(game_state.cur_data.players);
     render_status();
     render_message();
@@ -357,10 +381,19 @@ function render_stock()
     {
         var company = cur_game_state.cur_data.companies[key];
         var div_player_stock_in_company = $(".player_stock_in_company[company_abbr='" + key + "']");
+        var div_player_stock_in_company_main = $(".player_stock_in_company_main[company_abbr='" + key + "']");
         var div_player_stock_in_company_lbl = $(".player_stock_in_company_lbl[company_abbr='" + key + "']");
 
-        div_player_stock_in_company.text(get_cur_stock_in(key) + (!isNaN(stock_purchased_by_abbr[key]) ? stock_purchased_by_abbr[key] : 0) );
-        div_player_stock_in_company_lbl.text(company.name + " ($" + get_company_stock_cost_for(key) + ")");
+        if (company.size > 0)
+        {
+            div_player_stock_in_company_main.show();
+            div_player_stock_in_company.text(get_cur_stock_in(key) + (!isNaN(stock_purchased_by_abbr[key]) ? stock_purchased_by_abbr[key] : 0) );
+            div_player_stock_in_company_lbl.text(company.name + " ($" + get_company_stock_cost_for(key) + ")");
+        }
+        else
+        {
+            div_player_stock_in_company_main.hide();
+        }
     }
 }
 
@@ -416,8 +449,12 @@ function render_turn_button()
     }
 }
 
-function render_board(board, num_columns, num_rows)
+function render_board()
 {
+    board = cur_game_state.board;
+    num_columns = cur_game_state.template.width;
+    num_rows = cur_game_state.template.height;
+
     $(".debug_string").text(board);
 
     var row = 0, column = 0;
@@ -438,12 +475,18 @@ function render_cell(cell, cell_type, row, column)
     cell.css("background-color", "");
     cell.text((65 + row).to_char() + (column+1));
 
+    player_index = get_player_index().toString();
+
     switch(cell_type) {
         case 'e': // empty cell
             cell.addClass('empty');
             break;
         case 'u':
             cell.addClass('no_hotel');
+            break;
+        case '+':
+            cell.addClass('enabled');
+            cell.text("Merge");
             break;
         case player_index:
             cell.addClass('enabled');
@@ -466,12 +509,14 @@ function render_status()
 {
     $('.turn_label').text("Turn: " + (cur_game_state.cur_turn_number + 1));
     $('.money').text("$" + (get_cur_money() - stock_purchased_cost + stock_sell_cost));
+    var txt = $(".player[player_index='" + get_player_index() + "']").text();
+    $('.player_status_lbl').text(txt);
 }
 
 function render_players()
 {
     $('.player').removeClass('current_player');
-    $('.player[player_index=' + cur_game_state.cur_player_index + ']').addClass('current_player');
+    $('.player[player_index=' + get_player_index() + ']').addClass('current_player');
 }
 
 function render_message()
@@ -504,28 +549,14 @@ function render_start_company_at(row, column, game_state)
 
 function get_cur_stock_in(company_abbr)
 {
-    var val;
-
-    if (cur_game_state.debug_mode)
-    {
-        val = cur_game_state.cur_data.players[cur_game_state.cur_player_index]["stock_count"][company_abbr];
-    }
-    else
-    {
-        val = cur_game_state.cur_data.players[cur_game_state.user_player_index]["stock_count"][company_abbr];
-    }
+    var val = cur_game_state.cur_data.players[get_player_index()]["stock_count"][company_abbr];
 
     return isNaN(val) ? 0 : val;
 }
 
 function get_cur_money()
 {
-    if (cur_game_state.debug_mode)
-    {
-        return cur_game_state.cur_data.players[cur_game_state.cur_player_index]["money"];
-    }
-
-    return cur_game_state.cur_data.players[cur_game_state.user_player_index]["money"];
+    return cur_game_state.cur_data.players[get_player_index()]["money"];
 }
 
 function player_can_act()
@@ -702,12 +733,8 @@ function sub_stock_for(company_abbr)
 //------------------------------------------------------------------------------------------
 function load_game_state_resultHandler(game_state)
 {
-    console.log(game_state);
-
     cur_game_state = game_state;
     cur_turn_type = TURN_TYPES[cur_game_state.cur_data.state.toString()];
-
-    player_index = game_state.cur_player_index.toString();
 
     render_all(game_state);
 
@@ -720,6 +747,7 @@ function document_readyHandler()
 
     $('.enabled').live('click', enabled_clickHandler);
     $('.cell').hover(cell_hoverOverHandler, cell_hoverOutHandler);
+    $('.player').hover(player_hoverOverHandler, player_hoverOutHandler);
 }
 
 function game_readyHandler()
@@ -799,6 +827,26 @@ function cell_hoverOutHandler(click_event)
 
         render_message();
     }
+}
+
+function player_hoverOverHandler(click_event)
+{
+    var cell = click_event.currentTarget;
+
+    temp_player_index = parseInt(cell.getAttribute("player_index"));
+
+    render_status();
+    render_stock();
+    render_board();
+}
+
+function player_hoverOutHandler(click_event)
+{
+    temp_player_index = -1;
+
+    render_status();
+    render_stock();
+    render_board();
 }
 
 function send_game_update_successHandler()

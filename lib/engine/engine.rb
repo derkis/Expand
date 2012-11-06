@@ -43,10 +43,7 @@ module Engine
 						else
 							game.advance_turn_step
 							game.cur_turn.place_piece(action["row"], action["column"])
-							data_hash = game.cur_turn.data_hash
-							data_hash['state'] = Turn::PURCHASE_STOCK
-							game.cur_turn.serialize_data_hash(data_hash)
-							# We refresh player tiles AFTER they have purchased their stock!
+							Engine.goto_purchase_stock_or_advance_turn(game, game.cur_turn.data_hash)
 						end
 					when Turn::COMPANY_STARTED
 						game.advance_turn_step
@@ -58,16 +55,57 @@ module Engine
 					when Turn::MERGE_STARTED
 						game.advance_turn_step
 						data_hash = game.cur_turn.data_hash
-						data_hash['state'] = Turn::MERGE_CHOOSE_COMPANY
+
 						data_hash['merge_state'] = {
 													"row"=>action["row"],
 													"column"=>action["column"],
 													"companies_to_merge"=>{}
 													}
+
 						companies_merged = game.cur_turn.test_merge(action["row"], action["column"])
 
+						game.cur_turn.mark_merge_at(action["row"], action["column"])
+
+						largest_company_size = 0
+						largest_company_abbr = ""
+						last_company_size = -1
+						all_same_size = true
+
 						companies_merged.each do |key, company|
+							if company["size"] > largest_company_size
+								largest_company_size = company["size"] 
+								largest_company_abbr = company["abbr"]
+							end
+							all_same_size = false if last_company_size != -1 && last_company_size != company["size"]
 							data_hash['merge_state']["companies_to_merge"][key] = true
+
+							last_company_size = company["size"]
+						end
+
+						if all_same_size
+							# Okay, we only want to give a merge option if the companies involved
+							# in the merge are the SAME SIZE
+							data_hash['state'] = Turn::MERGE_CHOOSE_COMPANY
+						else
+							data_hash['state'] = Turn::MERGE_CHOOSE_STOCK_OPTIONS
+							data_hash['merge_state']["company_abbr"] = largest_company_abbr
+
+							# Create a collection of companies that still need stock options chosen for
+							data_hash['merge_state']["company_options_left"] = data_hash['merge_state']["companies_to_merge"].dup
+							# Remove the company that is the retained company
+							data_hash['merge_state']["company_options_left"].delete(largest_company_abbr)
+							# Pick the first company that needs to have stock options chosen for it
+							data_hash['merge_state']["cur_company_options"] = data_hash['merge_state']["company_options_left"].to_a()[0][0]
+							data_hash['merge_state']["company_options_left"].delete(data_hash['merge_state']["cur_company_options"])
+
+							# Setup the first player to be making a decision
+							data_hash['merge_state']["stock_option_player_index"] = Engine.find_first_player_index_with_stock_in(game, data_hash['merge_state']["cur_company_options"])
+
+							# First we award majority and minority to every single company that has been dissolved
+							# (obviously we need to exclude the company that remains)
+							data_hash["merge_state"]["companies_to_merge"].each do |c_a, company|
+								Engine.award_majority_minority(game, data_hash, c_a) if c_a != largest_company_abbr
+							end
 						end
 
 						game.cur_turn.serialize_data_hash(data_hash)
@@ -77,10 +115,11 @@ module Engine
 			# START_COMPANY
 			#--------------------------------------
 			when Turn::START_COMPANY
-				game.advance_turn_step
 				game.cur_turn.start_company_at(action["row"], action["column"], action["company_abbr"])
 				data_hash = game.cur_turn.data_hash
-				data_hash['state'] = Turn::PURCHASE_STOCK
+
+				Engine.goto_purchase_stock_or_advance_turn(game, data_hash)
+
 				data_hash["companies"][action["company_abbr"]]["stock_count"] -= 1
 
 				# Update stock value on the player by 1
@@ -130,16 +169,14 @@ module Engine
 			# MERGE_CHOOSE_COMPANY
 			#--------------------------------------
 			when Turn::MERGE_CHOOSE_COMPANY
+				game.advance_turn_step
+
 				data_hash = game.cur_turn.data_hash
 
 				# Here the client will have sent us the company abbreviation to retain
 				company_abbr = action["company_abbr"]
 				row = data_hash["merge_state"]["row"]
 				column = data_hash["merge_state"]["column"]
-
-				# Now we place the piece, telling the turn which company is being
-				# retained
-				game.cur_turn.place_piece_merge_companies_into(row, column, company_abbr)
 				
 				data_hash['state'] = Turn::MERGE_CHOOSE_STOCK_OPTIONS
 				data_hash['merge_state']["company_abbr"] = company_abbr
@@ -153,57 +190,161 @@ module Engine
 				data_hash['merge_state']["company_options_left"].delete(data_hash['merge_state']["cur_company_options"])
 
 				# Setup the first player to be making a decision
-				data_hash['merge_state']["stock_option_player_index"] = game.cur_turn.player.index
+				data_hash['merge_state']["stock_option_player_index"] = Engine.find_first_player_index_with_stock_in(game, company_abbr)
+
+				# First we award majority and minority to every single company that has been dissolved
+				# (obviously we need to exclude the company that remains)
+				data_hash["merge_state"]["companies_to_merge"].each do |c_a, company|
+					Engine.award_majority_minority(game, data_hash, c_a) if c_a != company_abbr
+				end
 
 				game.cur_turn.serialize_data_hash(data_hash)
 			#--------------------------------------
 			# MERGE_CHOOSE_STOCK_OPTIONS
 			#--------------------------------------
 			when Turn::MERGE_CHOOSE_STOCK_OPTIONS
-				binding.pry
 				data_hash = game.cur_turn.data_hash
+
+				company_from = data_hash['merge_state']["cur_company_options"]
+				company_to = data_hash['merge_state']["company_abbr"]
+
 				player_index = data_hash['merge_state']["stock_option_player_index"]
-				next_player_index = (player_index+1) % game.players.count
+
+				# The client will have sent us the options:
+				#   sell: the number of stocks to sell
+				#   split: the number of stocks to split 2-for-1 into the new company (should
+				#	be a multiple of 2)
+				
+				# Deal with split stock first.
+				split = action["stock_split"]
+				data_hash["players"][player_index]["stock_count"][company_from] -= split
+				if data_hash["players"][player_index]["stock_count"].has_key?(company_to)
+					data_hash["players"][player_index]["stock_count"][company_to] += (split / 2)
+				else
+					data_hash["players"][player_index]["stock_count"][company_to] = (split / 2)
+				end
+
+				data_hash["companies"][company_from]["stock_count"] += split
+				data_hash["companies"][company_to]["stock_count"] -= (split / 2)
+
+				# Deal with sold stock next.
+				sold = action["stock_sold"]
+				data_hash["players"][player_index]["money"] += (sold * game.cur_turn.stock_value_for(company_from))
+				if data_hash["players"][player_index]["stock_count"].has_key?(company_from)
+					data_hash["players"][player_index]["stock_count"][company_from] -= sold
+				end
+
+				data_hash["companies"][company_from]["stock_count"] += sold
 
 				# We continue on this cycle until we wrap around to the player who
-				# initiated this debacle of merging madness at which point we should
-				# technically move on to the next company in the sequence until there
-				# are no companies next
-				if next_player_index == game.cur_player_index
-					data_hash.delete("merge_state")
-					data_hash['state'] = Turn::PURCHASE_STOCK
-				else
-					company_from = data_hash['merge_state']["cur_company_options"]
-					company_to = data_hash['merge_state']["company_abbr"]
+				# initiated this debacle of merging madness.
+				next_player_index = (player_index+1) % game.players.count 
 
-					# The client will have sent us the options:
-					#   sell: the number of stocks to sell
-					#   split: the number of stocks to split 2-for-1 into the new company (should
-					#	be a multiple of 2)
-					
-					# Deal with split stock first.
-					split = action["stock_split"]
-					data_hash["players"][player_index]["stock_count"][company_from] -= split
-					if data_hash["players"][player_index]["stock_count"].has_key?(company_to)
-						data_hash["players"][player_index]["stock_count"][company_to] += (split / 2)
-					else
-						data_hash["players"][player_index]["stock_count"][company_to] = (split / 2)
-					end
+				return Engine.finalize_merge(game, data_hash) if next_player_index == game.cur_player_index
 
-					# Deal with sold stock next.
-					sold = action["stock_sold"]
-					data_hash["players"][player_index]["money"] += (sold * game.cur_turn.stock_value_for(company_from))
-					if data_hash["players"][player_index]["stock_count"].has_key?(company_from)
-						data_hash["players"][player_index]["stock_count"][company_from] -= sold
-					end
+				while !game.cur_turn.player_has_stock_in(next_player_index, company_from)
+					next_player_index = (next_player_index+1) % game.players.count
 
-					data_hash['merge_state']["stock_option_player_index"] = next_player_index
+					return Engine.finalize_merge(game, data_hash) if next_player_index == game.cur_player_index
 				end
+
+				data_hash['merge_state']["stock_option_player_index"] = next_player_index
 				
 				game.cur_turn.serialize_data_hash(data_hash)
 		end
 
 		game.cur_turn.refresh_company_sizes
 		game.cur_turn.update_attributes(:action => ActiveSupport::JSON.encode(action))
+	end
+
+	def self.award_majority_minority(game, data_hash, company_abbr)
+		stock_counts = []
+
+		majority_money = game.cur_turn.stock_value_for(company_abbr, "bonus_maj")
+		minority_money = game.cur_turn.stock_value_for(company_abbr, "bonus_min")
+
+		# First find the stock counts in the company
+		data_hash["players"].each_with_index do |player, i|
+			stock_counts.push(player["stock_count"][company_abbr]) if player["stock_count"][company_abbr] != 0 && player["stock_count"][company_abbr] != nil
+		end
+
+		# Sort in descending order
+		stock_counts.sort{|a,b| b <=> a}
+
+		# If there is only one value the majority and minority are shared by everyone involved
+		if stock_counts.size == 1
+			majority_minority = stock_counts[0]
+			winnarz = []
+			data_hash["players"].each_with_index do |player, i|
+				winnarz.push(player) if player["stock_count"][company_abbr] == majority_minority
+			end
+
+			winnarz.each_with_index do |player, i|
+				player["money"] += (majority_money + minority_money) / winnarz.size
+			end
+		else
+			# Now find the count of players for majority and minority
+			majority = stock_counts[0]
+			minority = stock_counts[1]
+
+			majority_winnarz = []
+			minority_winnarz = []
+
+			data_hash["players"].each_with_index do |player, i|
+				majority_winnarz.push(player) if player["stock_count"][company_abbr] == majority
+				minority_winnarz.push(player) if player["stock_count"][company_abbr] == minority
+			end
+
+			majority_winnarz.each_with_index do |player, i|
+				player["money"] += majority_money / majority_winnarz.size
+			end
+
+			minority_winnarz.each_with_index do |player, i|
+				player["money"] += minority_money / minority_winnarz.size
+			end
+		end
+	end
+
+	def self.goto_purchase_stock_or_advance_turn(game, data_hash)
+		# We want to see if the player in question has enough resources to buy
+		# any stock. If they do not, we just advance the turn. If they do
+		# we go into purchase stock phase.
+		if game.cur_turn.player_can_purchase_any_stock(game.cur_player_index)
+			game.advance_turn_step
+			data_hash['state'] = Turn::PURCHASE_STOCK
+			# We refresh player tiles AFTER they have purchased their stock!
+		else
+			game.advance_turn
+			game.cur_turn.refresh_player_tiles
+			data_hash['state'] = Turn::PLACE_PIECE
+		end
+
+		game.cur_turn.serialize_data_hash(data_hash)
+	end
+
+	# Finds the next player with stock in the company provided.
+	def self.find_first_player_index_with_stock_in(game, company_abbr)
+		next_player_index = game.cur_player_index
+
+		while !game.cur_turn.player_has_stock_in(next_player_index, company_abbr)
+			next_player_index = (next_player_index+1) % game.players.count
+		end
+
+		return next_player_index
+	end
+
+	def self.finalize_merge(game, data_hash)
+		row = data_hash["merge_state"]["row"]
+		column = data_hash["merge_state"]["column"]
+		company_abbr = data_hash["merge_state"]["company_abbr"]
+
+		# Delete the merge_state from the hash
+		data_hash.delete("merge_state")
+
+		# Update the board and flip all the tiles to the remaining company
+		game.cur_turn.place_piece_merge_companies_into(row, column, company_abbr)
+		
+		# Advance the turn or goto purchasing stocks for the current player
+		Engine.goto_purchase_stock_or_advance_turn(game, data_hash)
 	end
 end

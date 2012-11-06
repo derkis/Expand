@@ -1,9 +1,9 @@
 .leftnav
 	.player_status
+		.player_status_lbl
 		.player_companies
 			- @cur_turn.data_hash["companies"].each do |key, value|
-				%br
-				.player_stock_in_company{:abbr=>"#{key}", :style=>"color: #{value['color']};"}
+				.player_stock_in_company_main{:company_abbr=>"#{key}", :style=>"color: #{value['color']};"}
 					.player_stock_in_company_lbl{:company_abbr=>"#{key}", :style=>"float: left; width:190px; height:25px;"}
 						= value["name"]
 					.player_stock_in_company{:company_abbr=>"#{key}", :style=>"float: left;"}
@@ -51,6 +51,7 @@
 				Keep:&nbsp;
 			.stock_keep_count{:style=>"float:left; width:30px;"}
 			.stock_keep_company{:style=>"float:left;"}
+			.clear{:style=>"clear:both;"}
 		.stock_gain
 			.stock_gain_lbl{:style=>"float:left;"}
 				Gain:&nbsp;

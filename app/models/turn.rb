@@ -118,7 +118,7 @@ class Turn < ActiveRecord::Base
 		turn if turn.save!
 	end
 
-	def stock_value_for(company_abbr)
+	def stock_value_for(company_abbr, what = "cost")
 		company_size = data_hash["companies"][company_abbr]["size"]
 		value_table = data_hash["companies"][company_abbr]["value"]
 
@@ -130,8 +130,8 @@ class Turn < ActiveRecord::Base
 		end
 
 		# At this point, i - 1 in the table holds the row that contains the cost
-		val = value_table[last == 0 ? 0 : last - 1]
-		return val["cost"]
+		val = value_table[last == 0 ? 0 : last]
+		return val[what]
 	end
 
 	# creates subsequent turn from the this turn
@@ -199,7 +199,7 @@ class Turn < ActiveRecord::Base
 		self.board.chars.to_a.each do |t|
 			pid = t.ord - 48
 			if pid >= 0 && pid <= 9
-				tile_counts[pid] += 1 
+				tile_counts[pid] += 1
 			end
 		end
 
@@ -398,6 +398,7 @@ class Turn < ActiveRecord::Base
 		new_board = self.board.dup
 		piece_index = self.piece_index(row, column);		
 
+		# Replace the merge marker ("+") with our company marker
 		new_board[piece_index] = company_abbr
 
 		# Okay, we have to find all the OTHER pieces that this
@@ -475,5 +476,42 @@ class Turn < ActiveRecord::Base
 	# -----------------------------------------------------------------
 	def can_purchase_stock(player)
 		return num_established_companies() > 0
+	end
+
+	# -----------------------------------------------------------------
+	# Returns true if the player has stock in the company provided
+	# -----------------------------------------------------------------
+	def player_has_stock_in(player_index, company_abbr)
+		val = data_hash["players"][player_index]["stock_count"][company_abbr]
+		return false if val == nil || val == 0
+		return true
+	end
+
+	# -----------------------------------------------------------------
+	# Marks the board with a merge marker during the merge process.
+	# -----------------------------------------------------------------
+	def mark_merge_at(row, column)
+		piece_index = self.piece_index(row, column);		
+		new_board = board.dup
+		new_board[piece_index] = "+"
+		update_attributes(:board => new_board)
+	end
+
+	# -----------------------------------------------------------------
+	# Returns true if the provided player has enough money to purchase
+	# any stock.
+	# -----------------------------------------------------------------
+	def player_can_purchase_any_stock(player_index)
+		cheapest_stock = 100000
+
+		# Loop through all the companies and find the cheapest stock option
+		companies = data_hash["companies"]
+		companies.each do |key, company|
+			value = stock_value_for(key)
+
+			cheapest_stock = value if value < cheapest_stock
+		end
+
+		return data_hash["players"][player_index]["money"] >= cheapest_stock
 	end
 end

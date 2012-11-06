@@ -38,6 +38,10 @@
         background: #535353;
         border: 0.5em dotted #404040;
         width: 210px; }
+        .wrapper .main .leftnav .player_status .player_status_lbl {
+          font-family: Pixel, cursive;
+          font-size: 20px;
+          color: #db7556; }
         .wrapper .main .leftnav .player_status .money {
           float: right;
           font-family: Pixel, cursive;

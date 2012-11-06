@@ -44,6 +44,11 @@ $cell_height: 50px;
 				border: 0.5em dotted $dark_background;
 				width:210px;
 
+				.player_status_lbl
+				{
+					@include pixel_font($font_size_title, $primary_color_highlight);				
+				}
+
 				.money {
 					float: right;
 
