@@ -444,7 +444,7 @@ class Turn < ActiveRecord::Base
 		new_board = board.dup
 
 		tiles.each do |key, value|
-			new_board[value["index"]] = company_abbr
+			new_board[value["index"]] = company_abbr	
 		end
 
 		update_attributes(:board => new_board)

@@ -321,6 +321,8 @@ module Engine
 	end
 
 	def self.goto_purchase_stock_or_advance_turn(game, data_hash)
+		game.cur_turn.refresh_company_sizes
+		
 		# We want to see if the player in question has enough resources to buy
 		# any stock. If they do not, we just advance the turn. If they do
 		# we go into purchase stock phase.

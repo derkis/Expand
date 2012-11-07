@@ -232,7 +232,7 @@ function load_game_state()
 // server calls
 function send_game_update(custom)
 {
-    if (!is_my_turn() && !custom["forfeit"])
+    if (!is_my_turn() && custom && !custom["forfeit"])
     {
         return;
     }
