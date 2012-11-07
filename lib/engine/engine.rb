@@ -17,6 +17,16 @@ module Engine
 		end
 	end
 
+	def self.forfeit(game, current_user)
+		binding.pry
+		data_hash = game.cur_turn.data_hash
+		data_hash["forfeited_by"] = current_user.email
+
+		game.cur_turn.serialize_data_hash(data_hash)
+
+		game.finish
+	end
+
 	def self.run_action(game, action, controller)
 		if action.has_key?("previous_turn")
 			return Engine.previous_turn(game)
@@ -24,6 +34,10 @@ module Engine
 
 		if action.has_key?("next_turn")
 			return Engine.next_turn(game)
+		end
+
+		if action.has_key?("forfeit")
+			return Engine.forfeit(game, controller.current_user)
 		end
 
 		case game.cur_turn.data_hash['state']

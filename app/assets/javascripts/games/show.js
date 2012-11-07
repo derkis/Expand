@@ -232,7 +232,7 @@ function load_game_state()
 // server calls
 function send_game_update(custom)
 {
-    if (!is_my_turn())
+    if (!is_my_turn() && !custom["forfeit"])
     {
         return;
     }
@@ -772,6 +772,15 @@ function is_my_turn()
 function load_game_state_resultHandler(game_state)
 {
     cur_game_state = game_state;
+
+    if (cur_game_state.cur_data["forfeited_by"])
+    {
+        $("#forfeited_popup").bPopup({modalClose: false});
+        $(".forfeited_lbl").text("The game was forfeited by " + cur_game_state.cur_data["forfeited_by"] + ". That frickin' loser.");
+
+        return;
+    }
+
     cur_turn_type = TURN_TYPES[cur_game_state.cur_data.state.toString()];
 
     render_all(game_state);
@@ -926,6 +935,11 @@ function next_handler()
     send_game_update({next_turn: true});
 }
 
+function forfeit_handler()
+{
+    send_game_update({forfeit: true});
+}
+
 function start_company_click_handler()
 {
     send_game_update();
@@ -934,6 +948,11 @@ function start_company_click_handler()
 function purchase_stock_click_handler()
 {
     send_game_update();
+}
+
+function lobby_click_handler()
+{
+    window.location = "../../portal";
 }
 
 function sub_stock_split_handler()

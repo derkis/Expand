@@ -58,6 +58,10 @@ class Game < ActiveRecord::Base
     self.status ||= State::Proposed
   end
   
+  def finish()
+    update_attributes(:status => State::Finished)
+  end
+  
   def cur_data(current_user)
     datasan = self.cur_turn.data_hash
 

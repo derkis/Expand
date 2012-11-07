@@ -3,8 +3,11 @@
 		Start a New Company
 	- @cur_turn.data_hash["companies"].each do |key, value|
 		.company_to_start{:company_abbr=>"#{key}", :style=>"padding-top:5px;"}
-			%input{ :type=>"radio", :value=>"#{value['abbr']}", :name=>"company_group" }
+			%input{ :type=>"radio", :value=>"#{value['abbr']}", :name=>"whatever"}
 			%label
 				= value["name"]
 			.color{ :style=>"background-color:#{value['color']}; width:20px; height:13px; float:right;"}
 	= button_to_function 'go', 'start_company_click_handler()', :id => 'start_company_button', :class => 'image_button'
+#forfeited_popup
+	.forfeited_lbl
+	= button_to_function 'To Lobby...', 'lobby_click_handler()', :id => 'lobby_button', :class => 'image_button'
