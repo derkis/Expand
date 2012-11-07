@@ -71,6 +71,9 @@ class Game < ActiveRecord::Base
     datasan
   end
 
+  def pass_through(thing)
+    return thing
+  end
   def last_action()
     if self.cur_turn.action != nil
       return ActiveSupport::JSON.decode(self.cur_turn.action)
@@ -105,7 +108,7 @@ class Game < ActiveRecord::Base
 
   def player_index_for(user)
     self.players.each do |p|
-      return p.index if p.user_id = user.id
+      return p.index if p.user_id == user.id
     end
   end
 

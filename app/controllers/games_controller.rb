@@ -61,6 +61,7 @@ class GamesController < ApplicationController
             :debug_mode,
             :cur_turn_number,
             :cur_player_index,
+            { :name => :pass_through, :arguments => [current_user] },
             { :name => :user_player_index, :arguments => [current_user] },
             :last_action,
             :board,

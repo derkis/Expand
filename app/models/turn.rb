@@ -507,9 +507,11 @@ class Turn < ActiveRecord::Base
 		# Loop through all the companies and find the cheapest stock option
 		companies = data_hash["companies"]
 		companies.each do |key, company|
-			value = stock_value_for(key)
+			if company["size"] > 0
+				value = stock_value_for(key)
 
-			cheapest_stock = value if value < cheapest_stock
+				cheapest_stock = value if value < cheapest_stock
+			end
 		end
 
 		return data_hash["players"][player_index]["money"] >= cheapest_stock

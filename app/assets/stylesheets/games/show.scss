@@ -140,7 +140,7 @@ $cell_height: 50px;
 
 		.rightNav {
 			position: absolute;
-			top: 2em; right: -30px;
+			top: 2em; right: -100px;
 
 			.players {
 				background-color: $light_background;
@@ -171,13 +171,16 @@ $cell_height: 50px;
 						float:left; width:120px;
 					}
 					.company_data_stock_count {
-						float:left;
-					}
-					.divider {
+						width:50px;
 						float:left;
 					}
 					.company_data_size {
 						float:left;
+						width:50px;
+					}
+					.company_data_value {
+						float:left;
+						width:50px;
 					}
 				}
 			}

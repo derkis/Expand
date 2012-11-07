@@ -221,7 +221,7 @@ function polling_wrapper()
 {
     load_game_state();
 
-    setTimeout(polling_wrapper, 15000);
+    setTimeout(polling_wrapper, 2000);
 }
 
 function load_game_state()
@@ -232,6 +232,11 @@ function load_game_state()
 // server calls
 function send_game_update(custom)
 {
+    if (!is_my_turn())
+    {
+        return;
+    }
+
     var json_update = custom ? {'actions': custom} : { 'actions': cur_turn_type.get_action() };
 
     $.ajax(
@@ -270,15 +275,19 @@ function render_companies()
     for (var key in cur_game_state.cur_data.companies)
     {
         var company = cur_game_state.cur_data.companies[key];
+        var div_company_data_name = $(".company_data_name[company_abbr='" + key + "']");
         var div_company_data_stock_count = $(".company_data_stock_count[company_abbr='" + key + "']");
         var div_company_data_size = $(".company_data_size[company_abbr='" + key + "']");
-
+        var div_company_data_value = $(".company_data_value[company_abbr='" + key + "']");
+ 
+        div_company_data_name.text(company.name);
         div_company_data_stock_count.text(company["stock_count"]);
         div_company_data_size.text(company["size"]);
+        div_company_data_value.text("$" + get_company_stock_cost_for(key));
     }
 }
 
-function render_button(text, show = true)
+function render_button(text, show)
 {
     if (!show)
     {
@@ -388,7 +397,7 @@ function render_stock()
         {
             div_player_stock_in_company_main.show();
             div_player_stock_in_company.text(get_cur_stock_in(key) + (!isNaN(stock_purchased_by_abbr[key]) ? stock_purchased_by_abbr[key] : 0) );
-            div_player_stock_in_company_lbl.text(company.name + " ($" + get_company_stock_cost_for(key) + ")");
+            div_player_stock_in_company_lbl.text(company.name);
         }
         else
         {
@@ -417,14 +426,12 @@ function render_company_start()
 
 function render_stock_purchasing()
 {
-    // Here we pouplate the values of the companies in the radio buttons for
-    // purchase stock popup (e.g. Luxor for 1 stock at size 2 is $200)
     for (var key in cur_game_state.cur_data.companies)
     {
         var company = get_company(key);
         var div_company_stock_purchased = $(".company_stock_purchased[company_abbr='" + key + "']");
 
-        if (company.size && cur_game_state.cur_data.state == 300)
+        if (company.size && cur_game_state.cur_data.state == 300 && is_my_turn())
         {
             div_company_stock_purchased.show();
         }
@@ -516,19 +523,26 @@ function render_status()
 function render_players()
 {
     $('.player').removeClass('current_player');
-    $('.player[player_index=' + get_player_index() + ']').addClass('current_player');
+    $('.player[player_index=' + cur_game_state.cur_player_index + ']').addClass('current_player');
 }
 
 function render_message()
 {
-    var msg = cur_turn_type.message;
-
-    if (message_temp)
+    if (is_my_turn())
     {
-        msg = message_temp;
-    }
+        var msg = cur_turn_type.message;
 
-    $(".message").text(msg);
+        if (message_temp)
+        {
+            msg = message_temp;
+        }
+
+        $(".message").text(msg);
+    }
+    else
+    {
+        $(".message").text("It is not your turn. Frickin' wait man.");
+    }
 }
 
 function render_start_company_at(row, column, game_state)
@@ -746,6 +760,10 @@ function sub_stock_for(company_abbr)
     render_status();
 }
 
+function is_my_turn()
+{
+    return cur_game_state.user_player_index == cur_game_state.cur_player_index;
+}
 //------------------------------------------------------------------------------------------
 //
 // Events
@@ -758,7 +776,16 @@ function load_game_state_resultHandler(game_state)
 
     render_all(game_state);
 
-    TURN_TYPES[game_state.cur_data.state.toString()].render(game_state);
+    if (is_my_turn())
+    {
+        TURN_TYPES[game_state.cur_data.state.toString()].render(game_state);
+    }
+    else
+    {
+        render_stock_option_chooser(false)
+        render_merge_company_chooser(false);
+        render_button("Place", false);
+    }
 }
 
 function document_readyHandler()
@@ -851,6 +878,11 @@ function cell_hoverOutHandler(click_event)
 
 function player_hoverOverHandler(click_event)
 {
+    if (!cur_game_state.debug_mode)
+    {
+        return;
+    }
+
     var cell = click_event.currentTarget;
 
     temp_player_index = parseInt(cell.getAttribute("player_index"));
@@ -862,6 +894,11 @@ function player_hoverOverHandler(click_event)
 
 function player_hoverOutHandler(click_event)
 {
+    if (!cur_game_state.debug_mode)
+    {
+        return;
+    }
+    
     temp_player_index = -1;
 
     render_status();

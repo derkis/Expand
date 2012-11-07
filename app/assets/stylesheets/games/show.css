@@ -108,7 +108,7 @@
     .wrapper .main .rightNav {
       position: absolute;
       top: 2em;
-      right: -30px; }
+      right: -100px; }
       .wrapper .main .rightNav .players {
         background-color: #535353;
         border: 0.5em dotted #404040; }
@@ -134,11 +134,14 @@
             float: left;
             width: 120px; }
           .wrapper .main .rightNav .companies .company_data .company_data_stock_count {
-            float: left; }
-          .wrapper .main .rightNav .companies .company_data .divider {
+            width: 50px;
             float: left; }
           .wrapper .main .rightNav .companies .company_data .company_data_size {
-            float: left; }
+            float: left;
+            width: 50px; }
+          .wrapper .main .rightNav .companies .company_data .company_data_value {
+            float: left;
+            width: 50px; }
   .wrapper .footer {
     position: relative;
     margin: 0 auto;
