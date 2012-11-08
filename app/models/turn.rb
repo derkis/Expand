@@ -59,7 +59,7 @@ class Turn < ActiveRecord::Base
 		data['players'] = []
 
 		game.players.each_with_index do |p, i|
-		  	data['players'][i] = {:stock_count => {}, :money => 1500}
+		  	data['players'][i] = {:stock_count => {}, :money => 6000}
 		end
 
 	   # Setup pricing / value levels for the 3 types of companies
@@ -304,6 +304,21 @@ class Turn < ActiveRecord::Base
 		return false
 	end
 
+	def has_adjacent_at_least(piece_index, types, count)
+		c = 0
+		f = Hash.new
+
+		pieces = get_adjacent_pieces(piece_index)
+
+		[0,1,2,3].each do |i|
+			if pieces[i] && types.include?(pieces[i].to_sym) && !f.has_key?(pieces[i])
+				c += 1 
+				f[pieces[i]] = true
+			end
+		end
+		return true if c >= count
+	end
+
 	# -----------------------------------------------------------------
 	# Places a piece on the board for this turn only.
 	#
@@ -427,7 +442,7 @@ class Turn < ActiveRecord::Base
 	    bottom = row < game.template.height - 1 ? get_tile_at(row + 1, column) : nil;
 
 	    [left, right, top, bottom].each do |item|
-	        if item && item["row"] && item["column"] && item["tile"] != "e" && !item["tile"].is_int? && !map.has_key?(item["key"])
+	        if item && item["row"] && item["column"] && item["tile"] != "e" && item["tile"] != "!" && !item["tile"].is_int? && !map.has_key?(item["key"])
 	            map[item["key"]] = item;
 	            get_connected_tiles_recurse(item["row"], item["column"], map);
 	        end
@@ -515,5 +530,35 @@ class Turn < ActiveRecord::Base
 		end
 
 		return data_hash["players"][player_index]["money"] >= cheapest_stock
+	end
+
+	# -----------------------------------------------------------------
+	# Marks all squares that cannot have a tile placed
+	# -----------------------------------------------------------------
+	def mark_impossible_tiles()
+		new_board = board.dup
+		large_companies = Set.new
+
+		# First we find all the companies that are larger than a set size
+		companies = data_hash["companies"]
+		companies.each do |key, company|
+			large_companies.add(key.to_sym) if company["size"] >= 11
+		end
+
+		for i in 0..board.size
+			if has_adjacent_at_least(i, large_companies, 2)
+				# We have to replace any player tiles we might be overwriting
+				if new_board[i].is_int?
+					player_index = new_board[i]
+					new_board[i] = "!" 
+					unused_index = get_random_unused_tile
+					new_board[unused_index] = player_index
+				else
+					new_board[i] = "!" 
+				end
+			end
+		end
+
+		update_attributes(:board => new_board)
 	end
 end

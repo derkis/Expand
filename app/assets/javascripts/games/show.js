@@ -183,7 +183,7 @@ var TURN_TYPES = {
         },
         render: function(game_state)
         {
-            render_stock_option_chooser(cur_game_state.cur_data.merge_state.stock_option_player_index == cur_game_state.cur_player_index || cur_game_state.debug_mode)
+            render_stock_option_chooser(cur_game_state.cur_data.merge_state.stock_option_player_index == cur_game_state.user_player_index || cur_game_state.debug_mode)
             render_merge_company_chooser(false);
             render_button("Purchase", false);
         }
@@ -386,10 +386,13 @@ function render_stock_option_chooser_counts()
 
 function render_stock() 
 {
+    var total_assets = get_cur_money();
+
     for (var key in cur_game_state.cur_data.companies)
     {
         var company = cur_game_state.cur_data.companies[key];
         var div_player_stock_in_company = $(".player_stock_in_company[company_abbr='" + key + "']");
+        var div_player_stock_in_company_value = $(".player_stock_in_company_value[company_abbr='" + key + "']");
         var div_player_stock_in_company_main = $(".player_stock_in_company_main[company_abbr='" + key + "']");
         var div_player_stock_in_company_lbl = $(".player_stock_in_company_lbl[company_abbr='" + key + "']");
 
@@ -397,6 +400,9 @@ function render_stock()
         {
             div_player_stock_in_company_main.show();
             div_player_stock_in_company.text(get_cur_stock_in(key) + (!isNaN(stock_purchased_by_abbr[key]) ? stock_purchased_by_abbr[key] : 0) );
+            value = get_cur_stock_in(key) * get_company_value_for(key).cost;
+            total_assets += value;
+            div_player_stock_in_company_value.text("$" + value)
             div_player_stock_in_company_lbl.text(company.name);
         }
         else
@@ -404,6 +410,9 @@ function render_stock()
             div_player_stock_in_company_main.hide();
         }
     }
+
+    var div_total_assets = $(".total_assets");
+    div_total_assets.text("$" + total_assets);
 }
 
 function render_company_start()
@@ -485,6 +494,9 @@ function render_cell(cell, cell_type, row, column)
     player_index = get_player_index().toString();
 
     switch(cell_type) {
+        case '!': // empty cell
+            cell.text("!");
+            break;
         case 'e': // empty cell
             cell.addClass('empty');
             break;
@@ -541,7 +553,7 @@ function render_message()
     }
     else
     {
-        $(".message").text("It is not your turn. Frickin' wait man.");
+        $(".message").text("It is not your turn.");
     }
 }
 
@@ -762,6 +774,11 @@ function sub_stock_for(company_abbr)
 
 function is_my_turn()
 {
+    if (cur_game_state.cur_data.merge_state && cur_game_state.cur_data.merge_state.stock_option_player_index >= 0)
+    {
+        return cur_game_state.cur_data.merge_state.stock_option_player_index == cur_game_state.user_player_index;
+    }
+
     return cur_game_state.user_player_index == cur_game_state.cur_player_index;
 }
 //------------------------------------------------------------------------------------------
@@ -813,7 +830,7 @@ function game_readyHandler()
 
 function enabled_clickHandler(click_event)
 {
-    if(!player_can_place_piece())
+    if(!is_my_turn() || !player_can_place_piece())
     {
         return;
     }
@@ -832,6 +849,11 @@ function enabled_clickHandler(click_event)
 
 function cell_hoverOverHandler(click_event)
 {
+    if (!is_my_turn())
+    {
+        return;
+    }
+
     var cell = click_event.currentTarget;
 
     if (cur_turn_type == TURN_TYPES["100"])

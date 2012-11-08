@@ -1,6 +1,7 @@
 .footer
-	= button_to_function 'back', 'back_handler()', :id => 'back_button', :class => 'image_button'
-	= button_to_function 'forfeit', 'forfeit_handler()', :id => 'forfeit_button', :class => 'image_button'
-	= button_to_function 'next', 'next_handler()', :id => 'next_button', :class => 'image_button'
 	.message
-		= "Loading Game Data..."	
+		= "Loading Game Data..."
+	.buttons
+		= button_to_function 'back', 'back_handler()', :id => 'back_button'
+		= button_to_function 'forfeit', 'forfeit_handler()', :id => 'forfeit_button'
+		= button_to_function 'next', 'next_handler()', :id => 'next_button'

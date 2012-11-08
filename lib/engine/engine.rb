@@ -18,7 +18,6 @@ module Engine
 	end
 
 	def self.forfeit(game, current_user)
-		binding.pry
 		data_hash = game.cur_turn.data_hash
 		data_hash["forfeited_by"] = current_user.email
 
@@ -38,6 +37,10 @@ module Engine
 
 		if action.has_key?("forfeit")
 			return Engine.forfeit(game, controller.current_user)
+		end
+
+		if controller.current_user.id != game.cur_turn.player.user.id && game.cur_turn.data_hash["state"] != Turn::MERGE_CHOOSE_STOCK_OPTIONS
+			return
 		end
 
 		case game.cur_turn.data_hash['state']
@@ -129,6 +132,10 @@ module Engine
 			# START_COMPANY
 			#--------------------------------------
 			when Turn::START_COMPANY
+				if action["company_abbr"] == ""
+					return
+				end
+
 				game.cur_turn.start_company_at(action["row"], action["column"], action["company_abbr"])
 				data_hash = game.cur_turn.data_hash
 
@@ -265,6 +272,7 @@ module Engine
 				game.cur_turn.serialize_data_hash(data_hash)
 		end
 
+		game.cur_turn.mark_impossible_tiles
 		game.cur_turn.refresh_company_sizes
 		game.cur_turn.update_attributes(:action => ActiveSupport::JSON.encode(action))
 	end
@@ -322,7 +330,7 @@ module Engine
 
 	def self.goto_purchase_stock_or_advance_turn(game, data_hash)
 		game.cur_turn.refresh_company_sizes
-		
+
 		# We want to see if the player in question has enough resources to buy
 		# any stock. If they do not, we just advance the turn. If they do
 		# we go into purchase stock phase.

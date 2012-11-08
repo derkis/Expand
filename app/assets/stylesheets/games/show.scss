@@ -57,14 +57,7 @@ $cell_height: 50px;
 					@include pixel_font($font_size_title, $primary_color_highlight);				
 				}
 
-				.money {
-					float: right;
-					padding-top:2em;
-
-					@include pixel_font($font_size_title, $font_color_title);
-				}
-
-				.player_companies {
+				.player_companies, .player_companies_header, .money_section, .total_section {
 					@include pixel_font($font_size_subtitle, $primary_color);
 				}
 			}
@@ -213,12 +206,7 @@ $cell_height: 50px;
 			text-align:center;
 		}
 
-		#back_button
-		{
-			float: left;
-		}
-
-		#next_button
+		.buttons
 		{
 			float: right;
 		}

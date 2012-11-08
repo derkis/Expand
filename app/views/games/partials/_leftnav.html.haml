@@ -1,17 +1,40 @@
 .leftnav
 	.player_status
 		.player_status_lbl
+		%br
+		%br
+		.player_companies_header
+			.h1{:style=>"float:left; width:140px; height:25px;"}
+				Company
+			.h2{:style=>"float:left; width:60px;"}
+				Owned
+			.h3{:style=>"float:left;"}
+				Value
 		.player_companies
 			- @cur_turn.data_hash["companies"].each do |key, value|
 				.player_stock_in_company_main{:company_abbr=>"#{key}", :style=>"color: #{value['color']};"}
-					.player_stock_in_company_lbl{:company_abbr=>"#{key}", :style=>"float: left; width:170px; height:25px;"}
+					.player_stock_in_company_lbl{:company_abbr=>"#{key}", :style=>"float: left; width:140px; height:25px;"}
 						= value["name"]
-					.player_stock_in_company{:company_abbr=>"#{key}", :style=>"float: left; width:30px;"}
+					.player_stock_in_company{:company_abbr=>"#{key}", :style=>"float: left; width:60px;"}
+						0
+					.player_stock_in_company_value{:company_abbr=>"#{key}", :style=>"float: left; width:60px;"}
 						0
 					.company_stock_purchased{:company_abbr=>"#{key}", :style=>"float: left;"}
 						= button_to_function '-', 'sub_stock_for(\'' + key + '\')', :style=>"float:left;"
 						= button_to_function '+', 'add_stock_for(\'' + key + '\')', :style=>"float:left;"
-		.money
+		.money_section
+			.money_lbl{:style=>"float:left; width:140px; height:25px;"}
+				Cash on Hand
+			.money_skip{:style=>"float:left; width:60px;"}
+				&nbsp;
+			.money{:style=>"float:left;"}
+		.total_section
+			.total_lbl{:style=>"float:left; width:140px; height:25px;"}
+				Assets
+			.total_skip{:style=>"float:left; width:60px;"}
+				&nbsp;
+			.total_assets{:style=>"float:left;"}
+		.clear{:style=>"clear:both;"}
 		= button_to_function 'input', 'input_handler()', :id => 'turn_button', :class => 'image_button'
 		.clear{:style=>"clear:both;"}
 	.merge_company_chooser

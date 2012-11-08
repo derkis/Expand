@@ -51,13 +51,7 @@
           font-family: Pixel, cursive;
           font-size: 20px;
           color: #db7556; }
-        .wrapper .main .leftnav .player_status .money {
-          float: right;
-          padding-top: 2em;
-          font-family: Pixel, cursive;
-          font-size: 20px;
-          color: #a66c5a; }
-        .wrapper .main .leftnav .player_status .player_companies {
+        .wrapper .main .leftnav .player_status .player_companies, .wrapper .main .leftnav .player_status .player_companies_header, .wrapper .main .leftnav .player_status .money_section, .wrapper .main .leftnav .player_status .total_section {
           font-family: Pixel, cursive;
           font-size: 14px;
           color: #a66c5a; }
@@ -166,7 +160,5 @@
       position: relative;
       margin: 0 auto;
       text-align: center; }
-    .wrapper .footer #back_button {
-      float: left; }
-    .wrapper .footer #next_button {
+    .wrapper .footer .buttons {
       float: right; }
