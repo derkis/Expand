@@ -123,6 +123,7 @@ var TURN_TYPES = {
         after_action: function() {
             // Close the start company popup if it is open
             $("#start_company_popup").bPopup().close();
+            $("input[name=company_group]").attr("checked", false);
         },
         render: function(game_state) {
             render_button("Start", false);
@@ -1083,7 +1084,11 @@ function forfeit_handler()
 
 function start_company_click_handler()
 {
-    send_game_update();
+    company_chosen = $("input[name=company_group]").filter(':checked').val();
+    if (company_chosen && company_chosen != "")
+    {
+        send_game_update();
+    }
 }
 
 function purchase_stock_click_handler()

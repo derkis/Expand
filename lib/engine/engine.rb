@@ -174,13 +174,14 @@ module Engine
 			# START_COMPANY
 			#--------------------------------------
 			when Turn::START_COMPANY
-				if action["company_abbr"] == ""
+				data_hash = game.cur_turn.data_hash
+
+				if action["company_abbr"] == "" || data_hash["companies"][action["company_abbr"]]["size"] > 0
 					return
 				end
 
 				game.cur_turn.start_company_at(action["row"], action["column"], action["company_abbr"])
-				data_hash = game.cur_turn.data_hash
-
+				
 				data_hash["companies"][action["company_abbr"]]["stock_count"] -= 1
 
 				# Update stock value on the player by 1
