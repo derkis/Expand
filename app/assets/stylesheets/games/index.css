@@ -51,14 +51,14 @@
     color: white;
     width: 200px;
     padding-right: 5px; }
-  .panel #notable_user_panel {
+  .panel #info_panel {
     float: right;
     height: 100%; }
-    .panel #notable_user_panel .table_title {
+    .panel #info_panel .table_title {
       font-family: Pixel, cursive;
       font-size: 12px;
       color: #a66c5a; }
-    .panel #notable_user_panel .user_list {
+    .panel #info_panel .dotted_panel {
       border-width: 9px 9px 9px 9px;
       -webkit-border-image: url(../dotted_border.png) 9 9 9 9 fill repeat;
       -moz-border-image: url(../dotted_border.png) 9 9 9 9 repeat;
@@ -69,11 +69,19 @@
       width: 20em;
       margin: 1em;
       padding: 0.5em; }
-    .panel #notable_user_panel #checked_user_list {
+    .panel #info_panel #checked_user_list {
       position: relative;
       min-height: 111px; }
-      .panel #notable_user_panel #checked_user_list input[type=submit] {
+      .panel #info_panel #checked_user_list input[type=submit] {
         position: absolute;
         left: 100%;
         top: 100%;
         margin: -50px 0 0 -111px; }
+    .panel #info_panel #game_invites .game_invite {
+      padding: 5px 0px; }
+      .panel #info_panel #game_invites .game_invite .invite_players {
+        color: #e0a492;
+        display: block;
+        padding: 5px 0px; }
+      .panel #info_panel #game_invites .game_invite .invite_buttons {
+        padding-bottom: 5px; }
