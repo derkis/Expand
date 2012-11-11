@@ -51,7 +51,7 @@ module Engine
 		# data that indicates the game is ending. Then when advance_turn is called, it will
 		# check if that flag is true and if it is it will end the game.
 		if (action.has_key?("end_game") && action["end_game"] == true && game.can_end_game && 
-			controller.current_user.id == game.cur_turn.player.user.id || game.debug_mode)
+			(controller.current_user.id == game.cur_turn.player.user.id || game.debug_mode))
 
 			data_hash = game.cur_turn.data_hash
 			data_hash["ending_game"] = true

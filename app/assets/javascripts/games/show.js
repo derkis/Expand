@@ -69,6 +69,8 @@ var stock_sell_cost = 0;
 
 var data_sent = false;
 
+var first_load = true;
+
 //------------------------------------------------------------------------------------------
 //
 // Initialization
@@ -188,6 +190,20 @@ var TURN_TYPES = {
             render_stock_option_chooser(cur_game_state.cur_data.merge_state.stock_option_player_index == cur_game_state.user_player_index || cur_game_state.debug_mode)
             render_merge_company_chooser(false);
             render_button("Purchase", false);
+        }
+    },
+    "600": {
+        name: 'game_over',
+        message: "The game has ended!",
+        get_action: function()
+        {
+            return {};
+        },
+        after_action: function()
+        {
+        },
+        render: function(game_state)
+        {
         }
     }
 };
@@ -596,7 +612,15 @@ function render_notifications()
         }
     }
 
-    div_messages.html(notifications_text);
+    if (first_load || div_messages[0].scrollTop == div_messages[0].scrollHeight)
+    {
+        div_messages.html(notifications_text);
+        div_messages.scrollTop(div_messages[0].scrollHeight);
+    }
+    else
+    {
+        div_messages.html(notifications_text);
+    }
 }
 
 function render_players()
@@ -607,6 +631,12 @@ function render_players()
 
 function render_message()
 {
+    if (cur_game_state.cur_data.game_over)
+    {
+        $(".message").text("The game has ended!");
+        return;
+    }
+
     if (is_my_turn())
     {
         var msg = cur_turn_type.message;
@@ -841,6 +871,11 @@ function sub_stock_for(company_abbr)
 
 function is_my_turn()
 {
+    if (!cur_game_state)
+    {
+        return false;
+    }
+
     if (cur_game_state.debug_mode)
     {
         return true;
@@ -892,6 +927,8 @@ function load_game_state_resultHandler(game_state)
         render_merge_company_chooser(false);
         render_button("Place", false);
     }
+
+    first_load = false;
 }
 
 function document_readyHandler()

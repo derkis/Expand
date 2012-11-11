@@ -258,8 +258,6 @@ class Game < ActiveRecord::Base
   # whether the game is legally endable, it just ends the game as is
   # --------------------------------------------------  
   def end_game()
-    
-    binding.pry
 
     data_hash = cur_turn.data_hash
     data_hash["game_over"] = true
