@@ -27,10 +27,10 @@ class Game < ActiveRecord::Base
   
   # CONSTANTS
   module State
-    Proposed = 0; Starting = 1; Started = 2; Finished = 3
+    Proposed = 0; Starting = 1; Started = 2; Finished = 3; Canceled = 4
 
     def self.all
-      return [ Proposed, Starting, Started, Finished ]
+      return [ Proposed, Starting, Started, Finished, Canceled ]
     end
   end
 
@@ -58,7 +58,7 @@ class Game < ActiveRecord::Base
     self.status ||= State::Proposed
   end
   
-  def finish()
+  def finish
     update_attributes(:status => State::Finished)
   end
   
@@ -78,6 +78,7 @@ class Game < ActiveRecord::Base
   def pass_through(thing)
     return thing
   end
+
   def last_action()
     if self.cur_turn.action != nil
       return ActiveSupport::JSON.decode(self.cur_turn.action)
@@ -136,8 +137,8 @@ class Game < ActiveRecord::Base
   end
 
   def start
-    self.players.each_with_index do |p, i|
-      p.index = i
+    self.players.each_with_index do |player, index|
+      player.index = index
     end
 
     self.status = State::Started
@@ -158,6 +159,17 @@ class Game < ActiveRecord::Base
     self.cur_turn = self.cur_turn.create_next_turn_step()
   end
 
+  def remove_player(player)
+    if players.count <= 2
+      game.update_attributes!(:state => State::Canceled)
+    else
+      player.update_attributes!(:game_id => nil)
+      self.players.each_with_index do |player, index|
+        players.update_attributes!(:index => index)
+      end
+    end
+  end
+
   # SETTERS & GETTERS
   def cur_turn
     Turn.find(self.turn_id)
@@ -176,11 +188,7 @@ class Game < ActiveRecord::Base
   end
 
   def cur_player
-    {:index => cur_player_index}
-  end
-
-  def index_for_player (player)
-
+    { :index => cur_player_index }
   end
 
   def valid_action(current_user)
@@ -202,7 +210,6 @@ class Game < ActiveRecord::Base
     self.players.shuffle.first.id
   end
 
-  # NOT SURE WHAT TO DO ABOUT THIS ONE
   def board_array
     linear_index = 0
     Array.new(self.template.height){ Array.new }.each do |row_array|
