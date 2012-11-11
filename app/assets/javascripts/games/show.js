@@ -282,12 +282,10 @@ function render_companies()
         var company = cur_game_state.cur_data.companies[key];
         var div_company_data_name = $(".company_data_name[company_abbr='" + key + "']");
         var div_company_data_stock_count = $(".company_data_stock_count[company_abbr='" + key + "']");
-        var div_company_data_size = $(".company_data_size[company_abbr='" + key + "']");
         var div_company_data_value = $(".company_data_value[company_abbr='" + key + "']");
  
         div_company_data_name.text(company.name);
         div_company_data_stock_count.text(company["stock_count"]);
-        div_company_data_size.text(company["size"]);
         div_company_data_value.text("$" + get_company_stock_cost_for(key));
     }
 }
