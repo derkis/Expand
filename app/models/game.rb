@@ -149,9 +149,13 @@ class Game < ActiveRecord::Base
   end
 
   def advance_turn
-    next_player_index = (self.cur_turn.player.index + 1) % self.players.count
-    next_player = self.players.find_by_index(next_player_index)
-    self.cur_turn = self.cur_turn.create_next_turn_with_player(next_player)
+    if cur_turn.data_hash["ending_game"] == true
+        end_game
+    else
+      next_player_index = (self.cur_turn.player.index + 1) % self.players.count
+      next_player = self.players.find_by_index(next_player_index)
+      self.cur_turn = self.cur_turn.create_next_turn_with_player(next_player)
+    end
   end
 
   def advance_turn_step
@@ -213,4 +217,78 @@ class Game < ActiveRecord::Base
     end
   end
 
+  # --------------------------------------------------
+  # A game is endable when:
+  #
+  # * A company has more than 41 tiles
+  # * All established companies have more than 11 tiles
+  #
+  # Note this function MUST be called AFTER the company
+  # sizes have been updated.
+  # --------------------------------------------------
+  def can_end_game()
+    return false if cur_turn.num_established_companies == 0
+
+    max_company_size = 0
+    min_company_size = 1000
+
+    cur_turn.data_hash["companies"].each do |c_a, company|
+      if company["size"] > 0
+        max_company_size = company["size"].to_i if company["size"].to_i > max_company_size
+        min_company_size = company["size"].to_i if company["size"].to_i < min_company_size
+      end
+    end
+
+    return true if max_company_size >= 41 || min_company_size > 10
+    return false
+  end
+
+  # --------------------------------------------------
+  # Ends the game, calculating all relevant majority / minorities
+  # and assigning the rank of players and updating the notifications
+  #
+  # Note: this function does not actually do any checks to see
+  # whether the game is legally endable, it just ends the game as is
+  # --------------------------------------------------  
+  def end_game()
+    
+    binding.pry
+
+    data_hash = cur_turn.data_hash
+    data_hash["game_over"] = true
+
+    Engine.add_notification(self, data_hash, "GAME HAS ENDED!", false)
+
+    # Award all majority / minorities to every player for ONLY established companies
+    # (obviously some player may have a stock at this point in a company that is not
+    # established)
+    data_hash["companies"].each do |c_a, company|
+      if company["size"] > 0
+        Engine.award_majority_minority(self, data_hash, c_a)
+
+        # Now sell every player's stock in every company
+        data_hash["players"].each_with_index do |player, i|
+          stock = (player["stock_count"].has_key?(c_a) && player["stock_count"][c_a].to_i > 0) ? player["stock_count"][c_a] : 0
+          if stock > 0
+            Engine.add_notification(self, data_hash, player_by_index(player["index"].to_i).user.email + " sells " + stock.to_s + " in " + Engine.company_html(company) + ".", false)
+            player["money"] += stock * cur_turn.stock_value_for(c_a)
+            player["stock_count"][c_a] -= stock
+            company["stock_count"] += stock
+          end
+        end
+      end
+    end
+
+    Engine.add_notification(self, data_hash, "FINAL RESULTS:", false)
+
+    # Sort all the players by their total assets
+    players_ordered_by_money = data_hash["players"].dup
+    players_ordered_by_money.sort! { |a,b| b["money"] <=> a["money"] }
+
+    players_ordered_by_money.each_with_index do |p, i|
+      Engine.add_notification(self, data_hash, (i + 1).to_s + ")" + player_by_index(p["index"].to_i).user.email + " $" + p["money"].to_s, false)
+    end
+
+    cur_turn.serialize_data_hash(data_hash)
+  end
 end

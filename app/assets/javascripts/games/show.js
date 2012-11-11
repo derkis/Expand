@@ -221,9 +221,10 @@ function get_player_index()
 
 function polling_wrapper()
 {
-    load_game_state();
-
-    setTimeout(polling_wrapper, 2000);
+    $.getJSON(document.URL + '.json', function (game_state) {
+        load_game_state_resultHandler(game_state);
+        setTimeout(polling_wrapper, 2000);
+    });
 }
 
 function load_game_state()
@@ -239,7 +240,15 @@ function send_game_update(custom)
         return;
     }
 
-    var json_update = custom ? {'actions': custom} : { 'actions': cur_turn_type.get_action() };
+    var json_update = custom ? 
+                        {
+                            'actions': custom
+                        } :
+                        {
+                            'actions': cur_turn_type.get_action(),
+                        };
+
+    json_update["actions"]["end_game"] = $('#cb_endgame').is(':checked') && cur_game_state.can_end_game
 
     data_sent = true;
 
@@ -399,13 +408,21 @@ function render_stock()
         var div_player_stock_in_company_main = $(".player_stock_in_company_main[company_abbr='" + key + "']");
         var div_player_stock_in_company_lbl = $(".player_stock_in_company_lbl[company_abbr='" + key + "']");
 
-        if (company.size > 0 || get_cur_stock_in(key))
+        if (company.size > 0 || get_cur_stock_in(key) > 0)
         {
             div_player_stock_in_company_main.show();
             div_player_stock_in_company.text(get_cur_stock_in(key) + (!isNaN(stock_purchased_by_abbr[key]) ? stock_purchased_by_abbr[key] : 0) );
             value = get_cur_stock_in(key) * get_company_value_for(key).cost;
-            total_assets += value;
-            div_player_stock_in_company_value.text("$" + value)
+            if (company.size > 0)
+            {
+                total_assets += value;
+                div_player_stock_in_company_value.text("$" + value)
+            }
+            else
+            {
+                div_player_stock_in_company_value.text("N/A")
+            }
+            
             div_player_stock_in_company_lbl.text(company.name);
         }
         else
@@ -549,6 +566,14 @@ function render_status()
     $('.money').text("$" + (get_cur_money() - stock_purchased_cost + stock_sell_cost));
     var txt = $(".player[player_index='" + get_player_index() + "']").text();
     $('.player_status_lbl').text(txt);
+    if (!cur_game_state.can_end_game)
+    {
+        $(".endgame_checkbox").hide();
+    }
+    else
+    {
+        $(".endgame_checkbox").show();
+    }
 }
 
 function render_notifications()
@@ -561,7 +586,7 @@ function render_notifications()
     {
         last_num = 0;
 
-        for (var i = cur_game_state.cur_data.notifications.length - 1; i >= 0; i--)
+        for (var i = 0; i < cur_game_state.cur_data.notifications.length; i++)
         {
             notification = cur_game_state.cur_data.notifications[i];
 

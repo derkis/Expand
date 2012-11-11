@@ -227,7 +227,20 @@ $cell_height: 50px;
 
 		.buttons
 		{
-			float: right;
+			position:absolute;
+			right: 0px;
+			top: 0px;
+
+			.endgame_checkbox
+			{
+				width:150px;
+				float: right;
+
+				.endgame_lbl
+				{
+					float:right;
+				}
+			}
 		}
 	}
 }

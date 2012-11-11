@@ -27,6 +27,7 @@ module Engine
 	end
 
 	def self.run_action(game, action, controller)
+		# Ensure that only the current player can actually perform an action
 		if (controller.current_user.id != game.cur_turn.player.user.id &&
 			game.cur_turn.data_hash["state"] != Turn::MERGE_CHOOSE_STOCK_OPTIONS) &&
 			!game.debug_mode
@@ -43,6 +44,18 @@ module Engine
 
 		if action.has_key?("forfeit")
 			return Engine.forfeit(game, controller.current_user)
+		end
+
+		# If the person making the action is the current player for this turn and
+		# they have specified they want to end the game, then we update a flag on the turn
+		# data that indicates the game is ending. Then when advance_turn is called, it will
+		# check if that flag is true and if it is it will end the game.
+		if (action.has_key?("end_game") && action["end_game"] == true && game.can_end_game && 
+			controller.current_user.id == game.cur_turn.player.user.id || game.debug_mode)
+
+			data_hash = game.cur_turn.data_hash
+			data_hash["ending_game"] = true
+			game.cur_turn.serialize_data_hash(data_hash)
 		end
 
 		case game.cur_turn.data_hash['state']
@@ -326,6 +339,7 @@ module Engine
 
 		game.cur_turn.mark_impossible_tiles
 		game.cur_turn.refresh_company_sizes
+
 		game.cur_turn.update_attributes(:action => ActiveSupport::JSON.encode(action))
 	end
 
@@ -362,7 +376,7 @@ module Engine
 
 			winnarz.each_with_index do |player, i|
 				notification += ", " if notification.length > 0
-				notification += game.player_by_index(i).user.email
+				notification += game.player_by_index(player["index"]).user.email
 				player["money"] += award
 			end
 

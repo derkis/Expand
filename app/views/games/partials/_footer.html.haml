@@ -5,3 +5,7 @@
 		= button_to_function 'back', 'back_handler()', :id => 'back_button'
 		= button_to_function 'forfeit', 'forfeit_handler()', :id => 'forfeit_button'
 		= button_to_function 'next', 'next_handler()', :id => 'next_button'
+		.endgame_checkbox
+			.endgame_lbl
+				End Game?
+			= check_box_tag 'cb_endgame', 'endgame', false, :style => "float:left; opacity: 1;"

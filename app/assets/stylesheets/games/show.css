@@ -178,4 +178,11 @@
       margin: 0 auto;
       text-align: center; }
     .wrapper .footer .buttons {
-      float: right; }
+      position: absolute;
+      right: 0px;
+      top: 0px; }
+      .wrapper .footer .buttons .endgame_checkbox {
+        width: 150px;
+        float: right; }
+        .wrapper .footer .buttons .endgame_checkbox .endgame_lbl {
+          float: right; }
