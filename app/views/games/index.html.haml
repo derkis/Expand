@@ -3,19 +3,20 @@
 .panel
 	#top_bar
 		= image_tag('title_small.png', :class => 'title', :alt => 'Expand')
-		#game_invites
 	= form_for @game, :remote => true do |game_f|
 		= game_f.hidden_field :proposing_player, :value => current_user.id
 		= game_f.fields_for :players, @game.players do |players_f|
 			#online_user_table.user_table
 				.table_title= 'online_users:'
 				.padding_row
-			#notable_user_panel
-				#checked_user_list.user_list
+			#info_panel
+				#game_invites.dotted_panel
+					.table_title= 'game_invitations:'
+				#checked_user_list.dotted_panel
 					.table_title= 'selected_users:'
 					.user_table
 					= game_f.submit 'invite', :class => 'image_button', :disabled => !current_user.can_create_game?, :onclick => 'disable_button()'
-				#friend_user_list.user_list
+				#friend_user_list.dotted_panel
 					.table_title= 'friend_users:'
 					.user_table
 			- @online_users.each do |user|

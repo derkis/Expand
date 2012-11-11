@@ -3,7 +3,7 @@ var max_user_columns = 4;
 var friends_list_base_height;
 
 $(document).ready(function() {
-	setTimeout(polling_wrapper, 10000);
+	setTimeout(polling_wrapper, 5000);
 	organize_users_default();
 	bind_cell_click_handlers();
 });
@@ -149,25 +149,40 @@ function check_game_invitations() {
 function add_game_invitation_tag(this_player, players) {
 	var players_string = '';
 	for(var i=0 ; i<players.length-1 ; i++)
-		players_string += players[i] + ' and ';
+		players_string += '\n' + players[i];
 	players_string += players[players.length-1];
 
+	var player_id_and_game_id_params = '' + this_player['player_id'] + ',' + this_player['game_id'];
+	var accept_button_options = { 
+		click_handler: 'respond_to_game_invitation(' + player_id_and_game_id_params + ',' + true + ')',
+		should_disable: this_player.accepted,
+		title_text: 'accept'
+	};
+
+	var reject_button_options = {
+		click_handler: 'respond_to_game_invitation(' + player_id_and_game_id_params + ',' + false + ')',
+		title_text: 'reject'
+	};
+	
 	var game_invitation_tag =
 		'<div class="game_invite" player_id=' + this_player['player_id'] + ' game_id=' + this_player['game_id'] + '>' +
-			'<span class="players_text">Play a game with: ' + players_string + '<\/span>' +
-			'<button type="button" onclick="accept_game_invitation(' + this_player['player_id'] + ',' + this_player['game_id'] + ')"' + ((this_player.accepted) ? ' disabled="disabled">' : '>') +
-				'Accept' +
-			'<\/button>' +
-			((this_player.accepted) ? '<span class="waiting_text">Waiting for other players to accept...<\/span>' : '') +
+			'<span class="invite_title">Play a game with: <\/span>' + 
+			'<span class="invite_players">' + players_string + '<\/span>' +
+			'<div class="invite_buttons">' +
+				button_tag_with_options(accept_button_options) +
+				button_tag_with_options(reject_button_options) +
+			'<\/div>' +
+			((this_player.accepted) ? '<span class="waiting_text">Waiting for everyone else...<\/span>' : '') +
 		'<\/div>';
-	$('#game_invites').append(game_invitation_tag).fadeIn(fade_speed);
+
+	update_game_invitations_with_invite(game_invitation_tag);
 }
 
 // ready games polling
 function check_ready_game() {
 	$.getJSON('games/ready.json', function(ready_game) {
 		if(ready_game && $('#start_game_prompt').children().length == 0)
-		add_ready_game_prompt(ready_game);
+			add_ready_game_prompt(ready_game);
 	});
 }
 
@@ -177,10 +192,21 @@ function add_ready_game_prompt(ready_game) {
 		players_string += ready_game.other_players[i] + ' and ';
 	players_string += ready_game.other_players[ready_game.other_players.length-1];
 	
+	var start_button_options = {
+		click_handler: 'start_game(' + ready_game.game_id + ')',
+		title_text: 'start'
+	}
+
 	var start_game_prompt_tag =
-		'<span class ="players_text">Begin game with: ' + players_string + '?<\/span>' +
-		'<button type="button" onclick="start_game(' + ready_game.game_id + ')">Start<\/button>';
-	$('#start_game_prompt').append(start_game_prompt_tag).fadeIn(fade_speed);
+		'<div class="game_invite">' +
+			'<span class="invite_title">Begin game with: <\/span>' + 
+			'<span class="invite_players">' + players_string + '<\/span>' +
+			'<div class="invite_buttons">' +
+				button_tag_with_options(start_button_options) +
+			'<\/div>' +
+		'<\/div>';
+
+	update_game_invitations_with_invite(start_game_prompt_tag);
 }
 
 // started game polling
@@ -192,11 +218,11 @@ function check_started_game() {
 }
 
 // PUT player accept
-function accept_game_invitation(player_id, game_id) {	
+function respond_to_game_invitation(player_id, game_id, response) {	
 	$.ajax({
 		type: 'PUT',
 		url: 'players/' + player_id,
-		data: JSON.stringify({ 'player': { 'accepted': true } }),
+		data: JSON.stringify({ 'player': { 'accepted': response } }),
 		contentType: 'application/json',
 		dataType: 'json',
 		success: function(data) {
@@ -220,6 +246,28 @@ function start_game(game_id) {
 			window.location.replace('games/' + game_id);
 		}
 	});		
+}
+
+// shared invitation functions
+
+function update_game_invitations_with_invite(invite_tag) {
+	$('#game_invites').children('.game_invite').remove();
+	$('#game_invites').append(invite_tag).fadeIn(fade_speed);
+}
+
+function button_tag_with_options(options) {
+	var button_tag = '<button type="button" class="image_button"';
+	if(options.click_handler)
+		button_tag += 'onclick="' + options.click_handler + '" ';
+	if(options.should_disable)
+		button_tag += 'disabled="disabled" ';
+	button_tag += '>';
+
+	if(options.title_text)
+		button_tag += options.title_text;
+	button_tag += '<\/button>';
+	
+	return button_tag;
 }
 
 function disable_game_invitation(game_id) {

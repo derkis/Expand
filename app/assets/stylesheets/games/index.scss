@@ -63,7 +63,7 @@ $row_padding: 5px;
 		padding-right: $cell_padding;
 	}
 
-	#notable_user_panel {
+	#info_panel {
 		float: right;
 		height: 100%;
 
@@ -71,7 +71,7 @@ $row_padding: 5px;
 			@include pixel_font($font_size_std, $font_color_title);
 		}
 
-		.user_list {
+		.dotted_panel {
 			@include border_image(dotted_border, 9, 9, 9, 9, repeat);
 			@include pixel_font($font_size_std, $font_color_user);
 			width: 20em;
@@ -91,6 +91,17 @@ $row_padding: 5px;
 		}
 
 		#friend_user_list {
+
+		}
+
+		#game_invites {
+
+			.game_invite {
+				padding: 5px 0px;
+				
+				.invite_players { color: $primary_color_highlight_pale; display:block; padding: 5px 0px; }
+				.invite_buttons { padding-bottom: 5px; }
+			}
 
 		}
 	}
