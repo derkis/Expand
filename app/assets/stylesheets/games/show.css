@@ -44,7 +44,7 @@
       top: 2em;
       left: -100px; }
       .wrapper .main .leftnav .player_status {
-        background: #535353;
+        background: #636363;
         border: 0.5em dotted #404040;
         width: 270px; }
         .wrapper .main .leftnav .player_status .player_status_lbl {
@@ -57,7 +57,7 @@
           color: #a66c5a; }
       .wrapper .main .leftnav .merge_company_chooser, .wrapper .main .leftnav .merge_company_stock_option_chooser {
         width: 270px;
-        background: #535353;
+        background: #636363;
         border: 0.5em dotted #404040;
         font-family: Pixel, cursive;
         font-size: 14px;
@@ -75,18 +75,21 @@
           font-size: 12px;
           color: black;
           display: table-cell;
-          background: #535353;
+          background: #636363;
           width: 50px;
+          overflow: hidden;
           text-align: center;
           vertical-align: middle;
-          border: 2px dashed gray; }
+          border: 2px dotted #999; }
         .wrapper .main .board .row .game_cell {
           background: #404040;
-          color: #535353;
-          border: 3px dotted #000; }
+          color: #636363;
+          border: 2px dotted #999; }
           .wrapper .main .board .row .game_cell:hover {
-            border-color: #535353; }
+            border-color: #636363; }
         .wrapper .main .board .row .no_hotel {
+          background: #999; }
+        .wrapper .main .board .row .blocked {
           background: #000; }
         .wrapper .main .board .row .enabled {
           background: #a66c5a;
@@ -111,9 +114,10 @@
     .wrapper .main .rightNav {
       position: absolute;
       top: 2em;
-      right: -100px; }
+      right: -120px;
+      width: 300px; }
       .wrapper .main .rightNav .players {
-        background-color: #535353;
+        background-color: #636363;
         border: 0.5em dotted #404040; }
         .wrapper .main .rightNav .players .player {
           font-family: Pixel, cursive;
@@ -126,7 +130,7 @@
         .wrapper .main .rightNav .players .current_player {
           color: #78dabb; }
       .wrapper .main .rightNav .companies {
-        background-color: #535353;
+        background-color: #636363;
         border: 0.5em dotted #404040; }
         .wrapper .main .rightNav .companies .company_data {
           height: 25px;
@@ -145,10 +149,23 @@
           .wrapper .main .rightNav .companies .company_data .company_data_value {
             float: left;
             width: 50px; }
+      .wrapper .main .rightNav .notifications {
+        background-color: #636363;
+        border: 0.5em dotted #404040;
+        font-family: Pixel, cursive;
+        font-size: 14px;
+        color: #a66c5a; }
+        .wrapper .main .rightNav .notifications .messages {
+          font-family: Pixel, cursive;
+          font-size: 10px;
+          color: #a66c5a;
+          margin: 7px;
+          overflow: auto;
+          height: 230px; }
   .wrapper .footer {
     position: relative;
     margin: 0 auto;
-    background: #535353;
+    background: #636363;
     font-family: Pixel, cursive;
     font-size: 12px;
     color: black;

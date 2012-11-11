@@ -86,15 +86,16 @@ $cell_height: 50px;
 					display:table-cell;
 					background: $light-background;
 					width: $cell_height;
+					overflow: hidden;
 					text-align:center;
 					vertical-align:middle;
-					border: 2px dashed gray;
+					border: 2px dotted #999;
 				}
 
 				.game_cell {
 					background: $dark_background;
 					color: $font_color_cell;
-					border: 3px dotted #000;
+					border: 2px dotted #999;
 
 					&:hover {
 						border-color: $light-background;
@@ -102,6 +103,10 @@ $cell_height: 50px;
 				}
 
 				.no_hotel {
+					background: #999;
+				}
+
+				.blocked {
 					background: #000;
 				}
 
@@ -141,7 +146,8 @@ $cell_height: 50px;
 
 		.rightNav {
 			position: absolute;
-			top: 2em; right: -100px;
+			top: 2em; right: -120px;
+			width:300px;
 
 			.players {
 				background-color: $light_background;
@@ -183,6 +189,19 @@ $cell_height: 50px;
 						float:left;
 						width:50px;
 					}
+				}
+			}
+
+			.notifications {
+				background-color: $light_background;
+				border: 0.5em dotted $dark_background;
+				@include pixel_font($font_size_subtitle, $primary_color);
+
+				.messages {
+					@include pixel_font($font_size_small, $primary_color);
+					margin:7px;
+					overflow:auto;
+					height:230px;
 				}
 			}
 		}		

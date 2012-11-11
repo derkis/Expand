@@ -116,6 +116,12 @@ class Game < ActiveRecord::Base
     end
   end
 
+  def player_by_index(player_index)
+    self.players.each do |p|
+      return p if p.index == player_index
+    end
+  end
+
   def set_proposing_player
     player = self.players.object_passing_test do |player|
       self.proposing_player == player.user_id

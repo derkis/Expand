@@ -39,7 +39,7 @@
 		.clear{:style=>"clear:both;"}
 	.merge_company_chooser
 		.label
-			Which company would you like to retain during the merger?
+			Which company will acquire the others?
 		.merge_companies
 			- @cur_turn.data_hash["companies"].each do |key, value|
 				.merge_company{:company_abbr=>"#{key}"}
@@ -49,10 +49,10 @@
 						= value["name"]
 		= button_to_function 'Merge', 'input_handler()', :id => 'merge_button', :class => 'image_button'
 	.merge_company_stock_option_chooser
-		.stock_company_from{:style=>"float:left;"}
+		.stock_company_to{:style=>"float:left;"}
 		.divider{:style=>"float:left;"}
-			&nbsp;merging with&nbsp;
-		.stock_company_to
+			&nbsp;is acquiring&nbsp;
+		.stock_company_from
 		%br
 		.stock_split
 			.stock_split_lbl{:style=>"float:left; width:100px;"}

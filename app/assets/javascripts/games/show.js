@@ -67,6 +67,8 @@ var stock_split_count = 0;
 var stock_sell_count = 0;
 var stock_sell_cost = 0;
 
+var data_sent = false;
+
 //------------------------------------------------------------------------------------------
 //
 // Initialization
@@ -150,7 +152,7 @@ var TURN_TYPES = {
     
     "500": {
         name: 'merge_choose_company',
-        message: "Choose what company to retain in this merger",
+        message: "Choose what company is acquired in this merger",
         get_action: function()
         {
             return {company_abbr: $("input[name=merge_choice]").filter(':checked').val()};
@@ -239,6 +241,8 @@ function send_game_update(custom)
 
     var json_update = custom ? {'actions': custom} : { 'actions': cur_turn_type.get_action() };
 
+    data_sent = true;
+
     $.ajax(
         {
             type: 'PUT',
@@ -262,6 +266,7 @@ function render_all(game_state)
     render_board();
     render_players(game_state.cur_data.players);
     render_status();
+    render_notifications();
     render_message();
     render_stock();
     render_stock_purchasing();
@@ -465,6 +470,8 @@ function render_turn_button()
     }
 }
 
+var company_cells_marked = {};
+
 function render_board()
 {
     board = cur_game_state.board;
@@ -472,6 +479,8 @@ function render_board()
     num_rows = cur_game_state.template.height;
 
     $(".debug_string").text(board);
+
+    company_cells_marked = {};
 
     var row = 0, column = 0;
     for(var cell_index=0 ; cell_index < board.length ; cell_index++) {    
@@ -487,7 +496,7 @@ function render_board()
 function render_cell(cell, cell_type, row, column)
 {
     // Clear out all the cell's current styling
-    cell.removeClass('empty enabled no_hotel selected highlighted adjacent');
+    cell.removeClass('empty enabled no_hotel selected highlighted adjacent blocked');
     cell.css("background-color", "");
     cell.text((65 + row).to_char() + (column+1));
 
@@ -495,13 +504,15 @@ function render_cell(cell, cell_type, row, column)
 
     switch(cell_type) {
         case '!': // empty cell
-            cell.text("!");
+            cell.addClass('blocked');
+            cell.text("");
             break;
         case 'e': // empty cell
             cell.addClass('empty');
             break;
         case 'u':
             cell.addClass('no_hotel');
+            cell.text("");
             break;
         case '+':
             cell.addClass('enabled');
@@ -509,6 +520,7 @@ function render_cell(cell, cell_type, row, column)
             break;
         case player_index:
             cell.addClass('enabled');
+            cell.text("*");
             break;
         default:
             if (cell_type.is_int())
@@ -519,7 +531,16 @@ function render_cell(cell, cell_type, row, column)
             {
                 // This needs to be the color of the chain it belongs to:
                 cell.css("background-color", get_company(cell_type)["color"]);
-                cell.text(get_company(cell_type)["abbr"].toUpperCase());
+
+                if (!company_cells_marked[cell_type])
+                {
+                    company_cells_marked[cell_type] = true;
+                    cell.text(get_company(cell_type)["abbr"].toUpperCase() + " (" + get_company(cell_type)["size"] + ")");
+                }
+                else
+                {
+                    cell.text("");
+                }
             }
     }
 }
@@ -530,6 +551,29 @@ function render_status()
     $('.money').text("$" + (get_cur_money() - stock_purchased_cost + stock_sell_cost));
     var txt = $(".player[player_index='" + get_player_index() + "']").text();
     $('.player_status_lbl').text(txt);
+}
+
+function render_notifications()
+{
+    var div_messages = $('.messages');
+
+    var notifications_text = "";
+
+    if (cur_game_state.cur_data.notifications)
+    {
+        last_num = 0;
+
+        for (var i = cur_game_state.cur_data.notifications.length - 1; i >= 0; i--)
+        {
+            notification = cur_game_state.cur_data.notifications[i];
+
+            notifications_text += "</br>" + (last_num == notification.turn_number ? "" : "<span style='color:#AAAAAA;'>Turn " + notification.turn_number + "</span> :") + notification.message;
+
+            last_num = notification.turn_number;
+        }
+    }
+
+    div_messages.html(notifications_text);
 }
 
 function render_players()
@@ -774,6 +818,11 @@ function sub_stock_for(company_abbr)
 
 function is_my_turn()
 {
+    if (cur_game_state.debug_mode)
+    {
+        return true;
+    }
+
     if (cur_game_state.cur_data.merge_state && cur_game_state.cur_data.merge_state.stock_option_player_index >= 0)
     {
         return cur_game_state.cur_data.merge_state.stock_option_player_index == cur_game_state.user_player_index;
@@ -788,6 +837,14 @@ function is_my_turn()
 //------------------------------------------------------------------------------------------
 function load_game_state_resultHandler(game_state)
 {
+    // If we have outbound data and are waiting for a result on an action we have taken, we don't
+    // want to update the screen for an interval until that data is processed or else it might
+    // throw up a popup or something that we just finished using (e.g. the start company popup)
+    if (data_sent)
+    {
+        return;
+    }
+
     cur_game_state = game_state;
 
     if (cur_game_state.cur_data["forfeited_by"])
@@ -939,6 +996,8 @@ function player_hoverOutHandler(click_event)
 
 function send_game_update_successHandler()
 {
+    data_sent = false;
+
     load_game_state();
 }
 

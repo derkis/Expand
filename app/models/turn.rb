@@ -59,7 +59,7 @@ class Turn < ActiveRecord::Base
 		data['players'] = []
 
 		game.players.each_with_index do |p, i|
-		  	data['players'][i] = {:stock_count => {}, :money => 6000}
+		  	data['players'][i] = {:stock_count => {}, :money => 6000, :index => p.index}
 		end
 
 	   # Setup pricing / value levels for the 3 types of companies
@@ -94,19 +94,19 @@ class Turn < ActiveRecord::Base
 	    			{:size => 41, :cost => 1200, :bonus_maj => 12000, :bonus_min => 6000}]
 
 	    data["companies"] = {:l =>
-	    						{:abbr => "l", :name => "Luxor", :stock_count => 25, :value => level1, :color => "#DE5D35", :size =>0},
+	    						{:abbr => "l", :name => "Luxor", :stock_count => 25, :value => level1, :color => "#EE6D45", :size =>0},
 	    					 :t =>
-	    						{:abbr => "t", :name => "Tower", :stock_count => 25, :value => level1, :color => "#D9E043", :size =>0},
+	    						{:abbr => "t", :name => "Tower", :stock_count => 25, :value => level1, :color => "#E9F053", :size =>0},
 	    					 :a =>
-	    						{:abbr => "a", :name => "American", :stock_count => 25, :value => level2, :color => "#3838F2", :size =>0},
+	    						{:abbr => "a", :name => "American", :stock_count => 25, :value => level2, :color => "#2828D2", :size =>0},
 	    					 :w =>
-	    						{:abbr => "w", :name => "Worldwide", :stock_count => 25, :value => level2, :color => "#5E3436", :size =>0},
+	    						{:abbr => "w", :name => "Worldwide", :stock_count => 25, :value => level2, :color => "#4E2426", :size =>0},
 	    					 :f =>
-	    						{:abbr => "f", :name => "Festival", :stock_count => 25, :value => level2, :color => "#44AB41", :size =>0},
+	    						{:abbr => "f", :name => "Festival", :stock_count => 25, :value => level2, :color => "#54BB51", :size =>0},
 	    					 :i =>
-	    						{:abbr => "i", :name => "Imperial", :stock_count => 25, :value => level3, :color => "#ED47C4", :size =>0},
+	    						{:abbr => "i", :name => "Imperial", :stock_count => 25, :value => level3, :color => "#FD57D4", :size =>0},
 	    					 :c =>
-	    						{:abbr => "c", :name => "Continental", :stock_count => 25, :value => level3, :color => "#24BFA5", :size =>0}
+	    						{:abbr => "c", :name => "Continental", :stock_count => 25, :value => level3, :color => "#34CFB5", :size =>0}
 	    					}
 	   
 	    data["stock_purchase_limit"] = 3;
@@ -560,5 +560,9 @@ class Turn < ActiveRecord::Base
 		end
 
 		update_attributes(:board => new_board)
+	end
+
+	def get_tile_name(row, column)
+		return (65 + row.to_i).chr.to_s + "-" + (column + 1).to_s
 	end
 end

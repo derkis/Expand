@@ -34,7 +34,7 @@ html, body {
     background: url(button_hover.png) no-repeat center center; }
   .image_button:disabled {
     background: url(button_disabled.png) no-repeat center center;
-    color: #535353; }
+    color: #636363; }
 
 a {
   font-family: Pixel, cursive;
