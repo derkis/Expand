@@ -15,9 +15,9 @@ module GamesQueries
     games_string = proposed_game_players.inject('') do
     	|string, player| string += "p.game_id = #{player.game_id} OR "
     end
-    games_string = games_string[0..-5] # truncate the last OR and close the condition
+    games_string = games_string[0..-5] # truncate the dangling OR
 
-    # gets all players in the proposed games so that they can be displayed client side
+    # gets all players in each proposed game proposed games so that they can be displayed client side
     players_array_query = 
       "SELECT DISTINCT p.id AS player_id, p.game_id AS game_id, p.accepted AS accepted, u.email AS email " +
         "FROM users u, players p WHERE u.id = p.user_id AND (#{games_string})"

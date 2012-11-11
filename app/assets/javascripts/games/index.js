@@ -1,11 +1,13 @@
 var fade_speed = 75;
 var max_user_columns = 4;
 var friends_list_base_height;
+var polling_speed = 5000
 
 $(document).ready(function() {
-	setTimeout(polling_wrapper, 5000);
+	setTimeout(polling_wrapper, polling_speed);
 	organize_users_default();
 	bind_cell_click_handlers();
+	update_game_invite_with_state(game_invite_state.no_invites);
 });
 
 $(window).load(function() {
@@ -19,7 +21,7 @@ function polling_wrapper() {
 	check_game_invitations();
 	check_ready_game();
 	check_started_game();
-	setTimeout(polling_wrapper, 10000);
+	setTimeout(polling_wrapper, polling_speed);
 }
 
 function organize_users_default() {
@@ -141,6 +143,8 @@ function check_game_invitations() {
 						this_player = player;
 				}
 				add_game_invitation_tag(this_player, players);
+			} else {
+				update_game_invite_with_state(game_invite_state.no_invites);
 			}
 		}
 	});
@@ -152,30 +156,15 @@ function add_game_invitation_tag(this_player, players) {
 		players_string += '\n' + players[i];
 	players_string += players[players.length-1];
 
-	var player_id_and_game_id_params = '' + this_player['player_id'] + ',' + this_player['game_id'];
-	var accept_button_options = { 
-		click_handler: 'respond_to_game_invitation(' + player_id_and_game_id_params + ',' + true + ')',
-		should_disable: this_player.accepted,
-		title_text: 'accept'
-	};
+	var player_id = this_player['player_id'], game_id = this_player['game_id'];
+	var game_invite_options = {
+		players: players_string,
+		accept_handler: function() { respond_to_game_invitation(player_id, game_id, true) },
+		reject_handler: function() { respond_to_game_invitation(player_id, game_id, false) },
+		should_disable: this_player.accepted
+	}
 
-	var reject_button_options = {
-		click_handler: 'respond_to_game_invitation(' + player_id_and_game_id_params + ',' + false + ')',
-		title_text: 'reject'
-	};
-	
-	var game_invitation_tag =
-		'<div class="game_invite" player_id=' + this_player['player_id'] + ' game_id=' + this_player['game_id'] + '>' +
-			'<span class="invite_title">Play a game with: <\/span>' + 
-			'<span class="invite_players">' + players_string + '<\/span>' +
-			'<div class="invite_buttons">' +
-				button_tag_with_options(accept_button_options) +
-				button_tag_with_options(reject_button_options) +
-			'<\/div>' +
-			((this_player.accepted) ? '<span class="waiting_text">Waiting for everyone else...<\/span>' : '') +
-		'<\/div>';
-
-	update_game_invitations_with_invite(game_invitation_tag);
+	update_game_invite_with_state(game_invite_state.proposed_game, game_invite_options);
 }
 
 // ready games polling
@@ -192,21 +181,26 @@ function add_ready_game_prompt(ready_game) {
 		players_string += ready_game.other_players[i] + ' and ';
 	players_string += ready_game.other_players[ready_game.other_players.length-1];
 	
-	var start_button_options = {
-		click_handler: 'start_game(' + ready_game.game_id + ')',
-		title_text: 'start'
+	var start_game_options = {
+		players: players_string,
+		accept_handler: function() { start_or_cancel_game(ready_game.game_id, true) },
+		reject_hanlder: function() { start_or_cancel_game(ready_game.game_id, false) },
+		accept_title: 'start',
+		reject_title: 'cancel'
 	}
 
-	var start_game_prompt_tag =
-		'<div class="game_invite">' +
-			'<span class="invite_title">Begin game with: <\/span>' + 
-			'<span class="invite_players">' + players_string + '<\/span>' +
-			'<div class="invite_buttons">' +
-				button_tag_with_options(start_button_options) +
-			'<\/div>' +
-		'<\/div>';
+	update_game_invite_with_state(game_invite_state.start_game, start_game_options);
 
-	update_game_invitations_with_invite(start_game_prompt_tag);
+	// var start_game_prompt_tag =
+	// 	'<div class="game_invite">' +
+	// 		'<span class="invite_title">Begin game with: <\/span>' + 
+	// 		'<span class="invite_players">' + players_string + '<\/span>' +
+	// 		'<div class="invite_buttons">' +
+	// 			button_tag_with_options(start_button_options) +
+	// 		'<\/div>' +
+	// 	'<\/div>';
+
+	// update_game_invitations_with_invite(start_game_prompt_tag);
 }
 
 // started game polling
@@ -218,31 +212,28 @@ function check_started_game() {
 }
 
 // PUT player accept
-function respond_to_game_invitation(player_id, game_id, response) {	
+function respond_to_game_invitation(player_id, game_id, did_accept) {
 	$.ajax({
 		type: 'PUT',
 		url: 'players/' + player_id,
-		data: JSON.stringify({ 'player': { 'accepted': response } }),
+		data: JSON.stringify({ 'canceled': !did_accept, 'player': { 'accepted': did_accept } }),
 		contentType: 'application/json',
 		dataType: 'json',
 		success: function(data) {
-			console.log('PUT player update');
-			console.log(data);
-			disable_game_invitation(data);
+			update_game_invite_with_server_response(data, did_accept);
 		}
 	});
 }
 
 // PUT game start
-function start_game(game_id) {
+function start_or_cancel_game(game_id, should_start) {
 	$.ajax({
 		type: 'PUT',
 		url: 'games/' + game_id,
-		data: JSON.stringify({ 'game': { 'status': 1 } }), // 1 is currently the value for game, but this is not semantic
-		contentType: 'application/json',				   // and I don't think we can extract the constant from the model
-		dataType: 'json',								   // alternatively, we could probably GET an action in the controller
-		success: function(data) {                          // which manages starting the game on the backend.
-			console.log('game should be started');
+		data: JSON.stringify({ 'game': { 'status': 1 } }), // 1 is the constant value for start game on the backend, this is awful
+		contentType: 'application/json',
+		dataType: 'json',								   
+		success: function(data) {
 			window.location.replace('games/' + game_id);
 		}
 	});		
@@ -270,8 +261,64 @@ function button_tag_with_options(options) {
 	return button_tag;
 }
 
-function disable_game_invitation(game_id) {
-	var game_invitation = $('.game_invite[game_id=' + game_id + ']');
-	game_invitation.children('button[type="button"]').attr('disabled', 'disabled');
-	game_invitation.append('<span class="waiting_text">Waiting for other players to accept...</span>')
+function update_game_invite_with_server_response(game_id, did_accept) {
+	var game_invites_container = $('#game_invites')
+	if(did_accept) {
+		var game_invite = game_invites_container.children('.game_invite');
+		game_invite.children('.invite_buttons').children().attr('disabled', 'disabled');
+		game_invite.append('<span class="waiting_text">Waiting for other players to accept...</span>')
+	} else {
+
+	}
+}
+
+var current_state;
+var game_invite_state = { 
+	no_invites: { id: 0, style_class:'game_invite no_invites' },
+	proposed_game: { id: 1, style_class:'game_invite proposed_game' },
+	start_game: { id: 2, style_class:'game_invite start_game'}
+}
+
+function update_game_invite_with_state(state, options) {
+	current_state = state;
+	
+	var game_invite = $('.game_invite');
+	var game_invite_title = game_invite.children('.invite_title');
+	var game_invite_waiting_text = game_invite.children('.waiting_text');
+
+	game_invite.removeClass().addClass(state.style_class);
+	game_invite.children('.waiting_text').text('');
+
+	switch(state.id) {
+		case game_invite_state.no_invites.id:
+			game_invite_title.text('You have no invites');
+			break;
+		case game_invite_state.proposed_game.id:
+			game_invite_title.text('Play a game with:');
+			update_game_invite_for_active_state(game_invite, state, options);
+			break;
+		case game_invite_state.start_game.id:
+			game_invite_title.text('Start game with:');
+			update_game_invite_for_active_state(game_invite, state, options);
+			break;
+	}
+}
+
+function update_game_invite_for_active_state(game_invite, state, options) {
+	game_invite.children('.invite_players').text(options.players);
+	
+	var invite_buttons = game_invite.children('.invite_buttons');
+	var accept_button = invite_buttons.children('.accept_button');
+	var reject_button = invite_buttons.children('.reject_button');
+
+	accept_button.off('click').on('click', options.accept_handler);
+	accept_button.text(options.accept_title || 'accept');
+	
+	if(options.should_disable)
+		accept_button.attr('disabled', 'disabled');
+	else
+		accept_button.removeAttr('disabled');
+
+	reject_button.off('click').on('click', options.reject_handler);
+	reject_button.text(options.reject_title || 'reject');
 }

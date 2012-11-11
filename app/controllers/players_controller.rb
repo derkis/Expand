@@ -7,7 +7,7 @@ class PlayersController < ApplicationController
     @player = Player.find(params[:id])
     @player.update_attributes(params[:player])
 
-    if(params[:player].has_key?(:accepted) and not params[:player][:accepted])
+    if(params.has_key?(:canceled) and params[:canceled])
       @player.game.remove_player(@player)
     end
 

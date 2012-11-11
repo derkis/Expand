@@ -85,3 +85,15 @@
         padding: 5px 0px; }
       .panel #info_panel #game_invites .game_invite .invite_buttons {
         padding-bottom: 5px; }
+    .panel #info_panel #game_invites .no_invites .invite_players {
+      display: none; }
+    .panel #info_panel #game_invites .no_invites .invite_buttons {
+      display: none; }
+    .panel #info_panel #game_invites .no_invites .waiting_text {
+      display: none; }
+    .panel #info_panel #game_invites .proposed_game.start_game .invite_players {
+      display: block; }
+    .panel #info_panel #game_invites .proposed_game.start_game .invite_buttons {
+      display: block; }
+    .panel #info_panel #game_invites .proposed_game.start_game .waiting_text {
+      display: block; }
