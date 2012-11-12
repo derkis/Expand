@@ -21,12 +21,17 @@ module Engine
 		data_hash = game.cur_turn.data_hash
 		data_hash["forfeited_by"] = current_user.email
 
+		game.end_game
 		game.cur_turn.serialize_data_hash(data_hash)
 
 		game.finish
 	end
 
 	def self.run_action(game, action, controller)
+		if action.has_key?("forfeit")
+			return Engine.forfeit(game, controller.current_user)
+		end
+
 		# Ensure that only the current player can actually perform an action
 		if (controller.current_user.id != game.cur_turn.player.user.id &&
 			game.cur_turn.data_hash["state"] != Turn::MERGE_CHOOSE_STOCK_OPTIONS) &&
@@ -40,10 +45,6 @@ module Engine
 
 		if action.has_key?("next_turn") && game.debug_mode
 			return Engine.next_turn(game)
-		end
-
-		if action.has_key?("forfeit")
-			return Engine.forfeit(game, controller.current_user)
 		end
 
 		# If the person making the action is the current player for this turn and
