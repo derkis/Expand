@@ -103,6 +103,18 @@ $row_padding: 5px;
 				.invite_buttons { padding-bottom: 5px; }
 			}
 
+			.no_invites {
+				.invite_players { display: none }
+				.invite_buttons { display: none }
+				.waiting_text { display: none }
+			}
+
+			.proposed_game.start_game {
+				.invite_players { display: block }
+				.invite_buttons { display: block }
+				.waiting_text { display: block }
+			}
+
 		}
 	}
 	

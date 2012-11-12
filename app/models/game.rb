@@ -79,7 +79,7 @@ class Game < ActiveRecord::Base
     return thing
   end
 
-  def last_action()
+  def last_action
     if self.cur_turn.action != nil
       return ActiveSupport::JSON.decode(self.cur_turn.action)
     end
@@ -165,10 +165,10 @@ class Game < ActiveRecord::Base
 
   def remove_player(player)
     if players.count <= 2
-      game.update_attributes!(:state => State::Canceled)
+      self.update_attributes!(:status => State::Canceled)
     else
       player.update_attributes!(:game_id => nil)
-      self.players.each_with_index do |player, index|
+      self.players.each_with_index do |player, index| # probably not necessary since this doesn't happen until start
         players.update_attributes!(:index => index)
       end
     end
