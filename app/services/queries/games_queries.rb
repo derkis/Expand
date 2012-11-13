@@ -2,7 +2,7 @@ module GamesQueries
 
   # returns hash of proposed games/players in the format
   #   game id string => array of players
-  # accepts a user model object as a parameter (though it only uses the id)
+  # accepts a user model object as a parameter
   def self.get_proposed_games_for(current_user)
     # finds players in proposed gams which match this user's id
     proposed_game_players_conditions = { :conditions => ['user_id = ? AND games.status = ?', current_user.id, Game::State::Proposed] }
@@ -27,39 +27,31 @@ module GamesQueries
       players_array[i] = players_array[i].delete_if { |key, value| key.kind_of? Integer } 
     end
 
-    players_array.group_by { |player| player['game_id'] }
+    return players_array.group_by { |player| player['game_id'] }
   end
 
+  # returns a hash containing the id of the game which is ready to be started, for initiator's approval
+  #   and a list of the emails of the other players, for display client-side
+  # accepts a user model object as a parameter 
   def self.get_ready_game_for(current_user)
-    game = Game.includes([:players]).first(
-    	:conditions => [
-        'game_id = players.game_id AND proposing_player = players.id
-          AND status = ? AND players.user_id = ?', 
-          Game::State::Proposed, current_user.id
-      ]
-    )
-    return nil unless game
+    ready_game_query_format = 'game_id = players.game_id AND proposing_player = players.id AND status = ? AND players.user_id = ?'
+    # fetch a game model where status is ready and this user was the proposing player
+    ready_game_conditions = [ ready_game_query_format, Game::State::Ready, current_user.id ]
+    ready_game = Game.includes([:players]).first(:conditions => ready_game_conditions)
+    return nil unless ready_game
 
-    players_are_ready = game.players.inject(true) do |is_ready, player| 
-      is_ready &&= player.accepted
-    end
+    # iterating over the game's players, returning the emails of everyone still in the game who is not the proposing player
+    other_players_conditions = [ 'game_id = ? AND user_id <> ?', ready_game.id, current_user.id ]
+    other_players_emails = Player.all(:conditions => other_players_conditions).map(&:email)
 
-    other_player_emails = User.includes([:players]).all(
-    	:select => :email, 
-    	:conditions => ['user_id = players.user_id AND players.game_id = ? AND NOT user_id = ?', game.id, current_user.id]
-    ).map(&:email)
-
-    { :game_id => game.id, :other_players => other_player_emails } if players_are_ready
+    return { :game_id => ready_game.id, :other_players => other_players_emails }
   end
 
   def self.get_started_game_for(current_user)
-    Game.includes([:players]).first(
-    	:select => :game_id, 
-    	:conditions => [
-        'status = ? AND game_id = players.game_id 
-          AND players.user_id = ?', Game::State::Started, current_user.id
-      ]
-    )
+    started_game_query_format = 'status = ? AND game_id = players.game_id AND players.user_id = ?'
+    started_game_conditions = [ started_game_query_format, Game::State::Started, current_user.id ]
+    started_game = Game.includes([:players]).first(:select => :game_id, :conditions => started_game_conditions)
+    return started_game
   end
 
 end

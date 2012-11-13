@@ -1,4 +1,3 @@
-#start_game_prompt
 .push
 .panel
 	#top_bar
@@ -16,7 +15,7 @@
 				#checked_user_list.dotted_panel
 					.table_title= 'selected_users:'
 					.user_table
-					= game_f.submit 'invite', :class => 'image_button', :disabled => !current_user.can_create_game?, :onclick => 'disable_button()'
+					= game_f.submit 'invite', :class => 'image_button', :disabled => !current_user.can_create_game?, :onclick => 'did_invite_players()'
 				#friend_user_list.dotted_panel
 					.table_title= 'friend_users:'
 					.user_table
