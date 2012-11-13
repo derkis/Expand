@@ -250,7 +250,7 @@ function did_send_response_to_game_invite(game_id, did_accept) {
 	var game_invites_container = $('#game_invites')
 	if(did_accept) {
 		var game_invite = game_invites_container.children('.game_invite');
-		game_invite.children('.accept_button').attr('disabled', 'disabled');
+		game_invite.children('.invite_buttons').children('.accept_button').attr('disabled', 'disabled');
 		game_invite.children('.waiting_text').text(proposed_waiting_text);
 	} else {
 		update_game_invite_with_state(game_invite_state.no_invites);

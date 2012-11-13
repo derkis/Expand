@@ -5,7 +5,7 @@ module GamesQueries
   # accepts a user model object as a parameter
   def self.get_proposed_games_for(current_user)
     # finds players in proposed gams which match this user's id
-    proposed_game_players_conditions = { :conditions => ['user_id = ? AND games.status = ?', current_user.id, Game::State::Proposed] }
+    proposed_game_players_conditions = { :conditions => ['user_id = ? AND games.status <= ?', current_user.id, Game::State::Ready] }
     proposed_game_players = Player.includes([:game]).all(proposed_game_players_conditions)
 
     # return an empty hash if there are no proposed games with a player that matches this user
