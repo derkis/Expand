@@ -92,7 +92,8 @@ function append_cell_to_table(cell, table, should_fade_in) {
 }
 
 function resize_friends_list() {
-	$('#friend_user_list').css('height', friends_list_base_height - $('#checked_user_list').outerHeight(true));
+	other_panels_height = $('#checked_user_list').outerHeight(true) + $('#game_invites').outerHeight(true);
+	$('#friend_user_list').css('height', friends_list_base_height - other_panels_height);
 }
 
 // online user polling
@@ -134,31 +135,30 @@ function remove_user_tag(displayed_user) {
 // games polling
 function check_game_invitations() {
 	$.getJSON('games/proposed.json', function(games) {
-		var current_users_email = $(".profile_link").text();
+		// use the first game and just hope order is consistent D:
+		// if it ends up jacking shit up i'll have to go back into the query 
+		// and return an ordered collection instead
 		for(var game_id in games) {
+			var current_users_email = $(".profile_link").text();
 			var game = games[game_id];
-			var should_add_invitation = true;
-			$.each($('.game_invite'), function(index, value) {
-				var other_game_id = $(value).attr('game_id');
-				if(other_game_id == "" + game_id)
-					should_add_invitation = false;
-			});
-			
-			if(should_add_invitation) {
-				var this_player, players = [];
-				for(var player_index in game) {
-					var player = game[player_index]
-					var players_email = player['email'];
-					if(players_email != current_users_email)
-						players.push(players_email);
-					else
-						this_player = player;
-				}
-				show_game_invite_for_players(this_player, players);
-			} else {
-				update_game_invite_with_state(game_invite_state.no_invites);
+
+			var this_player, players = [];
+			for(var player_index in game) {
+				var player = game[player_index]
+				var players_email = player['email'];
+				if(players_email != current_users_email)
+					players.push(players_email);
+				else
+					this_player = player;
 			}
-		}
+
+			show_game_invite_for_players(this_player, players);
+			// so we can fall through safely if there is nothing in the object
+			// yes, I feel bad about all of this
+			return; 
+		}	
+		
+		update_game_invite_with_state(game_invite_state.no_invites);
 	});
 }
 
@@ -291,6 +291,8 @@ function update_game_invite_with_state(state, options) {
 			update_game_invite_for_active_state(game_invite, state, options);
 			break;
 	}
+
+	resize_friends_list();
 }
 
 function update_game_invite_for_active_state(game_invite, state, options) {

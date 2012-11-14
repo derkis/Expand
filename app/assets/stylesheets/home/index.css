@@ -7,7 +7,7 @@
   top: 15em;
   height: 136px;
   max-height: 100%;
-  background: #404040;
+  background-image: url(/assets/zigzag.png);
   border-color: #636363;
   border-style: solid none solid;
   border-width: 0.4em;
