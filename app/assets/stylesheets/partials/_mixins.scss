@@ -4,3 +4,16 @@
 	-moz-border-image: url(../#{$image_url}.png) $top $right $bottom $left $border_style;
 	border-image: url(../#{$image_url}.png) $top $right $bottom $left fill $border_style;
 }
+
+@mixin border_image_no_fill($image_url, $top, $right, $bottom, $left, $border_style) {
+	border-width: #{$top}px #{$right}px #{$bottom}px #{$left}px;
+	-webkit-border-image: url(../#{$image_url}.png) $top $right $bottom $left $border_style;
+	-moz-border-image: url(../#{$image_url}.png) $top $right $bottom $left $border_style;
+	border-image: url(../#{$image_url}.png) $top $right $bottom $left $border_style;
+}
+
+@mixin drop_shadow($y-offset, $x-offset, $size, $color) {
+	-moz-box-shadow: $y-offset $x-offset $size $color;
+	-webkit-box-shadow: $y-offset $x-offset $size $color;
+	box-shadow: $y-offset $x-offset $size $color;
+}

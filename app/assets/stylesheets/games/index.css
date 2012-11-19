@@ -2,25 +2,19 @@
   font-family: Pixel;
   src: url(/assets/fffharmo.ttf) format("truetype"); }
 
-.push {
-  position: relative;
-  float: left;
-  width: 1px;
-  height: 50%;
-  margin-bottom: -22.5em; }
-
 .panel {
-  border-width: 10px 10px 22px 22px;
-  -webkit-border-image: url(../round_shadow.png) 10 10 22 22 fill stretch;
-  -moz-border-image: url(../round_shadow.png) 10 10 22 22 stretch;
-  border-image: url(../round_shadow.png) 10 10 22 22 fill stretch;
   position: relative;
   clear: left;
   overflow: auto;
-  margin: 0 auto;
+  margin: 1.2% 5% 2% 5%;
+  padding: 0.5%;
+  min-width: 525px;
+  height: 85%;
   border-radius: 10px;
-  width: 65em;
-  height: 38em; }
+  background-image: url(/assets/zigzag.png);
+  -moz-box-shadow: 3px 3px 20px black;
+  -webkit-box-shadow: 3px 3px 20px black;
+  box-shadow: 3px 3px 20px black; }
   .panel #top_bar {
     display: inline-block;
     width: 100%;
@@ -52,8 +46,7 @@
     width: 200px;
     padding-right: 5px; }
   .panel #info_panel {
-    float: right;
-    height: 100%; }
+    float: right; }
     .panel #info_panel .table_title {
       font-family: Pixel, cursive;
       font-size: 12px;

@@ -8,18 +8,20 @@ $cell_padding: 5px;
 $row_height: 20px;
 $row_padding: 5px;
 
-.push {
-	position:relative; float:left; 
-	width:1px; height:50%;	
-	margin-bottom:-22.5em;
-}
-
 .panel {
-	@include border_image(round_shadow, 10, 10, 22, 22, stretch);
+	// @include border_image_no_fill(round_shadow, 10, 10, 22, 22, stretch);
 	position:relative; clear:left; overflow: auto;
-	margin: 0 auto;
+	margin: 1.2% 5% 2% 5%;
+	padding: 0.5%;
+	
+	min-width: 525px;
+	height: 85%;
+
 	border-radius: 10px;
-	width: 65em; height: 38em;
+	background-image: $dark_background_image;
+	@include drop_shadow(3px, 3px, 20px, #000);
+	// min-width: 50em; max-width: 80em;
+	// min-height: 38em; max-height: 50em;
 
 	#top_bar {
 		display: inline-block;
@@ -65,7 +67,6 @@ $row_padding: 5px;
 
 	#info_panel {
 		float: right;
-		height: 100%;
 
 		.table_title {
 			@include pixel_font($font_size_std, $font_color_title);

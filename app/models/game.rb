@@ -27,10 +27,10 @@ class Game < ActiveRecord::Base
   
   # CONSTANTS
   module State
-    Proposed = 0; Starting = 1; Started = 2; Finished = 3; Canceled = 4
+    Proposed = 0; Ready = 1; Starting = 2; Started = 3; Finished = 4; Canceled = 5
 
     def self.all
-      return [ Proposed, Starting, Started, Finished, Canceled ]
+      return [ Proposed, Ready, Starting, Started, Finished, Canceled ]
     end
   end
 
@@ -73,10 +73,6 @@ class Game < ActiveRecord::Base
     end
 
     datasan
-  end
-
-  def pass_through(thing)
-    return thing
   end
 
   def last_action
@@ -127,8 +123,8 @@ class Game < ActiveRecord::Base
     player = self.players.object_passing_test do |player|
       self.proposing_player == player.user_id
     end
-    self.proposing_player = player.id
-    self.save
+    self.update_attributes(:proposing_player => player.id)
+    player.update_attributes(:accepted => true)
   end
     
   # GAME STATE MANAGEMENT
@@ -163,15 +159,22 @@ class Game < ActiveRecord::Base
     self.cur_turn = self.cur_turn.create_next_turn_step()
   end
 
+  # PLAYER LIST METHODS
   def remove_player(player)
     if players.count <= 2
       self.update_attributes!(:status => State::Canceled)
     else
+      binding.pry
       player.update_attributes!(:game_id => nil)
-      self.players.each_with_index do |player, index| # probably not necessary since this doesn't happen until start
-        players.update_attributes!(:index => index)
-      end
     end
+  end
+
+  # callback from a player object when its state is initally set to true
+  def player_did_accept
+    game_is_ready = self.players.inject(true) do |is_ready, player| 
+      is_ready and player.accepted
+    end
+    if game_is_ready then self.update_attributes(:status => State::Ready) end 
   end
 
   # SETTERS & GETTERS
@@ -181,6 +184,10 @@ class Game < ActiveRecord::Base
 
   def cur_turn=(turn)
     self.update_attributes(:turn_id => turn.id)
+  end
+
+  def pass_through(object)
+    object
   end
 
   def board

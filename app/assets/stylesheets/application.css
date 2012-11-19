@@ -5,7 +5,8 @@
 html, body {
   margin: 0;
   padding: 0;
-  height: 100%; }
+  height: 100%;
+  background-image: url(/assets/noisy_grid.png); }
 
 #header {
   height: 1.5em;
@@ -46,13 +47,14 @@ a {
   a:visited {
     color: #66636f; }
 
-nav {
+.user_nav {
   float: right;
-  white-space: nowrap; }
-  nav ul li {
+  white-space: nowrap;
+  margin: 0.5% 0.5% 0 0; }
+  .user_nav ul li {
     list-style-type: none;
     display: inline-block; }
-    nav ul li a {
+    .user_nav ul li a {
       padding: 0 5px;
       font-weight: bold; }
 

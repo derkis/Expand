@@ -11,8 +11,8 @@ class GamesController < ApplicationController
   
   before_filter :authenticate_user!
   before_filter :redirect_user_to_started_game, :only => :index
-  before_filter :verify_user_in_game, :only => [:update, :show]
-  after_filter :set_last_request_at, :only => [:index, :create, :update, :show]
+  before_filter :verify_user_in_game, :only => [ :update, :show ]
+  after_filter :set_last_request_at, :only => [ :index, :create, :update, :show ]
   
   def index
     @title = 'portal'

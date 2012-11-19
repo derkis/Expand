@@ -14,7 +14,8 @@
 
 class Player < ActiveRecord::Base
   
-  after_create :set_create_defaults
+  after_create :after_create
+  after_update :after_update
 
   belongs_to :user
   belongs_to :game
@@ -22,12 +23,25 @@ class Player < ActiveRecord::Base
 
   attr_accessible :user_id, :game_id, :accepted
 
+  # active record callbacks
+  def after_create
+    self.update_attributes(:accepted => false)
+  end
+
+  def after_update
+    if self.accepted_was == false and self.accepted
+      self.game.player_did_accept
+    end
+  end
+
+  # conditions
   def is_active
     game.current_turn.player_id == id
   end
-  
-  def set_create_defaults
-    self.accepted ||= false
+
+  # convenience
+  def email
+    user.email
   end
 
   def to_s
