@@ -47,6 +47,14 @@ function hasClasses(element, classes)
     return true;
 }
 
+Object.size = function(obj) {
+    var size = 0, key;
+    for (key in obj) {
+        if (obj.hasOwnProperty(key)) size++;
+    }
+    return size;
+};
+
 //------------------------------------------------------------------------------------------
 //
 // Variables
@@ -70,6 +78,10 @@ var stock_sell_cost = 0;
 var data_sent = false;
 
 var first_load = true;
+
+var merge_order_rendered = false;
+
+var merge_order_custom = null;
 
 //------------------------------------------------------------------------------------------
 //
@@ -105,6 +117,7 @@ var TURN_TYPES = {
         render: function(game_state) {
             render_stock_option_chooser(false)
             render_merge_company_chooser(false);
+            render_merge_order_chooser(false);
             render_button("Place", false);
         }
     },
@@ -169,6 +182,27 @@ var TURN_TYPES = {
             render_button("Purchase", false);
         }
     },
+    "520": {
+        name: 'merge_choose_order',
+        message: "",
+        get_action: function()
+        {
+            return  {
+                    merge_order: merge_order_custom ? merge_order_custom : cur_game_state.cur_data.merge_state.merge_order
+                    };
+        },
+        after_action: function()
+        {
+            merge_order_custom = null;
+        },
+        render: function(game_state)
+        {
+            render_merge_order_chooser(true);
+            render_stock_option_chooser(false);
+            render_merge_company_chooser(false);
+            render_button("Purchase", false);
+        }
+    },
 
     "550": {
         name: 'merge_choose_stock_options',
@@ -190,6 +224,7 @@ var TURN_TYPES = {
         {
             render_stock_option_chooser(cur_game_state.cur_data.merge_state.stock_option_player_index == cur_game_state.user_player_index || cur_game_state.debug_mode)
             render_merge_company_chooser(false);
+            render_merge_order_chooser(false);
             render_button("Purchase", false);
         }
     },
@@ -225,7 +260,7 @@ function get_player_index()
     {
         // If we are in debug mode and we are currently choosing stock options, we want to 
         // display the data for the current player choosing stock options.
-        if (cur_game_state.cur_data["merge_state"] && cur_game_state.cur_data["merge_state"]["stock_option_player_index"])
+        if (cur_game_state.cur_data["merge_state"] && cur_game_state.cur_data["merge_state"]["stock_option_player_index"] >= 0)
         {
             return cur_game_state.cur_data["merge_state"]["stock_option_player_index"];
         }
@@ -354,6 +389,36 @@ function render_merge_company_chooser(show)
         }
 
         $(".merge_company_chooser").show();
+    }
+}
+
+function render_merge_order_chooser(show)
+{
+    if (!show)
+    {
+        $(".merge_company_order_chooser").hide();
+    }
+    else
+    {
+        cur_merge_order = merge_order_custom ? merge_order_custom : cur_game_state.cur_data.merge_state.merge_order;
+
+        html = "";
+
+        for (var i = 0; i < cur_merge_order.length; i ++)
+        {
+            company = get_company(cur_merge_order[i]);
+
+            html += "<div style='color:"
+                    + company.color + ";'>"
+                    + (i + 1).toString()
+                    + ": "
+                    + company.name
+                    + "<button type='button' index='"+i+"' name='order_choice' onclick='merge_order_down_handler(event)'>v</button>"
+                    + "<button type='button' index='"+i+"' name='order_choice' onclick='merge_order_up_handler(event)'>^</button></div>";
+        }
+
+        $(".merge_company_order_content").html(html);
+        $(".merge_company_order_chooser").show();
     }
 }
 
@@ -675,6 +740,19 @@ function get_cur_stock_in(company_abbr)
 {
     var val = cur_game_state.cur_data.players[get_player_index()]["stock_count"][company_abbr];
 
+    if (cur_game_state.cur_data.merge_state)
+    {
+        if (company_abbr == cur_game_state.cur_data.merge_state.company_abbr)
+        {
+            val = isNaN(val) ? stock_split_count / 2 : val + stock_split_count / 2;
+        }
+
+        if (company_abbr == cur_game_state.cur_data.merge_state.cur_company_options)
+        {
+            val = isNaN(val) ? -(stock_split_count + stock_sell_count) : val - (stock_split_count + stock_sell_count);
+        }
+    }
+
     return isNaN(val) ? 0 : val;
 }
 
@@ -926,6 +1004,7 @@ function load_game_state_resultHandler(game_state)
     {
         render_stock_option_chooser(false)
         render_merge_company_chooser(false);
+        render_merge_order_chooser(false);
         render_button("Place", false);
     }
 
@@ -1110,6 +1189,7 @@ function sub_stock_split_handler()
         stock_split_count = 0
     }
 
+    render_stock();
     render_stock_option_chooser_counts();
 }
 
@@ -1131,6 +1211,7 @@ function add_stock_split_handler()
 
     stock_split_count+=2;
 
+    render_stock();
     render_stock_option_chooser_counts();
 }
 
@@ -1146,6 +1227,7 @@ function sub_stock_sell_handler()
     stock_sell_cost = stock_sell_count * get_company_stock_cost_for(cur_game_state.cur_data.merge_state.cur_company_options);
 
     render_status();
+    render_stock();
     render_stock_option_chooser_counts();
 }
 
@@ -1163,5 +1245,38 @@ function add_stock_sell_handler()
     stock_sell_cost = stock_sell_count * get_company_stock_cost_for(cur_game_state.cur_data.merge_state.cur_company_options);
 
     render_status();
+    render_stock();
     render_stock_option_chooser_counts();
+}
+
+function merge_order_down_handler(event)
+{
+    cur_merge_order = merge_order_custom ? merge_order_custom : cur_game_state.cur_data.merge_state.merge_order;
+
+    index = parseInt(event.currentTarget.getAttribute("index"));
+
+    edge_case = index == cur_merge_order.length-1;
+    temp = edge_case ? cur_merge_order[0] : cur_merge_order[index + 1];
+    cur_merge_order[edge_case ? 0 : index + 1] = cur_merge_order[index];
+    cur_merge_order[index] = temp;
+
+    merge_order_custom = cur_merge_order;
+
+    render_merge_order_chooser(true);
+}
+
+function merge_order_up_handler(event)
+{
+    cur_merge_order = merge_order_custom ? merge_order_custom : cur_game_state.cur_data.merge_state.merge_order;
+
+    index = parseInt(event.currentTarget.getAttribute("index"));
+
+    edge_case = index == 0;
+    temp = edge_case ? cur_merge_order[cur_merge_order.length - 1] : cur_merge_order[index - 1];
+    cur_merge_order[edge_case ? cur_merge_order.length - 1 : index - 1] = cur_merge_order[index];
+    cur_merge_order[index] = temp;
+
+    merge_order_custom = cur_merge_order;
+
+    render_merge_order_chooser(true);
 }

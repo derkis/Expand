@@ -37,6 +37,11 @@
 		.clear{:style=>"clear:both;"}
 		= button_to_function 'input', 'input_handler()', :id => 'turn_button', :class => 'image_button'
 		.clear{:style=>"clear:both;"}
+	.merge_company_order_chooser
+		.label
+			Choose the company merge order:
+		.merge_company_order_content
+		= button_to_function 'Apply', 'input_handler()', :id => 'merge_order_button', :class => 'image_button'
 	.merge_company_chooser
 		.label
 			Which company will acquire the others?
@@ -54,6 +59,17 @@
 			&nbsp;is acquiring&nbsp;
 		.stock_company_from
 		%br
+		.stock_keep
+			.stock_keep_lbl{:style=>"float:left; width:100px;"}
+				Keeping:&nbsp;
+			.stock_keep_count{:style=>"float:left; width:30px;"}
+			.stock_keep_company{:style=>"float:left;"}
+			.clear{:style=>"clear:both;"}
+		.stock_gain
+			.stock_gain_lbl{:style=>"float:left; width:100px;"}
+				Getting:&nbsp;
+			.stock_gain_count{:style=>"float:left; width:30px;"}
+			.stock_gain_company{:style=>"float:left;"}
 		.stock_split
 			.stock_split_lbl{:style=>"float:left; width:100px;"}
 				Split(2 > 1):
@@ -63,22 +79,11 @@
 				= button_to_function '+', 'add_stock_split_handler()', :id => 'add_stock_split_button'
 		.stock_sell
 			.stock_sell_lbl{:style=>"float:left; width:100px;"}
-				Sell:
+				Selling:
 			.stock_sell_count{:style=>"float:left; width:30px;"}
 			.stock_sell_buttons{:style=>"float:left;"}
 				= button_to_function '-', 'sub_stock_sell_handler()', :id => 'sub_stock_sell_button'
 				= button_to_function '+', 'add_stock_sell_handler()', :id => 'add_stock_sell_button'
 			.clear{:style=>"clear:both;"}
-		.stock_keep
-			.stock_keep_lbl{:style=>"float:left; width:100px;"}
-				Keep:&nbsp;
-			.stock_keep_count{:style=>"float:left; width:30px;"}
-			.stock_keep_company{:style=>"float:left;"}
-			.clear{:style=>"clear:both;"}
-		.stock_gain
-			.stock_gain_lbl{:style=>"float:left; width:100px;"}
-				Gain:&nbsp;
-			.stock_gain_count{:style=>"float:left; width:30px;"}
-			.stock_gain_company{:style=>"float:left;"}
 		.stock_sell_buttons{:style=>"float:left;"}
 		= button_to_function 'Apply', 'input_handler()', :id => 'stock_option_button', :class => 'image_button'

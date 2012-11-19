@@ -55,7 +55,7 @@
           font-family: Pixel, cursive;
           font-size: 14px;
           color: #a66c5a; }
-      .wrapper .main .leftnav .merge_company_chooser, .wrapper .main .leftnav .merge_company_stock_option_chooser {
+      .wrapper .main .leftnav .merge_company_chooser, .wrapper .main .leftnav .merge_company_stock_option_chooser, .wrapper .main .leftnav .merge_company_order_chooser {
         width: 270px;
         background: #636363;
         border: 0.5em dotted #404040;

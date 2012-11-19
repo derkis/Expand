@@ -258,8 +258,10 @@ class Game < ActiveRecord::Base
   # whether the game is legally endable, it just ends the game as is
   # --------------------------------------------------  
   def end_game()
-
     data_hash = cur_turn.data_hash
+    
+    return if data_hash.has_key? "game_over"
+
     data_hash["game_over"] = true
 
     Engine.add_notification(self, data_hash, "GAME HAS ENDED!", false)
@@ -295,5 +297,7 @@ class Game < ActiveRecord::Base
     end
 
     cur_turn.serialize_data_hash(data_hash)
+
+    update_attributes(:status => State::Finished)
   end
 end

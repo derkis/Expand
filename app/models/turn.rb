@@ -29,18 +29,19 @@ class Turn < ActiveRecord::Base
 	attr_accessible :game_id, :player_id, :number, :board, :tiles, :data, :action, :step
 
 	# CONSTANTS
-	INACTIVE				= 000
-	PLACE_PIECE 		= 100
-	START_COMPANY 		= 200
-	PURCHASE_STOCK		= 300
-	TRADE_STOCK			= 400
-	MERGE_CHOOSE_COMPANY= 500
+	INACTIVE					= 000
+	PLACE_PIECE 				= 100
+	START_COMPANY 				= 200
+	PURCHASE_STOCK				= 300
+	TRADE_STOCK					= 400
+	MERGE_CHOOSE_COMPANY 		= 500
+	MERGE_CHOOSE_COMPANY_ORDER	= 520
 	MERGE_CHOOSE_STOCK_OPTIONS	= 550
-	GAME_OVER			= 600
+	GAME_OVER					= 600
 
-	PIECE_PLACED 		= 0
-	COMPANY_STARTED 	= 1
-	MERGE_STARTED 		= 2
+	PIECE_PLACED 				= 0
+	COMPANY_STARTED 			= 1
+	MERGE_STARTED 				= 2
 
  	# CREATION
 	# creates the first turn given a game and a starting player id.

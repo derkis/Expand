@@ -99,11 +99,11 @@ module Engine
 						game.advance_turn_step
 						data_hash = game.cur_turn.data_hash
 
-						data_hash['merge_state'] = {
-													"row"=>action["row"],
-													"column"=>action["column"],
-													"companies_to_merge"=>{}
-													}
+						merge_state = data_hash['merge_state'] = {
+																"row"=>action["row"],
+																"column"=>action["column"],
+																"companies_to_merge"=>{}
+																}
 
 						companies_merged = game.cur_turn.test_merge(action["row"], action["column"])
 
@@ -112,60 +112,41 @@ module Engine
 						largest_company_size = 0
 						largest_company_abbr = ""
 						last_company_size = -1
-						all_same_size = true
-
-						companies_being_acquired_txt = ""
 
 						companies_merged.each do |key, company|
 							if company["size"] > largest_company_size
 								largest_company_size = company["size"] 
 								largest_company_abbr = company["abbr"]
 							end
-							all_same_size = false if last_company_size != -1 && last_company_size != company["size"]
-							data_hash['merge_state']["companies_to_merge"][key] = true
-
-							last_company_size = company["size"]
+							merge_state["companies_to_merge"][key] = true
 						end
 
-						if all_same_size
-							# Okay, we only want to give a merge option if the companies involved
-							# in the merge are the SAME SIZE
-							data_hash['state'] = Turn::MERGE_CHOOSE_COMPANY
+						acquire_choice = {}
+						merge_order = []
+
+						companies_merged.each do |key, company|
+							if company["size"] == largest_company_size
+								acquire_choice[key] = true
+							else
+								merge_order.push(key);
+							end
+						end
+
+						if acquire_choice.size > 1
+							data_hash["state"] = Turn::MERGE_CHOOSE_COMPANY
+							merge_state["acquire_choice"] = acquire_choice
 						else
-							data_hash['state'] = Turn::MERGE_CHOOSE_STOCK_OPTIONS
-							data_hash['merge_state']["company_abbr"] = largest_company_abbr
-
-							# Create a collection of companies that still need stock options chosen for
-							data_hash['merge_state']["company_options_left"] = data_hash['merge_state']["companies_to_merge"].dup
-							# Remove the company that is the retained company
-							data_hash['merge_state']["company_options_left"].delete(largest_company_abbr)
-
-							data_hash['merge_state']["company_options_left"].each do |c_a, company|
-								companies_being_acquired_txt += " and " if companies_being_acquired_txt.length > 0
-								companies_being_acquired_txt += Engine.company_html(data_hash["companies"][c_a])
-							end
+							merge_state["company_abbr"] = largest_company_abbr
 							
-							# Pick the first company that needs to have stock options chosen for it
-							data_hash['merge_state']["cur_company_options"] = data_hash['merge_state']["company_options_left"].to_a()[0][0]
-							data_hash['merge_state']["company_options_left"].delete(data_hash['merge_state']["cur_company_options"])
-
-							# Setup the first player to be making a decision
-							data_hash['merge_state']["stock_option_player_index"] = Engine.find_first_player_index_with_stock_in(game, data_hash['merge_state']["cur_company_options"])
-
-							# First we award majority and minority to every single company that has been dissolved
-							# (obviously we need to exclude the company that remains)
-							data_hash["merge_state"]["companies_to_merge"].each do |c_a, company|
-								Engine.award_majority_minority(game, data_hash, c_a) if c_a != largest_company_abbr
+							if merge_order.size > 1
+								merge_state["merge_order"] = merge_order
+								data_hash["state"] = Turn::MERGE_CHOOSE_COMPANY_ORDER
+							else
+								merge_state["merge_order"] = merge_order
+								data_hash["state"] = Turn::MERGE_CHOOSE_STOCK_OPTIONS
+								
+								Engine.begin_merge_stock_options(game, data_hash)
 							end
-
-							Engine.add_notification(game, data_hash, game.cur_turn.player.user.email \
-													+ " caused " \
-													+ Engine.company_html(data_hash["companies"][largest_company_abbr]) \
-													+ " to acquire " \
-													+ companies_being_acquired_txt \
-													+ " at " \
-													+ tile_name \
-													+ ".", false)
 						end
 
 						game.cur_turn.serialize_data_hash(data_hash)
@@ -240,6 +221,51 @@ module Engine
 
 				game.advance_turn
 			#--------------------------------------
+			# MERGE_CHOOSE_COMPANY_ORDER
+			#--------------------------------------
+			when Turn::MERGE_CHOOSE_COMPANY_ORDER
+				game.advance_turn_step
+
+				data_hash = game.cur_turn.data_hash
+
+				companies_being_acquired_txt = ""
+
+				merge_state = data_hash["merge_state"]
+
+				tile_name = game.cur_turn.get_tile_name(merge_state["row"], merge_state["column"])
+
+				merge_state["merge_order"] = action["merge_order"];
+
+				merge_state["merge_order"].each do |c_a|
+					companies_being_acquired_txt += " and then " if companies_being_acquired_txt.length > 0
+					companies_being_acquired_txt += Engine.company_html(data_hash["companies"][c_a])
+				end
+
+				# Pick the first company that needs to have stock options chosen for it
+				merge_state["cur_company_options"] = merge_state["merge_order"].shift(1)[0]
+
+				# Setup the first player to be making a decision
+				merge_state["stock_option_player_index"] = Engine.find_first_player_index_with_stock_in(game, merge_state["cur_company_options"])
+
+				Engine.add_notification(game, data_hash, game.cur_turn.player.user.email \
+										+ " caused " \
+										+ Engine.company_html(data_hash["companies"][merge_state["company_abbr"]]) \
+										+ " to acquire " \
+										+ companies_being_acquired_txt \
+										+ " at " \
+										+ tile_name \
+										+ ".", false)
+
+				# First we award majority and minority to every single company that has been dissolved
+				# (obviously we need to exclude the company that remains)
+				merge_state["companies_to_merge"].each do |c_a, company|
+					Engine.award_majority_minority(game, data_hash, c_a) if c_a != largest_company_abbr
+				end
+
+				data_hash["state"] = Turn::MERGE_CHOOSE_STOCK_OPTIONS;
+
+				game.cur_turn.serialize_data_hash(data_hash)
+			#--------------------------------------
 			# MERGE_CHOOSE_COMPANY
 			#--------------------------------------
 			when Turn::MERGE_CHOOSE_COMPANY
@@ -285,6 +311,7 @@ module Engine
 			# MERGE_CHOOSE_STOCK_OPTIONS
 			#--------------------------------------
 			when Turn::MERGE_CHOOSE_STOCK_OPTIONS
+				binding.pry
 				data_hash = game.cur_turn.data_hash
 
 				company_from = data_hash['merge_state']["cur_company_options"]
@@ -301,11 +328,16 @@ module Engine
 				
 				# Deal with split stock first.
 				split = action["stock_split"]
-				data_hash["players"][player_index]["stock_count"][company_from] -= split
-				if data_hash["players"][player_index]["stock_count"].has_key?(company_to)
-					data_hash["players"][player_index]["stock_count"][company_to] += (split / 2)
-				else
-					data_hash["players"][player_index]["stock_count"][company_to] = (split / 2)
+
+				player_hash = data_hash["players"][player_index]
+
+				if split > 0
+					player_hash["stock_count"][company_from] -= split
+					if player_hash["stock_count"].has_key?(company_to)
+						player_hash["stock_count"][company_to] += (split / 2)
+					else
+						player_hash["stock_count"][company_to] = (split / 2)
+					end
 				end
 
 				data_hash["companies"][company_from]["stock_count"] += split
@@ -313,25 +345,27 @@ module Engine
 
 				# Deal with sold stock next.
 				sold = action["stock_sold"]
-				data_hash["players"][player_index]["money"] += (sold * game.cur_turn.stock_value_for(company_from))
-				if data_hash["players"][player_index]["stock_count"].has_key?(company_from)
-					data_hash["players"][player_index]["stock_count"][company_from] -= sold
+				player_hash["money"] += (sold * game.cur_turn.stock_value_for(company_from))
+				if player_hash["stock_count"].has_key?(company_from)
+					player_hash["stock_count"][company_from] -= sold
 				end
 
 				data_hash["companies"][company_from]["stock_count"] += sold
 
 				Engine.add_notification(game, data_hash, game.player_by_index(player_index).user.email + " split " + split.to_s + " and sold " + sold.to_s + " stock in " + Engine.company_html(data_hash["companies"][company_from]), false)
 
+				game.cur_turn.serialize_data_hash(data_hash)
+
 				# We continue on this cycle until we wrap around to the player who
 				# initiated this debacle of merging madness.
 				next_player_index = (player_index+1) % game.players.count 
 
-				return Engine.finalize_merge(game, data_hash) if next_player_index == game.cur_player_index
+				return Engine.next_company_or_finalize_merge(game, data_hash) if next_player_index == game.cur_player_index
 
 				while !game.cur_turn.player_has_stock_in(next_player_index, company_from)
 					next_player_index = (next_player_index+1) % game.players.count
 
-					return Engine.finalize_merge(game, data_hash) if next_player_index == game.cur_player_index
+					return Engine.next_company_or_finalize_merge(game, data_hash) if next_player_index == game.cur_player_index
 				end
 
 				data_hash['merge_state']["stock_option_player_index"] = next_player_index
@@ -345,7 +379,42 @@ module Engine
 		game.cur_turn.update_attributes(:action => ActiveSupport::JSON.encode(action))
 	end
 
+	def self.begin_merge_stock_options(game, data_hash)
+		merge_state = data_hash["merge_state"]
+		
+		companies_being_acquired_txt = ""
+
+		merge_state["merge_order"].each do |c_a, company|
+			companies_being_acquired_txt += " and " if companies_being_acquired_txt.length > 0
+			companies_being_acquired_txt += Engine.company_html(data_hash["companies"][c_a])
+		end
+
+		# Pick the first company that needs to have stock options chosen for it
+		merge_state["cur_company_options"] = merge_state["merge_order"].shift(1)[0]
+
+		# Setup the first player to be making a decision
+		merge_state["stock_option_player_index"] = Engine.find_first_player_index_with_stock_in(game, merge_state["cur_company_options"])
+
+		tile_name = game.cur_turn.get_tile_name(merge_state["row"], merge_state["column"])
+
+		Engine.add_notification(game, data_hash, game.cur_turn.player.user.email \
+								+ " caused " \
+								+ Engine.company_html(data_hash["companies"][merge_state["company_abbr"]]) \
+								+ " to acquire " \
+								+ companies_being_acquired_txt \
+								+ " at " \
+								+ tile_name \
+								+ ".", false)
+
+		# First we award majority and minority to every single company that has been dissolved
+		# (obviously we need to exclude the company that remains)
+		merge_state["companies_to_merge"].each do |c_a, company|
+			Engine.award_majority_minority(game, data_hash, c_a) if c_a != merge_state["company_abbr"]
+		end
+	end
+
 	def self.award_majority_minority(game, data_hash, company_abbr)
+		binding.pry
 		stock_counts = []
 
 		majority_money = game.cur_turn.stock_value_for(company_abbr, "bonus_maj")
@@ -449,6 +518,7 @@ module Engine
 
 	# Finds the next player with stock in the company provided.
 	def self.find_first_player_index_with_stock_in(game, company_abbr)
+		# We always start with the current player and then go around the table to find that next person.
 		next_player_index = game.cur_player_index
 
 		while !game.cur_turn.player_has_stock_in(next_player_index, company_abbr)
@@ -458,7 +528,23 @@ module Engine
 		return next_player_index
 	end
 
-	def self.finalize_merge(game, data_hash)
+	def self.next_company_or_finalize_merge(game, data_hash)
+		binding.pry
+		merge_state = data_hash["merge_state"]
+
+		if merge_state.has_key?("merge_order") && merge_state["merge_order"].size > 0
+			# Move to the next company
+			merge_state["cur_company_options"] = merge_state["merge_order"].shift(1)[0]
+
+			# Setup the first player to be making a decision
+			merge_state["stock_option_player_index"] = Engine.find_first_player_index_with_stock_in(game, merge_state["cur_company_options"])
+
+			data_hash["state"] = Turn::MERGE_CHOOSE_STOCK_OPTIONS
+
+			game.cur_turn.serialize_data_hash(data_hash)
+			return
+		end
+
 		row = data_hash["merge_state"]["row"]
 		column = data_hash["merge_state"]["column"]
 		company_abbr = data_hash["merge_state"]["company_abbr"]
