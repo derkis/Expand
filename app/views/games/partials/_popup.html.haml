@@ -1,13 +1,19 @@
 #start_company_popup
-	.title{:style=>"padding-bottom:10px;"}
-		Start a New Company
+	.section_header
+		New Company!
+	.details
+		You will automatically get one stock:
 	- @cur_turn.data_hash["companies"].each do |key, value|
 		.company_to_start{:company_abbr=>"#{key}", :style=>"padding-top:5px;"}
 			%input{ :type=>"radio", :value=>"#{value['abbr']}", :name=>"company_group"}
-			%label
-				= value["name"]
-			.color{ :style=>"background-color:#{value['color']}; width:20px; height:13px; float:right;"}
-	= button_to_function 'go', 'start_company_click_handler()', :id => 'start_company_button', :class => 'image_button'
-#forfeited_popup
-	.forfeited_lbl
-	= button_to_function 'To Lobby...', 'lobby_click_handler()', :id => 'lobby_button', :class => 'image_button'
+			%label{ :style=>"color:#{value['color']};"}
+				= value["name"] + " ($" + @cur_turn.stock_value_for(key).to_s + " / stock)"
+	.button
+		= button_to_function 'start', 'start_company_click_handler()', :id => 'start_company_button', :class => 'image_button'
+#forfeit_popup
+	.section_header
+		Forfeit?
+	.forfeit_lbl
+		Are you sure? This will wipe out all your assets and force the entire game to end.
+	= button_to_function 'Yes', 'forfeit_confirm_handler()', :id => 'forfeit_confirm_button', :class => 'image_button', :style => "position:absolute; left: 1em;"
+	= button_to_function 'NO!', 'forfeit_disconfirm_handler()', :id => 'forfeit_disconfirm_button', :class => 'image_button', :style => "position:absolute; right: 1em;"

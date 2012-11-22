@@ -37,7 +37,7 @@
     .panel #online_user_table .table_title {
       font-family: Pixel, cursive;
       font-size: 20px;
-      color: #a66c5a;
+      color: #cc846e;
       display: table-header-group; }
   .panel .user_cell {
     font-family: Pixel, cursive;
@@ -50,7 +50,7 @@
     .panel #info_panel .table_title {
       font-family: Pixel, cursive;
       font-size: 12px;
-      color: #a66c5a; }
+      color: #cc846e; }
     .panel #info_panel .dotted_panel {
       border-width: 9px 9px 9px 9px;
       -webkit-border-image: url(../dotted_border.png) 9 9 9 9 fill repeat;

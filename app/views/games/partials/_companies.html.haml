@@ -1,4 +1,13 @@
 .companies
+	.section_header
+		Companies
+	.company_headers
+		.company_data_name
+			Name
+		.company_data_stock_count
+			Avail.
+		.company_data_value
+			$/Stock
 	- @cur_turn.data_hash["companies"].each do |key, value|
 		.company_data{:company_abbr=>"#{key}", :style=>"color: #{value['color'];}"}
 			.company_data_name{:company_abbr=>"#{key}"}

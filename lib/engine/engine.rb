@@ -20,8 +20,20 @@ module Engine
 	def self.forfeit(game, current_user)
 		data_hash = game.cur_turn.data_hash
 		data_hash["forfeited_by"] = current_user.email
+		data_hash["forfeited_by_index"] = game.user_player_index(current_user)
 
-		game.end_game
+		# Wipe out the forfeiting players assets
+	    data_hash["players"].each_with_index do |p, i|
+	       if p["index"].to_i == data_hash["forfeited_by_index"]
+		       p["money"] = 0;
+		       p["stock_count"] = {}
+	       end
+	    end
+
+		game.end_game(data_hash)
+
+		data_hash["state"] = Turn::FORFEIT
+
 		game.cur_turn.serialize_data_hash(data_hash)
 
 		game.finish
@@ -72,7 +84,7 @@ module Engine
 					when Turn::PIECE_PLACED
 						# Switch to stock purchasing (if can purchase stock) or advanced the turn
 						if !game.cur_turn.can_purchase_stock(game.cur_turn.player)
-							Engine.add_notification(game, nil, game.cur_turn.player.user.email + " placed " + tile_name + ".", true)
+							Engine.add_notification(game, nil, game.cur_turn.player.user.email + " placed " + Engine.tile_html(tile_name) + ".", true)
 
 							game.advance_turn
 							game.cur_turn.place_piece(action["row"], action["column"])
@@ -81,7 +93,7 @@ module Engine
 						else
 							game.advance_turn_step
 							
-							Engine.add_notification(game, nil, game.cur_turn.player.user.email + " placed " + tile_name + ".", true)
+							Engine.add_notification(game, nil, game.cur_turn.player.user.email + " placed " + Engine.tile_html(tile_name) + ".", true)
 
 							game.cur_turn.place_piece(action["row"], action["column"])
 
@@ -92,7 +104,7 @@ module Engine
 						game.cur_turn.place_piece(action["row"], action["column"])
 						data_hash = game.cur_turn.data_hash
 						data_hash['state'] = Turn::START_COMPANY
-						Engine.add_notification(game, data_hash, game.cur_turn.player.user.email + " placed " + tile_name + ".", false)
+						Engine.add_notification(game, data_hash, game.cur_turn.player.user.email + " placed " + Engine.tile_html(tile_name) + ".", false)
 						game.cur_turn.serialize_data_hash(data_hash)
 						# We refresh player tiles AFTER they have purchased their stock!
 					when Turn::MERGE_STARTED
@@ -311,7 +323,6 @@ module Engine
 			# MERGE_CHOOSE_STOCK_OPTIONS
 			#--------------------------------------
 			when Turn::MERGE_CHOOSE_STOCK_OPTIONS
-				binding.pry
 				data_hash = game.cur_turn.data_hash
 
 				company_from = data_hash['merge_state']["cur_company_options"]
@@ -379,6 +390,10 @@ module Engine
 		game.cur_turn.update_attributes(:action => ActiveSupport::JSON.encode(action))
 	end
 
+	def self.tile_html(tile_name)
+		return "<span class='tile_in_text' onclick='tile_in_text_click_handler()'>" + tile_name + "</span>"
+	end
+
 	def self.begin_merge_stock_options(game, data_hash)
 		merge_state = data_hash["merge_state"]
 		
@@ -414,7 +429,6 @@ module Engine
 	end
 
 	def self.award_majority_minority(game, data_hash, company_abbr)
-		binding.pry
 		stock_counts = []
 
 		majority_money = game.cur_turn.stock_value_for(company_abbr, "bonus_maj")
@@ -433,9 +447,17 @@ module Engine
 		# Sort in descending order
 		stock_counts = stock_counts.sort.reverse!
 
-		# If there is only one value the majority and minority are shared by everyone involved
+		# This can happen if the only player who has stock in a company forfeits
+		if stock_counts.size == 0
+			Engine.add_notification(game, data_hash, "Nobody has any stock in " + Engine.company_html(data_hash["companies"][company_abbr]), false)
+
+			return
+		end
+
+		# If there is only one value the majority and minority are shared by everyone involved unless tha value is 0, of course
 		if stock_counts.size == 1
 			majority_minority = stock_counts[0]
+
 			winnarz = []
 			data_hash["players"].each_with_index do |player, i|
 				winnarz.push(player) if player["stock_count"][company_abbr] == majority_minority
@@ -456,7 +478,7 @@ module Engine
 							+ award.to_s \
 							+ " for having " \
 							+ stock_counts[0].to_s \
-							+ " stock in " \
+							+ " " \
 							+ Engine.company_html(data_hash["companies"][company_abbr]) \
 							+ "."
 
@@ -477,20 +499,45 @@ module Engine
 			if majority_winnarz.size == 1
 				award = majority_money / majority_winnarz.size
 
-				Engine.add_notification(game, data_hash, "Majority of $" + award.to_s + " awarded to " + game.player_by_index(majority_winnarz[0]["index"]).user.email + " for having " + stock_counts[0].to_s + " stock.", false)
+				Engine.add_notification(game, data_hash, "$" \
+					+ award.to_s \
+					+ " majority to " \
+					+ game.player_by_index(majority_winnarz[0]["index"]).user.email \
+					+ " for " \
+					+ stock_counts[0].to_s \
+					+ " " \
+					+ Engine.company_html(data_hash["companies"][company_abbr]) \
+					+ ".", false)
+
 				majority_winnarz[0]["money"] += award
 
-				award = minority_money / majority_winnarz.size
+				award = minority_money / minority_winnarz.size
 
 				minority_winnarz.each_with_index do |player, i|
-					Engine.add_notification(game, data_hash, "Minority of $" + award.to_s + " awarded to " + game.player_by_index(player["index"]).user.email  + " for having " + stock_counts[1].to_s + " stock.", false)
+					Engine.add_notification(game, data_hash, "$" \
+						+ award.to_s \
+						+ " minority to " \
+						+ game.player_by_index(player["index"]).user.email \
+						+ " for " \
+						+ stock_counts[1].to_s \
+						+ " " \
+						+ Engine.company_html(data_hash["companies"][company_abbr]) \
+						+ ".", false)
 					player["money"] += minority_money / minority_winnarz.size
 				end
 			else
 				award = (majority_money + minority_money) / majority_winnarz.size
 
 				majority_winnarz.each_with_index do |player, i|
-					Engine.add_notification(game, data_hash, "Majority/Minority split of $" + award.to_s + " awarded to " + game.player_by_index(player["index"]).user.email  + " for having " + stock_counts[0].to_s + " stock each.", false)
+					Engine.add_notification(game, data_hash, "$" \
+						+ award.to_s \
+						+ " majority/minority to " \
+						+ game.player_by_index(player["index"]).user.email \
+						+ " for " \
+						+ stock_counts[0].to_s \
+						+ " " \
+						+ Engine.company_html(data_hash["companies"][company_abbr]) \
+						+ ".", false)
 					player["money"] += award
 				end
 			end
@@ -508,6 +555,8 @@ module Engine
 			data_hash['state'] = Turn::PURCHASE_STOCK
 			# We refresh player tiles AFTER they have purchased their stock!
 		else
+			Engine.add_notification(game, data_hash, game.cur_turn.player.user.email + " purchased nothing", false)
+
 			game.advance_turn
 			game.cur_turn.refresh_player_tiles
 			data_hash['state'] = Turn::PLACE_PIECE
@@ -529,7 +578,6 @@ module Engine
 	end
 
 	def self.next_company_or_finalize_merge(game, data_hash)
-		binding.pry
 		merge_state = data_hash["merge_state"]
 
 		if merge_state.has_key?("merge_order") && merge_state["merge_order"].size > 0
@@ -561,13 +609,21 @@ module Engine
 		game.cur_turn.refresh_company_sizes
 	end
 
+	def self.clear_notifications(game, data_hash, save_immediately)
+		data_hash = game.cur_turn.data_hash if !data_hash
+
+		data_hash["notifications"] = []
+
+		game.cur_turn.serialize_data_hash(data_hash) if save_immediately
+	end
+
 	def self.add_notification(game, data_hash, message, save_immediately)
 		data_hash = game.cur_turn.data_hash if !data_hash
 
 		data_hash["notifications"] = [] if !data_hash.has_key?("notifications")
 
 		# We only retain notifications for the last 2 turns
-		while (data_hash["notifications"].size > 0 && (data_hash["notifications"][0]["turn_number"] < game.cur_turn.number - 2 || data_hash["notifications"][0]["turn_number"] > game.cur_turn.number))
+		while (data_hash["notifications"].size > 0 && data_hash["notifications"][0]["turn_number"] < game.cur_turn.number - 2)
 			data_hash["notifications"].shift
 		end 
 

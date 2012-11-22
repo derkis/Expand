@@ -7,23 +7,82 @@
   font-size: 12px;
   color: black; }
 
-#start_company_popup {
-  background-color: #ffffff;
-  border: 2px dashed gray;
-  padding: 1em;
-  display: none;
-  font-family: Pixel, cursive;
-  font-size: 12px;
-  color: black; }
+.title_image {
+  position: absolute;
+  left: -90px;
+  top: -50px; }
 
-#forfeited_popup {
-  background-color: #ffffff;
+#start_company_popup {
+  width: 20em;
+  background-color: #636363;
   border: 2px dashed gray;
   padding: 1em;
   display: none;
   font-family: Pixel, cursive;
   font-size: 12px;
   color: black; }
+  #start_company_popup .button {
+    text-align: right; }
+  #start_company_popup .details {
+    font-family: Pixel, cursive;
+    font-size: 12px;
+    color: #cc846e; }
+
+#forfeit_popup {
+  background-color: #636363;
+  border: 2px dashed gray;
+  width: 25em;
+  padding: 1em;
+  display: none;
+  font-family: Pixel, cursive;
+  font-size: 12px;
+  color: black; }
+  #forfeit_popup .forfeit_lbl {
+    font-family: Pixel, cursive;
+    font-size: 12px;
+    color: #cc846e; }
+
+.section_header, .end_game_header {
+  font-family: Pixel, cursive;
+  font-size: 20px;
+  color: #db7556;
+  border-bottom: 5px dotted #404040;
+  margin-bottom: 2px; }
+
+.end_game_result {
+  font-family: Pixel, cursive;
+  font-size: 14px;
+  color: #db7556; }
+
+.players {
+  margin: 0 auto;
+  margin-top: 1em;
+  padding-top: 0.25em;
+  width: 35em;
+  border-top: 0.5em dotted #636363; }
+  .players .player {
+    text-align: center;
+    float: left;
+    font-family: Pixel, cursive;
+    font-size: 14px;
+    color: #cc846e; }
+  .players .current_player {
+    color: #78dabb; }
+
+.tile_in_text {
+  font-family: Pixel, cursive;
+  font-size: 7px;
+  color: white;
+  border: 0.1em solid #ffffff;
+  padding: 0.2em; }
+
+.turn_button {
+  float: right; }
+
+.total_lbl, .total_assets {
+  font-family: Pixel, cursive;
+  font-size: 20px;
+  color: #db7556; }
 
 .wrapper {
   width: 70em;
@@ -31,6 +90,7 @@
   background: #404040; }
   .wrapper .main {
     position: relative;
+    top: 1em;
     margin: 0 auto; }
     .wrapper .main .turn_label {
       text-align: center;
@@ -38,7 +98,7 @@
       margin-right: auto;
       font-family: Pixel, cursive;
       font-size: 20px;
-      color: #a66c5a; }
+      color: #cc846e; }
     .wrapper .main .leftnav {
       position: absolute;
       top: 2em;
@@ -46,37 +106,44 @@
       .wrapper .main .leftnav .player_status {
         background: #636363;
         border: 0.5em dotted #404040;
-        width: 270px; }
-        .wrapper .main .leftnav .player_status .player_status_lbl {
-          font-family: Pixel, cursive;
-          font-size: 20px;
-          color: #db7556; }
+        width: 300px; }
         .wrapper .main .leftnav .player_status .player_companies, .wrapper .main .leftnav .player_status .player_companies_header, .wrapper .main .leftnav .player_status .money_section, .wrapper .main .leftnav .player_status .total_section {
           font-family: Pixel, cursive;
           font-size: 14px;
-          color: #a66c5a; }
+          color: #cc846e; }
+        .wrapper .main .leftnav .player_status .player_stock_in_company_main .player_stock_in_company {
+          border-left: 0.25em dotted #636363; }
+        .wrapper .main .leftnav .player_status .money_section, .wrapper .main .leftnav .player_status .total_section {
+          border-top: 5px dotted #404040;
+          margin-top: 2px; }
       .wrapper .main .leftnav .merge_company_chooser, .wrapper .main .leftnav .merge_company_stock_option_chooser, .wrapper .main .leftnav .merge_company_order_chooser {
-        width: 270px;
+        margin-top: 1em;
+        width: 300px;
         background: #636363;
         border: 0.5em dotted #404040;
         font-family: Pixel, cursive;
         font-size: 14px;
-        color: #a66c5a; }
+        color: #cc846e; }
+      .wrapper .main .leftnav .merge_company_stock_option_chooser .note {
+        margin: 0.5em;
+        font-family: Pixel, cursive;
+        font-size: 10px;
+        color: #cc846e; }
     .wrapper .main .board {
       display: table;
       margin: 0 auto;
-      padding-top: 2em;
+      padding-top: 1em;
       padding-bottom: 2em; }
       .wrapper .main .board .row {
         display: table-row;
-        height: 50px; }
+        height: 43px; }
         .wrapper .main .board .row .cell {
           font-family: Pixel, cursive;
           font-size: 12px;
           color: black;
           display: table-cell;
           background: #636363;
-          width: 50px;
+          width: 43px;
           overflow: hidden;
           text-align: center;
           vertical-align: middle;
@@ -92,7 +159,7 @@
         .wrapper .main .board .row .blocked {
           background: #000; }
         .wrapper .main .board .row .enabled {
-          background: #a66c5a;
+          background: #cc846e;
           color: white; }
           .wrapper .main .board .row .enabled:hover {
             border-color: #fff;
@@ -114,75 +181,37 @@
     .wrapper .main .rightNav {
       position: absolute;
       top: 2em;
-      right: -120px;
+      right: -90px;
       width: 300px; }
-      .wrapper .main .rightNav .players {
-        background-color: #636363;
-        border: 0.5em dotted #404040; }
-        .wrapper .main .rightNav .players .player {
-          font-family: Pixel, cursive;
-          font-size: 14px;
-          color: #a66c5a; }
-          .wrapper .main .rightNav .players .player .player_info {
-            font-family: Pixel, cursive;
-            font-size: 10px;
-            color: white; }
-        .wrapper .main .rightNav .players .current_player {
-          color: #78dabb; }
       .wrapper .main .rightNav .companies {
         background-color: #636363;
         border: 0.5em dotted #404040; }
-        .wrapper .main .rightNav .companies .company_data {
+        .wrapper .main .rightNav .companies .company_data, .wrapper .main .rightNav .companies .company_headers {
           height: 25px;
           font-family: Pixel, cursive;
           font-size: 14px;
-          color: #a66c5a; }
-          .wrapper .main .rightNav .companies .company_data .company_data_name {
+          color: #cc846e; }
+          .wrapper .main .rightNav .companies .company_data .company_data_name, .wrapper .main .rightNav .companies .company_headers .company_data_name {
             float: left;
             width: 120px; }
-          .wrapper .main .rightNav .companies .company_data .company_data_stock_count {
-            width: 50px;
+          .wrapper .main .rightNav .companies .company_data .company_data_stock_count, .wrapper .main .rightNav .companies .company_headers .company_data_stock_count {
+            width: 80px;
             float: left; }
-          .wrapper .main .rightNav .companies .company_data .company_data_size {
+          .wrapper .main .rightNav .companies .company_data .company_data_value, .wrapper .main .rightNav .companies .company_headers .company_data_value {
+            text-align: right;
             float: left;
-            width: 50px; }
-          .wrapper .main .rightNav .companies .company_data .company_data_value {
-            float: left;
-            width: 50px; }
+            width: 70px; }
       .wrapper .main .rightNav .notifications {
+        margin-top: 1em;
         background-color: #636363;
         border: 0.5em dotted #404040;
         font-family: Pixel, cursive;
         font-size: 14px;
-        color: #a66c5a; }
+        color: #cc846e; }
         .wrapper .main .rightNav .notifications .messages {
           font-family: Pixel, cursive;
           font-size: 10px;
-          color: #a66c5a;
+          color: #cc846e;
           margin: 7px;
           overflow: auto;
           height: 230px; }
-  .wrapper .footer {
-    position: relative;
-    margin: 0 auto;
-    background: #636363;
-    font-family: Pixel, cursive;
-    font-size: 12px;
-    color: black;
-    text-align: center;
-    vertical-align: middle;
-    border: 0.5em dotted #404040;
-    color: white; }
-    .wrapper .footer .message {
-      position: relative;
-      margin: 0 auto;
-      text-align: center; }
-    .wrapper .footer .buttons {
-      position: absolute;
-      right: 0px;
-      top: 0px; }
-      .wrapper .footer .buttons .endgame_checkbox {
-        width: 150px;
-        float: right; }
-        .wrapper .footer .buttons .endgame_checkbox .endgame_lbl {
-          float: right; }

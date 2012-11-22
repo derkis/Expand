@@ -1,4 +1,7 @@
 .notifications
-	.title
-		Notifications
 	.messages
+	.notification_buttons
+		= button_to_function 'back', 'back_handler()', :id => 'back_button'
+		= button_to_function 'Forfeit', 'forfeit_handler()', :id => 'forfeit_button', :class => "image_button"
+		= button_to_function 'Lobby', 'lobby_handler()', :id => 'lobby_button', :class => "image_button"
+		= button_to_function 'next', 'next_handler()', :id => 'next_button'

@@ -186,12 +186,26 @@ class Game < ActiveRecord::Base
     self.update_attributes(:turn_id => turn.id)
   end
 
-  def pass_through(object)
-    object
-  end
+  # --------------------------------------------------
+  # Sanitizes the board for the provided user so they
+  # cannot see anyone else's tiles.
+  # --------------------------------------------------
+  def board (current_user)
+    # We need to sanitize the board of all other players tiles unless we are in debug_mode
+    return cur_turn.board if debug_mode
 
-  def board
-    cur_turn.board
+    sanitized_board = ""
+    index_okay = player_index_for(current_user)
+
+    cur_turn.board.chars.to_a.each do |c|
+      if !(c.to_i >= 0 && c.to_i <= 9) || c.to_i == index_okay
+        sanitized_board += c 
+      else
+        sanitized_board += "e"
+      end
+    end
+
+    return sanitized_board
   end
 
   def cur_turn_number
@@ -264,27 +278,37 @@ class Game < ActiveRecord::Base
   # Note: this function does not actually do any checks to see
   # whether the game is legally endable, it just ends the game as is
   # --------------------------------------------------  
-  def end_game()
-    data_hash = cur_turn.data_hash
+  def end_game(data_hash)
+    data_hash = cur_turn.data_hash if data_hash == nil
     
     return if data_hash.has_key? "game_over"
 
     data_hash["game_over"] = true
+    data_hash["state"] = Turn::GAME_OVER
 
-    Engine.add_notification(self, data_hash, "GAME HAS ENDED!", false)
+    Engine.clear_notifications(self, data_hash, false)
+    Engine.add_notification(self, data_hash, "<div class='end_game_header'>GAME HAS ENDED!</div>", false)
 
     # Award all majority / minorities to every player for ONLY established companies
     # (obviously some player may have a stock at this point in a company that is not
     # established)
     data_hash["companies"].each do |c_a, company|
       if company["size"] > 0
+        Engine.add_notification(self, data_hash, "<div class='end_game_result' style='color:" + company['color'] + "'>" + company["name"] + " Awards</div>", false)
         Engine.award_majority_minority(self, data_hash, c_a)
 
         # Now sell every player's stock in every company
         data_hash["players"].each_with_index do |player, i|
           stock = (player["stock_count"].has_key?(c_a) && player["stock_count"][c_a].to_i > 0) ? player["stock_count"][c_a] : 0
           if stock > 0
-            Engine.add_notification(self, data_hash, player_by_index(player["index"].to_i).user.email + " sells " + stock.to_s + " in " + Engine.company_html(company) + ".", false)
+            Engine.add_notification(self, data_hash, player_by_index(player["index"].to_i).user.email \
+              + " sells " \
+              + stock.to_s \
+              + " in " \
+              + Engine.company_html(company) \
+              + " for $" \
+              + (stock * cur_turn.stock_value_for(c_a)).to_s \
+              + ".", false)
             player["money"] += stock * cur_turn.stock_value_for(c_a)
             player["stock_count"][c_a] -= stock
             company["stock_count"] += stock
@@ -293,14 +317,20 @@ class Game < ActiveRecord::Base
       end
     end
 
-    Engine.add_notification(self, data_hash, "FINAL RESULTS:", false)
-
-    # Sort all the players by their total assets
+    Engine.add_notification(self, data_hash, "<div class='end_game_header'>FINAL RESULTS:</div>", false)
     players_ordered_by_money = data_hash["players"].dup
+
     players_ordered_by_money.sort! { |a,b| b["money"] <=> a["money"] }
 
+    winning_asset_value = players_ordered_by_money[0]["money"]
+    data_hash["winner"] = "";
+
     players_ordered_by_money.each_with_index do |p, i|
-      Engine.add_notification(self, data_hash, (i + 1).to_s + ")" + player_by_index(p["index"].to_i).user.email + " $" + p["money"].to_s, false)
+      Engine.add_notification(self, data_hash, "<div class='end_game_result'>" + (i + 1).to_s + ") " + player_by_index(p["index"].to_i).user.email + " $" + p["money"].to_s + "</div>", false)
+      if p["money"] == winning_asset_value
+        data_hash["winner"] += ", " if data_hash["winner"].length > 0
+        data_hash["winner"] += player_by_index(p["index"].to_i).user.email
+      end
     end
 
     cur_turn.serialize_data_hash(data_hash)

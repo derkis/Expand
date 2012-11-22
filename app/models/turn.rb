@@ -38,6 +38,7 @@ class Turn < ActiveRecord::Base
 	MERGE_CHOOSE_COMPANY_ORDER	= 520
 	MERGE_CHOOSE_STOCK_OPTIONS	= 550
 	GAME_OVER					= 600
+	FORFEIT						= 700
 
 	PIECE_PLACED 				= 0
 	COMPANY_STARTED 			= 1
@@ -565,6 +566,6 @@ class Turn < ActiveRecord::Base
 	end
 
 	def get_tile_name(row, column)
-		return (65 + row.to_i).chr.to_s + "-" + (column + 1).to_s
+		return (65 + row.to_i).chr.to_s + (column + 1).to_s
 	end
 end

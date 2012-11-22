@@ -1,5 +1,6 @@
 .players
 	- @game.players.each_with_index do |player, i|
-		.player{ :player_id => player.id, :player_index => i }
+		.player{ :player_id => player.id, :player_index => i, :style => "width: #{100 / @game.players.size}%;" }
 			= player.user[:email]
 		.player_money{:player_index => i}
+	.clear{:style=>"clear:both;"}

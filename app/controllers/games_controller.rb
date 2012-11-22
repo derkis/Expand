@@ -56,16 +56,15 @@ class GamesController < ApplicationController
 
       format.json do
         render :json => @game.build_json({
-          :include => [:template, :players], 
+          :include => [:template, {:players => {:include => [:user] } }], 
           :methods => [
             :debug_mode,
             :cur_turn_number,
             :cur_player_index,
             :can_end_game,
-            { :name => :pass_through, :arguments => [current_user] },
             { :name => :user_player_index, :arguments => [current_user] },
             :last_action,
-            :board,
+            { :name => :board, :arguments => [current_user] },
             { :name => :cur_data, :arguments => [current_user] }
           ]
         })

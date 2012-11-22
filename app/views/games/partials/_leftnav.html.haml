@@ -1,41 +1,43 @@
 .leftnav
+
 	.player_status
-		.player_status_lbl
-		%br
-		%br
+		.player_status_lbl{:class => "section_header"}
 		.player_companies_header
-			.h1{:style=>"float:left; width:140px; height:25px;"}
+			.h1{:style=>"float:left; width:130px; height:25px;"}
 				Company
-			.h2{:style=>"float:left; width:60px;"}
-				Owned
+			.h2{:style=>"float:left; width:90px;"}
+				Stock
 			.h3{:style=>"float:left;"}
-				Value
+				Total
+		.clear{:style=>"clear:both;"}
 		.player_companies
 			- @cur_turn.data_hash["companies"].each do |key, value|
 				.player_stock_in_company_main{:company_abbr=>"#{key}", :style=>"color: #{value['color']};"}
-					.player_stock_in_company_lbl{:company_abbr=>"#{key}", :style=>"float: left; width:140px; height:25px;"}
+					.player_stock_in_company_lbl{:company_abbr=>"#{key}", :style=>"float: left; width:130px; height:25px;"}
 						= value["name"]
-					.player_stock_in_company{:company_abbr=>"#{key}", :style=>"float: left; width:60px;"}
+					.player_stock_in_company{:company_abbr=>"#{key}", :style=>"float: left; width:90px;"}
 						0
-					.player_stock_in_company_value{:company_abbr=>"#{key}", :style=>"float: left; width:60px;"}
+					.company_stock_purchased{:company_abbr=>"#{key}", :style=>"float: left; display:none;"}
+						= button_to_function '-', 'sub_stock_for(\'' + key + '\')', :style=>"position:absolute;right:123px;", :company_abbr=>"#{key}", :class => "sub_stock"
+						= button_to_function '+', 'add_stock_for(\'' + key + '\')', :style=>"position:absolute;right:97px;", :company_abbr=>"#{key}", :class => "add_stock"
+					.player_stock_in_company_value{:company_abbr=>"#{key}", :style=>"text-align:right; margin-right:0.5em;"}
 						0
-					.company_stock_purchased{:company_abbr=>"#{key}", :style=>"float: left;"}
-						= button_to_function '-', 'sub_stock_for(\'' + key + '\')', :style=>"float:left;"
-						= button_to_function '+', 'add_stock_for(\'' + key + '\')', :style=>"float:left;"
+				.clear{:style=>"clear:both;"}
+		.clear{:style=>"clear:both;"}
 		.money_section
 			.money_lbl{:style=>"float:left; width:140px; height:25px;"}
-				Cash on Hand
-			.money_skip{:style=>"float:left; width:60px;"}
+				Cash
+			.money_skip{:style=>"float:left; width:80px;"}
 				&nbsp;
-			.money{:style=>"float:left;"}
-		.total_section
-			.total_lbl{:style=>"float:left; width:140px; height:25px;"}
-				Assets
-			.total_skip{:style=>"float:left; width:60px;"}
-				&nbsp;
-			.total_assets{:style=>"float:left;"}
+			.money{:style=>"text-align:right; margin-right:0.5em;"}
 		.clear{:style=>"clear:both;"}
-		= button_to_function 'input', 'input_handler()', :id => 'turn_button', :class => 'image_button'
+		.total_section
+			.total_lbl{:style=>"float:left; width:200px; height:25px;"}
+				Total
+			.total_assets{:style=>"text-align:right; margin-right:0.5em;"}
+		.clear{:style=>"clear:both;"}
+		= button_to_function 'End Game', 'end_game_handler()', :id => 'endgame_button', :class => 'image_button endgame_button'
+		= button_to_function 'End Turn', 'input_handler()', :id => 'turn_button', :class => 'image_button turn_button'
 		.clear{:style=>"clear:both;"}
 	.merge_company_order_chooser
 		.label
@@ -60,30 +62,33 @@
 		.stock_company_from
 		%br
 		.stock_keep
-			.stock_keep_lbl{:style=>"float:left; width:100px;"}
-				Keeping:&nbsp;
-			.stock_keep_count{:style=>"float:left; width:30px;"}
+			.stock_keep_lbl{:style=>"float:left; width:140px;"}
+				Keep:&nbsp;
+			.stock_keep_count{:style=>"float:left; width:23px;"}
 			.stock_keep_company{:style=>"float:left;"}
-			.clear{:style=>"clear:both;"}
+		.clear{:style=>"clear:both;"}
 		.stock_gain
-			.stock_gain_lbl{:style=>"float:left; width:100px;"}
-				Getting:&nbsp;
-			.stock_gain_count{:style=>"float:left; width:30px;"}
+			.stock_gain_lbl{:style=>"float:left; width:140px;"}
+				Get:&nbsp;
+			.stock_gain_count{:style=>"float:left; width:23px;"}
 			.stock_gain_company{:style=>"float:left;"}
+		.clear{:style=>"clear:both;"}
 		.stock_split
-			.stock_split_lbl{:style=>"float:left; width:100px;"}
-				Split(2 > 1):
-			.stock_split_count{:style=>"float:left; width:30px;"}
+			.stock_split_lbl{:style=>"float:left; width:140px;"}
+				Split (2-for-1):
+			.stock_split_count{:style=>"float:left; width:60px;"}
 			.stock_split_buttons{:style=>"float:left;"}
 				= button_to_function '-', 'sub_stock_split_handler()', :id => 'sub_stock_split_button'
 				= button_to_function '+', 'add_stock_split_handler()', :id => 'add_stock_split_button'
+		.clear{:style=>"clear:both;"}
 		.stock_sell
-			.stock_sell_lbl{:style=>"float:left; width:100px;"}
-				Selling:
-			.stock_sell_count{:style=>"float:left; width:30px;"}
+			.stock_sell_lbl{:style=>"float:left; width:140px;"}
+				Sell:
+			.stock_sell_count{:style=>"float:left; width:60px;"}
 			.stock_sell_buttons{:style=>"float:left;"}
 				= button_to_function '-', 'sub_stock_sell_handler()', :id => 'sub_stock_sell_button'
 				= button_to_function '+', 'add_stock_sell_handler()', :id => 'add_stock_sell_button'
-			.clear{:style=>"clear:both;"}
-		.stock_sell_buttons{:style=>"float:left;"}
-		= button_to_function 'Apply', 'input_handler()', :id => 'stock_option_button', :class => 'image_button'
+		.clear{:style=>"clear:both;"}
+		.note
+			Keep a couple stock to have an upper hand if the merged company is started again. Split stock 2-for-1 to boost your investment in the standing company.
+		= button_to_function 'Done', 'input_handler()', :id => 'stock_option_button', :class => 'image_button'

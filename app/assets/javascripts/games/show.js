@@ -83,6 +83,8 @@ var merge_order_rendered = false;
 
 var merge_order_custom = null;
 
+var end_game = false;
+
 //------------------------------------------------------------------------------------------
 //
 // Initialization
@@ -119,6 +121,9 @@ var TURN_TYPES = {
             render_merge_company_chooser(false);
             render_merge_order_chooser(false);
             render_button("Place", false);
+        },
+        turn_label: function() {
+            return is_my_turn() ? "Place a tile..." : active_player_name() + " is placing a tile";
         }
     },
     
@@ -140,7 +145,13 @@ var TURN_TYPES = {
         },
         render: function(game_state) {
             render_button("Start", false);
+            render_stock_option_chooser(false);
+            render_merge_order_chooser(false);
+            render_merge_company_chooser(false);
             render_start_company_at(game_state.last_action.row, game_state.last_action.column, game_state);
+        },
+        turn_label: function() {
+            return is_my_turn() ? "Start a company..." : active_player_name() + " is choosing a company to start";
         }
     },
     
@@ -158,12 +169,13 @@ var TURN_TYPES = {
         render: function(game_state) {
             render_stock_option_chooser(false);
             render_merge_company_chooser(false);
-            render_button("Purchase", true);
+            render_merge_order_chooser(false);
+            
+            render_button("End Turn", true);
+        },
+        turn_label: function() {
+            return is_my_turn() ? "Purchase stocks and end turn..." : active_player_name() + " is purchasing stocks and ending the turn";
         }
-    },
-    
-    "400": {
-        name: 'trade_stock'
     },
     
     "500": {
@@ -180,6 +192,9 @@ var TURN_TYPES = {
         {
             render_merge_company_chooser(true);
             render_button("Purchase", false);
+        },
+        turn_label: function() {
+            return is_my_turn() ? "Choose an acquiring company..." : active_player_name() + " is choosing acquiring company";
         }
     },
     "520": {
@@ -201,6 +216,9 @@ var TURN_TYPES = {
             render_stock_option_chooser(false);
             render_merge_company_chooser(false);
             render_button("Purchase", false);
+        },
+        turn_label: function() {
+            return is_my_turn() ? "Choose merge order... " : active_player_name() + " is choosing merge order";
         }
     },
 
@@ -226,6 +244,9 @@ var TURN_TYPES = {
             render_merge_company_chooser(false);
             render_merge_order_chooser(false);
             render_button("Purchase", false);
+        },
+        turn_label: function() {
+            return is_my_turn() ? "Choose stock options... " : active_player_name() + " is choosing merge stock options";
         }
     },
     "600": {
@@ -240,6 +261,40 @@ var TURN_TYPES = {
         },
         render: function(game_state)
         {
+            $("#forfeit_button").hide();
+            $("#lobby_button").show();
+
+            render_stock_option_chooser(false)
+            render_merge_company_chooser(false);
+            render_merge_order_chooser(false);
+            render_button("Place", false);
+        },
+        turn_label: function() {
+            return "Game Over. " + cur_game_state.cur_data.winner + " wins!";
+        }
+    },
+    "700": {
+        name: 'forfeit',
+        message: "The game has ended!",
+        get_action: function()
+        {
+            return {};
+        },
+        after_action: function()
+        {
+        },
+        render: function(game_state)
+        {
+            $("#forfeit_button").hide();
+            $("#lobby_button").show();
+
+            render_stock_option_chooser(false)
+            render_merge_company_chooser(false);
+            render_merge_order_chooser(false);
+            render_button("Place", false);
+        },
+        turn_label: function() {
+            return cur_game_state.cur_data["forfeited_by"] + " Forfeited. " + cur_game_state.cur_data.winner + " wins!";
         }
     }
 };
@@ -249,6 +304,21 @@ var TURN_TYPES = {
 // Methods
 //
 //------------------------------------------------------------------------------------------
+function active_player_name()
+{
+    return cur_game_state.players[get_active_player_index()].user.email;
+}
+
+function get_active_player_index()
+{
+    if (cur_game_state.cur_data["merge_state"] && cur_game_state.cur_data["merge_state"]["stock_option_player_index"] >= 0)
+    {
+        return cur_game_state.cur_data["merge_state"]["stock_option_player_index"];
+    }
+
+    return cur_game_state.cur_player_index;
+}
+
 function get_player_index()
 {
     if (temp_player_index != -1)
@@ -300,7 +370,8 @@ function send_game_update(custom)
                             'actions': cur_turn_type.get_action(),
                         };
 
-    json_update["actions"]["end_game"] = $('#cb_endgame').is(':checked') && cur_game_state.can_end_game
+    json_update["actions"]["end_game"] = end_game;
+    end_game = false;
 
     data_sent = true;
 
@@ -324,6 +395,8 @@ function reset_game()
 
 function render_all(game_state)
 {
+    $("#lobby_button").hide();
+
     render_board();
     render_players(game_state.cur_data.players);
     render_status();
@@ -480,7 +553,7 @@ function render_stock_option_chooser_counts()
 
 function render_stock() 
 {
-    var total_assets = get_cur_money();
+    var total_assets = get_cur_money() - stock_purchased_cost + stock_sell_cost;
 
     for (var key in cur_game_state.cur_data.companies)
     {
@@ -492,9 +565,10 @@ function render_stock()
 
         if (company.size > 0 || get_cur_stock_in(key) > 0)
         {
+            stock_being_purchased = (!isNaN(stock_purchased_by_abbr[key]) ? stock_purchased_by_abbr[key] : 0);
             div_player_stock_in_company_main.show();
-            div_player_stock_in_company.text(get_cur_stock_in(key) + (!isNaN(stock_purchased_by_abbr[key]) ? stock_purchased_by_abbr[key] : 0) );
-            value = get_cur_stock_in(key) * get_company_value_for(key).cost;
+            div_player_stock_in_company.text(get_cur_stock_in(key) + stock_being_purchased );
+            value = (get_cur_stock_in(key) + stock_being_purchased) * get_company_value_for(key).cost;
             if (company.size > 0)
             {
                 total_assets += value;
@@ -537,14 +611,21 @@ function render_company_start()
 
 function render_stock_purchasing()
 {
+    $(".endgame_button").hide();
+
     for (var key in cur_game_state.cur_data.companies)
     {
         var company = get_company(key);
         var div_company_stock_purchased = $(".company_stock_purchased[company_abbr='" + key + "']");
 
-        if (company.size && cur_game_state.cur_data.state == 300 && is_my_turn())
+        if (company.size > 0 && cur_game_state.cur_data.state == 300 && is_my_turn())
         {
             div_company_stock_purchased.show();
+
+            if (cur_game_state.can_end_game)
+            {
+                $(".endgame_button").show();
+            }
         }
         else
         {
@@ -642,20 +723,19 @@ function render_cell(cell, cell_type, row, column)
     }
 }
 
+function get_turn_text()
+{
+    return cur_turn_type.turn_label();
+}
+
 function render_status()
 {
-    $('.turn_label').text("Turn: " + (cur_game_state.cur_turn_number + 1));
+    document.title = "Expand: " + get_turn_text();
+
+    $('.turn_label').text("Turn " + (cur_game_state.cur_turn_number + 1) + ": " + get_turn_text());
     $('.money').text("$" + (get_cur_money() - stock_purchased_cost + stock_sell_cost));
     var txt = $(".player[player_index='" + get_player_index() + "']").text();
     $('.player_status_lbl').text(txt);
-    if (!cur_game_state.can_end_game)
-    {
-        $(".endgame_checkbox").hide();
-    }
-    else
-    {
-        $(".endgame_checkbox").show();
-    }
 }
 
 function render_notifications()
@@ -697,27 +777,6 @@ function render_players()
 
 function render_message()
 {
-    if (cur_game_state.cur_data.game_over)
-    {
-        $(".message").text("The game has ended!");
-        return;
-    }
-
-    if (is_my_turn())
-    {
-        var msg = cur_turn_type.message;
-
-        if (message_temp)
-        {
-            msg = message_temp;
-        }
-
-        $(".message").text(msg);
-    }
-    else
-    {
-        $(".message").text("It is not your turn.");
-    }
 }
 
 function render_start_company_at(row, column, game_state)
@@ -986,10 +1045,6 @@ function load_game_state_resultHandler(game_state)
 
     if (cur_game_state.cur_data["forfeited_by"])
     {
-        $("#forfeited_popup").bPopup({modalClose: false});
-        $(".forfeited_lbl").text("The game was forfeited by " + cur_game_state.cur_data["forfeited_by"] + ". That frickin' loser.");
-
-        return;
     }
 
     cur_turn_type = TURN_TYPES[cur_game_state.cur_data.state.toString()];
@@ -1146,6 +1201,12 @@ function input_handler()
     send_game_update();
 }
 
+function end_game_handler()
+{
+    end_game = true;
+    send_game_update();
+}
+
 function back_handler()
 {
     send_game_update({previous_turn: true});
@@ -1158,7 +1219,18 @@ function next_handler()
 
 function forfeit_handler()
 {
+    $("#forfeit_popup").bPopup({modalClose: false});
+}
+
+function forfeit_confirm_handler()
+{
     send_game_update({forfeit: true});
+    $("#forfeit_popup").bPopup().close();
+}
+
+function forfeit_disconfirm_handler()
+{
+    $("#forfeit_popup").bPopup().close();
 }
 
 function start_company_click_handler()
@@ -1279,4 +1351,9 @@ function merge_order_up_handler(event)
     merge_order_custom = cur_merge_order;
 
     render_merge_order_chooser(true);
+}
+
+function lobby_handler()
+{
+    document.URL = "/portal";
 }
