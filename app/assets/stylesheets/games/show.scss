@@ -10,7 +10,7 @@ $cell_height: 43px;
 .title_image
 {
 	position: absolute;
-	left: -90px;
+	left: 0px;
 	top: -50px;
 }
 
@@ -96,7 +96,7 @@ $cell_height: 43px;
 
 .wrapper
 {
-	width: 70em;
+	width: 80em;
 	margin: 0 auto;
 	background: $dark_background;
 
@@ -116,7 +116,7 @@ $cell_height: 43px;
 		.leftnav
 		{
 			position: absolute;
-			top: 2em; left: -100px;
+			top: 2em; left: 0px;
 
 			.player_status
 			{
@@ -237,7 +237,7 @@ $cell_height: 43px;
 
 		.rightNav {
 			position: absolute;
-			top: 2em; right: -90px;
+			top: 2em; right: 0px;
 			width:300px;
 
 			.companies {

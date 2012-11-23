@@ -9,7 +9,7 @@ String.prototype.format = function() {
 var fade_speed = 75;
 var max_user_columns = 4;
 var friends_list_base_height;
-var polling_speed = 5000
+var polling_speed = 2000
 
 var game_state = {
 	proposed: 0, ready: 1, starting: 2, started: 3, finished: 4, canceled: 5
@@ -205,7 +205,7 @@ function start_or_cancel_game(game_id, should_start) {
 
 // show various invitation types
 function show_game_invite_for_players(this_player, players) {
-	var players_string = players_string_from_array(players, '\n', '');
+	var players_string = players_string_from_array(players, '\n', ',');
 	var player_id = this_player['player_id'], game_id = this_player['game_id'];
 
 	var game_invite_options = {

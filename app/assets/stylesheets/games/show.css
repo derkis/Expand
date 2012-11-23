@@ -9,7 +9,7 @@
 
 .title_image {
   position: absolute;
-  left: -90px;
+  left: 0px;
   top: -50px; }
 
 #start_company_popup {
@@ -85,7 +85,7 @@
   color: #db7556; }
 
 .wrapper {
-  width: 70em;
+  width: 80em;
   margin: 0 auto;
   background: #404040; }
   .wrapper .main {
@@ -102,7 +102,7 @@
     .wrapper .main .leftnav {
       position: absolute;
       top: 2em;
-      left: -100px; }
+      left: 0px; }
       .wrapper .main .leftnav .player_status {
         background: #636363;
         border: 0.5em dotted #404040;
@@ -181,7 +181,7 @@
     .wrapper .main .rightNav {
       position: absolute;
       top: 2em;
-      right: -90px;
+      right: 0px;
       width: 300px; }
       .wrapper .main .rightNav .companies {
         background-color: #636363;
